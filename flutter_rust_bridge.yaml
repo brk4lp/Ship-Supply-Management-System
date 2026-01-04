@@ -1,0 +1,20 @@
+# Flutter Rust Bridge Configuration
+# https://cjycode.com/flutter_rust_bridge/
+
+# Rust input - API file that exposes functions to Dart
+rust_input: crate::api
+
+# Rust root path
+rust_root: backend
+
+# Dart output directory
+dart_output: frontend/lib/src/rust
+
+# Full dependency mode - analyzes all dependencies
+full_dep: false
+
+# Dart 3 support
+dart3: true
+
+# Add mod to lib.rs automatically
+add_mod_to_lib: true

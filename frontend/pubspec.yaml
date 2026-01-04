@@ -1,0 +1,54 @@
+name: ssms_frontend
+description: Ship Supply Management System - Desktop & iOS App
+publish_to: 'none'
+version: 0.1.0
+
+environment:
+  sdk: '>=3.0.0 <4.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # Flutter Rust Bridge
+  flutter_rust_bridge: ^2.11.1
+
+  # State Management
+  flutter_riverpod: ^2.4.9
+  riverpod_annotation: ^2.3.3
+
+  # Networking (for fallback/remote APIs)
+  dio: ^5.4.0
+
+  # Data Grid (Windows Desktop)
+  pluto_grid: ^8.0.0
+
+  # Calendar (Port/Ship Timeline)
+  syncfusion_flutter_calendar: ^31.1.19
+
+  # UI/Styling - "Linear Aesthetic"
+  flex_color_scheme: ^8.0.0
+  google_fonts: ^6.1.0
+
+  # Utilities
+  intl: ^0.20.2
+  freezed_annotation: ^2.4.1
+  json_annotation: ^4.8.1
+  go_router: ^13.0.1
+  shared_preferences: ^2.2.2
+  ffi: ^2.1.0
+  
+  # Icons
+  cupertino_icons: ^1.0.6
+
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+  flutter_lints: ^3.0.1
+  build_runner: ^2.4.8
+  freezed: ^2.4.6
+  json_serializable: ^6.7.1
+  riverpod_generator: ^2.3.9
+
+flutter:
+  uses-material-design: true

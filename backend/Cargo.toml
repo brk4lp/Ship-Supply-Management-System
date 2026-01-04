@@ -1,0 +1,50 @@
+[package]
+name = "ssms_core"
+version = "0.1.0"
+edition = "2021"
+description = "Ship Supply Management System - Core Business Logic"
+authors = ["SSMS Team"]
+
+[lib]
+crate-type = ["cdylib", "staticlib"]
+
+# Disable default binary target (we only need the library)
+[[bin]]
+name = "ssms_core"
+path = "src/main.rs"
+required-features = ["binary"]
+
+[features]
+default = []
+binary = []
+
+[dependencies]
+# Flutter Rust Bridge
+flutter_rust_bridge = "=2.11.1"
+
+# Database
+sea-orm = { version = "1.1", features = ["sqlx-postgres", "sqlx-sqlite", "runtime-tokio-rustls", "macros"] }
+
+# Async Runtime
+tokio = { version = "1.35", features = ["full"] }
+
+# Serialization
+serde = { version = "1.0", features = ["derive"] }
+serde_json = "1.0"
+
+# Configuration
+dotenvy = "0.15"
+
+# Logging
+tracing = "0.1"
+tracing-subscriber = { version = "0.3", features = ["env-filter"] }
+
+# Utilities
+uuid = { version = "1.6", features = ["v4", "serde"] }
+chrono = { version = "0.4", features = ["serde"] }
+thiserror = "2.0"
+anyhow = "1.0"
+rust_decimal = { version = "1.33", features = ["serde"] }
+
+[dev-dependencies]
+tokio-test = "0.4"
