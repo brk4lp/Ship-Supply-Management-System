@@ -44,6 +44,20 @@ pub async fn delete_ship(id: i32) -> Result<bool, String> {
         .map_err(|e| e.to_string())
 }
 
+/// Search ships by name, IMO or flag
+pub async fn search_ships(query: String) -> Result<Vec<Ship>, String> {
+    services::ship_service::search(&query)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Get total ship count
+pub async fn get_ship_count() -> Result<i64, String> {
+    services::ship_service::count()
+        .await
+        .map_err(|e| e.to_string())
+}
+
 // ============================================================================
 // Order Operations
 // ============================================================================
@@ -139,11 +153,21 @@ pub async fn create_supplier(supplier: CreateSupplierRequest) -> Result<Supplier
 // Database Initialization
 // ============================================================================
 
-/// Initialize the database connection
+/// Initialize the database connection with custom URL
 pub async fn init_database(database_url: String) -> Result<(), String> {
     crate::database::init(&database_url)
         .await
         .map_err(|e| e.to_string())
+}
+
+/// Initialize SQLite database with default local path
+pub async fn init_local_database() -> Result<String, String> {
+    crate::database::init_sqlite()
+        .await
+        .map_err(|e| e.to_string())?;
+    
+    let path = crate::database::get_default_db_path();
+    Ok(format!("SQLite database initialized at: {}", path.display()))
 }
 
 /// Check if database is connected

@@ -1,7 +1,7 @@
 # 🚢 Ship Supply Management System (SSMS) - Proje Yol Haritası
 
-> **Son Güncelleme:** 4 Ocak 2026  
-> **Proje Durumu:** 🟡 Aktif Geliştirme (Faz 1)
+> **Son Güncelleme:** 5 Ocak 2026  
+> **Proje Durumu:** 🟢 Aktif Geliştirme (Faz 2)
 
 ---
 
@@ -52,27 +52,30 @@ SSMS, gemi kumanyacılığı (ship chandler) operasyonlarını dijitalleştiren,
 - [x] Temel sayfalar (Dashboard, Orders, Ships, Suppliers, Calendar)
 - [x] OrderStatus state machine tasarımı
 - [x] SeaORM entity tanımlamaları
+- [x] **Flutter Rust Bridge (FRB) v2.11.1 entegrasyonu** ✅
+- [x] **Dart binding'leri otomatik oluşturma** ✅
+- [x] **Windows FFI bağlantısı (DLL)** ✅
+- [x] **FRB API testleri** ✅
 
 ### Bekleyen Kritik İşler
-- [ ] Flutter Rust Bridge (FRB) entegrasyonu
-- [ ] PostgreSQL veritabanı bağlantısı
-- [ ] CRUD operasyonları
+- [ ] PostgreSQL/SQLite veritabanı bağlantısı
+- [ ] CRUD operasyonları (Ships, Orders)
 - [ ] Kimlik doğrulama sistemi
 
 ---
 
-## 🔷 Faz 1: Temel Altyapı (Q1 2026)
+## ✅ Faz 1: Temel Altyapı (Q1 2026) - TAMAMLANDI
 
-### 1.1 Flutter Rust Bridge Kurulumu
-**Süre:** 2 hafta | **Öncelik:** 🔴 Kritik
+### 1.1 Flutter Rust Bridge Kurulumu ✅
+**Süre:** 2 hafta | **Öncelik:** 🔴 Kritik | **Tamamlanma:** 5 Ocak 2026
 
 | Görev | Durum | Açıklama |
 |-------|-------|----------|
-| FRB v2 konfigürasyonu | ⬜ | `flutter_rust_bridge_codegen` kurulumu |
-| Rust library derleme | ⬜ | `cdylib` + `staticlib` output |
-| Dart binding oluşturma | ⬜ | Otomatik kod üretimi |
-| Windows entegrasyonu | ⬜ | DLL yükleme ve FFI bağlantısı |
-| Temel API testleri | ⬜ | Ping/pong, basit veri transferi |
+| FRB v2 konfigürasyonu | ✅ | `flutter_rust_bridge_codegen` v2.11.1 kuruldu |
+| Rust library derleme | ✅ | `cdylib` + `staticlib` output (ssms_core.dll) |
+| Dart binding oluşturma | ✅ | api.dart, models.dart, frb_generated.dart |
+| Windows entegrasyonu | ✅ | DLL yükleme ve FFI bağlantısı çalışıyor |
+| Temel API testleri | ✅ | greet(), getVersion() testleri başarılı |
 
 **Teknik Detaylar:**
 ```yaml

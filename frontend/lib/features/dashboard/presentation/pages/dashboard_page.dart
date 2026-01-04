@@ -15,20 +15,31 @@ class DashboardPage extends StatefulWidget {
 class _DashboardPageState extends State<DashboardPage> {
   String _rustVersion = 'Yükleniyor...';
   String _greetMessage = '';
+  int _shipCount = 0;
+  bool _dbConnected = false;
 
   @override
   void initState() {
     super.initState();
-    _testRustBridge();
+    _loadData();
   }
 
-  Future<void> _testRustBridge() async {
+  Future<void> _loadData() async {
     try {
       final version = await rust_api.getVersion();
       final greeting = await rust_api.greet(name: 'SSMS Kullanıcısı');
+      final dbConnected = await rust_api.isDatabaseConnected();
+      
+      int shipCount = 0;
+      if (dbConnected) {
+        shipCount = (await rust_api.getShipCount()).toInt();
+      }
+      
       setState(() {
         _rustVersion = version;
         _greetMessage = greeting;
+        _dbConnected = dbConnected;
+        _shipCount = shipCount;
       });
     } catch (e) {
       setState(() {
@@ -65,7 +76,7 @@ class _DashboardPageState extends State<DashboardPage> {
         actions: [
           IconButton(
             icon: const Icon(Icons.refresh, color: AppTheme.secondaryText),
-            onPressed: _testRustBridge,
+            onPressed: _loadData,
             tooltip: 'Yenile',
           ),
           const SizedBox(width: 8),
@@ -80,6 +91,7 @@ class _DashboardPageState extends State<DashboardPage> {
             _FRBStatusBanner(
               version: _rustVersion,
               message: _greetMessage,
+              dbConnected: _dbConnected,
             ),
             const SizedBox(height: 16),
             // Summary Cards Row
@@ -108,7 +120,7 @@ class _DashboardPageState extends State<DashboardPage> {
                 const SizedBox(width: 16),
                 Expanded(child: _SummaryCard(
                   title: 'Toplam Gemi',
-                  value: '0',
+                  value: '$_shipCount',
                   icon: Icons.directions_boat_outlined,
                   color: const Color(0xFF0EA5E9),
                 )),
@@ -318,10 +330,12 @@ class _MobileSummaryCard extends StatelessWidget {
 class _FRBStatusBanner extends StatelessWidget {
   final String version;
   final String message;
+  final bool dbConnected;
 
   const _FRBStatusBanner({
     required this.version,
     required this.message,
+    this.dbConnected = false,
   });
 
   @override
@@ -362,16 +376,34 @@ class _FRBStatusBanner extends StatelessWidget {
                     color: AppTheme.primaryText,
                   ),
                 ),
-                if (message.isNotEmpty) ...[
-                  const SizedBox(height: 4),
-                  Text(
-                    message,
-                    style: GoogleFonts.inter(
-                      fontSize: 12,
-                      color: AppTheme.secondaryText,
+                const SizedBox(height: 4),
+                Row(
+                  children: [
+                    Icon(
+                      dbConnected ? Icons.storage : Icons.storage_outlined,
+                      size: 14,
+                      color: dbConnected ? const Color(0xFF10B981) : AppTheme.secondaryText,
                     ),
-                  ),
-                ],
+                    const SizedBox(width: 4),
+                    Text(
+                      dbConnected ? 'SQLite Bağlı' : 'Veritabanı Bekleniyor',
+                      style: GoogleFonts.inter(
+                        fontSize: 12,
+                        color: dbConnected ? const Color(0xFF10B981) : AppTheme.secondaryText,
+                      ),
+                    ),
+                    if (message.isNotEmpty) ...[
+                      const SizedBox(width: 12),
+                      Text(
+                        '• $message',
+                        style: GoogleFonts.inter(
+                          fontSize: 12,
+                          color: AppTheme.secondaryText,
+                        ),
+                      ),
+                    ],
+                  ],
+                ),
               ],
             ),
           ),

@@ -63,6 +63,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected int dco_decode_i_32(dynamic raw);
 
+@protected PlatformInt64 dco_decode_i_64(dynamic raw);
+
 @protected ItemProfit dco_decode_item_profit(dynamic raw);
 
 @protected List<Order> dco_decode_list_order(dynamic raw);
@@ -143,6 +145,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected int sse_decode_i_32(SseDeserializer deserializer);
 
+@protected PlatformInt64 sse_decode_i_64(SseDeserializer deserializer);
+
 @protected ItemProfit sse_decode_item_profit(SseDeserializer deserializer);
 
 @protected List<Order> sse_decode_list_order(SseDeserializer deserializer);
@@ -222,6 +226,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 @protected void sse_encode_f_64(double self, SseSerializer serializer);
 
 @protected void sse_encode_i_32(int self, SseSerializer serializer);
+
+@protected void sse_encode_i_64(PlatformInt64 self, SseSerializer serializer);
 
 @protected void sse_encode_item_profit(ItemProfit self, SseSerializer serializer);
 

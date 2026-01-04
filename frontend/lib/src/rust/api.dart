@@ -26,6 +26,14 @@ Future<Ship> updateShip({required int id, required UpdateShipRequest ship}) =>
 Future<bool> deleteShip({required int id}) =>
     RustLib.instance.api.crateApiDeleteShip(id: id);
 
+/// Search ships by name, IMO or flag
+Future<List<Ship>> searchShips({required String query}) =>
+    RustLib.instance.api.crateApiSearchShips(query: query);
+
+/// Get total ship count
+Future<PlatformInt64> getShipCount() =>
+    RustLib.instance.api.crateApiGetShipCount();
+
 /// Get all orders with optional status filter
 Future<List<Order>> getAllOrders({OrderStatus? statusFilter}) =>
     RustLib.instance.api.crateApiGetAllOrders(statusFilter: statusFilter);
@@ -79,9 +87,13 @@ Future<List<Supplier>> getAllSuppliers() =>
 Future<Supplier> createSupplier({required CreateSupplierRequest supplier}) =>
     RustLib.instance.api.crateApiCreateSupplier(supplier: supplier);
 
-/// Initialize the database connection
+/// Initialize the database connection with custom URL
 Future<void> initDatabase({required String databaseUrl}) =>
     RustLib.instance.api.crateApiInitDatabase(databaseUrl: databaseUrl);
+
+/// Initialize SQLite database with default local path
+Future<String> initLocalDatabase() =>
+    RustLib.instance.api.crateApiInitLocalDatabase();
 
 /// Check if database is connected
 Future<bool> isDatabaseConnected() =>

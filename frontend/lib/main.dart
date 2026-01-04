@@ -4,12 +4,21 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'core/router/app_router.dart';
 import 'core/theme/app_theme.dart';
 import 'src/rust/frb_generated.dart';
+import 'src/rust/api.dart' as rust_api;
 
 Future<void> main() async {
   WidgetsFlutterBinding.ensureInitialized();
   
   // Initialize Flutter Rust Bridge
   await RustLib.init();
+  
+  // Initialize SQLite database
+  try {
+    final result = await rust_api.initLocalDatabase();
+    debugPrint('Database initialized: $result');
+  } catch (e) {
+    debugPrint('Database initialization error: $e');
+  }
   
   runApp(
     const ProviderScope(
