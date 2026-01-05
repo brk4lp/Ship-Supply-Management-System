@@ -31,6 +31,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected bool dco_decode_bool(dynamic raw);
 
+@protected bool dco_decode_box_autoadd_bool(dynamic raw);
+
 @protected CreateOrderItemRequest dco_decode_box_autoadd_create_order_item_request(dynamic raw);
 
 @protected CreateOrderRequest dco_decode_box_autoadd_create_order_request(dynamic raw);
@@ -39,7 +41,13 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected CreateSupplierRequest dco_decode_box_autoadd_create_supplier_request(dynamic raw);
 
+@protected CreateSupplyItemRequest dco_decode_box_autoadd_create_supply_item_request(dynamic raw);
+
+@protected DeliveryType dco_decode_box_autoadd_delivery_type(dynamic raw);
+
 @protected double dco_decode_box_autoadd_f_64(dynamic raw);
+
+@protected int dco_decode_box_autoadd_i_32(dynamic raw);
 
 @protected OrderStatus dco_decode_box_autoadd_order_status(dynamic raw);
 
@@ -47,9 +55,17 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected Ship dco_decode_box_autoadd_ship(dynamic raw);
 
+@protected Supplier dco_decode_box_autoadd_supplier(dynamic raw);
+
+@protected SupplyItem dco_decode_box_autoadd_supply_item(dynamic raw);
+
 @protected UpdateOrderItemRequest dco_decode_box_autoadd_update_order_item_request(dynamic raw);
 
 @protected UpdateShipRequest dco_decode_box_autoadd_update_ship_request(dynamic raw);
+
+@protected UpdateSupplierRequest dco_decode_box_autoadd_update_supplier_request(dynamic raw);
+
+@protected UpdateSupplyItemRequest dco_decode_box_autoadd_update_supply_item_request(dynamic raw);
 
 @protected CreateOrderItemRequest dco_decode_create_order_item_request(dynamic raw);
 
@@ -58,6 +74,10 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 @protected CreateShipRequest dco_decode_create_ship_request(dynamic raw);
 
 @protected CreateSupplierRequest dco_decode_create_supplier_request(dynamic raw);
+
+@protected CreateSupplyItemRequest dco_decode_create_supply_item_request(dynamic raw);
+
+@protected DeliveryType dco_decode_delivery_type(dynamic raw);
 
 @protected double dco_decode_f_64(dynamic raw);
 
@@ -77,15 +97,27 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected List<Supplier> dco_decode_list_supplier(dynamic raw);
 
+@protected List<SupplyItem> dco_decode_list_supply_item(dynamic raw);
+
 @protected String? dco_decode_opt_String(dynamic raw);
 
+@protected bool? dco_decode_opt_box_autoadd_bool(dynamic raw);
+
+@protected DeliveryType? dco_decode_opt_box_autoadd_delivery_type(dynamic raw);
+
 @protected double? dco_decode_opt_box_autoadd_f_64(dynamic raw);
+
+@protected int? dco_decode_opt_box_autoadd_i_32(dynamic raw);
 
 @protected OrderStatus? dco_decode_opt_box_autoadd_order_status(dynamic raw);
 
 @protected OrderWithItems? dco_decode_opt_box_autoadd_order_with_items(dynamic raw);
 
 @protected Ship? dco_decode_opt_box_autoadd_ship(dynamic raw);
+
+@protected Supplier? dco_decode_opt_box_autoadd_supplier(dynamic raw);
+
+@protected SupplyItem? dco_decode_opt_box_autoadd_supply_item(dynamic raw);
 
 @protected Order dco_decode_order(dynamic raw);
 
@@ -101,6 +133,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected Supplier dco_decode_supplier(dynamic raw);
 
+@protected SupplyItem dco_decode_supply_item(dynamic raw);
+
 @protected int dco_decode_u_8(dynamic raw);
 
 @protected void dco_decode_unit(dynamic raw);
@@ -109,9 +143,15 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected UpdateShipRequest dco_decode_update_ship_request(dynamic raw);
 
+@protected UpdateSupplierRequest dco_decode_update_supplier_request(dynamic raw);
+
+@protected UpdateSupplyItemRequest dco_decode_update_supply_item_request(dynamic raw);
+
 @protected String sse_decode_String(SseDeserializer deserializer);
 
 @protected bool sse_decode_bool(SseDeserializer deserializer);
+
+@protected bool sse_decode_box_autoadd_bool(SseDeserializer deserializer);
 
 @protected CreateOrderItemRequest sse_decode_box_autoadd_create_order_item_request(SseDeserializer deserializer);
 
@@ -121,7 +161,13 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected CreateSupplierRequest sse_decode_box_autoadd_create_supplier_request(SseDeserializer deserializer);
 
+@protected CreateSupplyItemRequest sse_decode_box_autoadd_create_supply_item_request(SseDeserializer deserializer);
+
+@protected DeliveryType sse_decode_box_autoadd_delivery_type(SseDeserializer deserializer);
+
 @protected double sse_decode_box_autoadd_f_64(SseDeserializer deserializer);
+
+@protected int sse_decode_box_autoadd_i_32(SseDeserializer deserializer);
 
 @protected OrderStatus sse_decode_box_autoadd_order_status(SseDeserializer deserializer);
 
@@ -129,9 +175,17 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected Ship sse_decode_box_autoadd_ship(SseDeserializer deserializer);
 
+@protected Supplier sse_decode_box_autoadd_supplier(SseDeserializer deserializer);
+
+@protected SupplyItem sse_decode_box_autoadd_supply_item(SseDeserializer deserializer);
+
 @protected UpdateOrderItemRequest sse_decode_box_autoadd_update_order_item_request(SseDeserializer deserializer);
 
 @protected UpdateShipRequest sse_decode_box_autoadd_update_ship_request(SseDeserializer deserializer);
+
+@protected UpdateSupplierRequest sse_decode_box_autoadd_update_supplier_request(SseDeserializer deserializer);
+
+@protected UpdateSupplyItemRequest sse_decode_box_autoadd_update_supply_item_request(SseDeserializer deserializer);
 
 @protected CreateOrderItemRequest sse_decode_create_order_item_request(SseDeserializer deserializer);
 
@@ -140,6 +194,10 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 @protected CreateShipRequest sse_decode_create_ship_request(SseDeserializer deserializer);
 
 @protected CreateSupplierRequest sse_decode_create_supplier_request(SseDeserializer deserializer);
+
+@protected CreateSupplyItemRequest sse_decode_create_supply_item_request(SseDeserializer deserializer);
+
+@protected DeliveryType sse_decode_delivery_type(SseDeserializer deserializer);
 
 @protected double sse_decode_f_64(SseDeserializer deserializer);
 
@@ -159,15 +217,27 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected List<Supplier> sse_decode_list_supplier(SseDeserializer deserializer);
 
+@protected List<SupplyItem> sse_decode_list_supply_item(SseDeserializer deserializer);
+
 @protected String? sse_decode_opt_String(SseDeserializer deserializer);
 
+@protected bool? sse_decode_opt_box_autoadd_bool(SseDeserializer deserializer);
+
+@protected DeliveryType? sse_decode_opt_box_autoadd_delivery_type(SseDeserializer deserializer);
+
 @protected double? sse_decode_opt_box_autoadd_f_64(SseDeserializer deserializer);
+
+@protected int? sse_decode_opt_box_autoadd_i_32(SseDeserializer deserializer);
 
 @protected OrderStatus? sse_decode_opt_box_autoadd_order_status(SseDeserializer deserializer);
 
 @protected OrderWithItems? sse_decode_opt_box_autoadd_order_with_items(SseDeserializer deserializer);
 
 @protected Ship? sse_decode_opt_box_autoadd_ship(SseDeserializer deserializer);
+
+@protected Supplier? sse_decode_opt_box_autoadd_supplier(SseDeserializer deserializer);
+
+@protected SupplyItem? sse_decode_opt_box_autoadd_supply_item(SseDeserializer deserializer);
 
 @protected Order sse_decode_order(SseDeserializer deserializer);
 
@@ -183,6 +253,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected Supplier sse_decode_supplier(SseDeserializer deserializer);
 
+@protected SupplyItem sse_decode_supply_item(SseDeserializer deserializer);
+
 @protected int sse_decode_u_8(SseDeserializer deserializer);
 
 @protected void sse_decode_unit(SseDeserializer deserializer);
@@ -191,9 +263,15 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected UpdateShipRequest sse_decode_update_ship_request(SseDeserializer deserializer);
 
+@protected UpdateSupplierRequest sse_decode_update_supplier_request(SseDeserializer deserializer);
+
+@protected UpdateSupplyItemRequest sse_decode_update_supply_item_request(SseDeserializer deserializer);
+
 @protected void sse_encode_String(String self, SseSerializer serializer);
 
 @protected void sse_encode_bool(bool self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_bool(bool self, SseSerializer serializer);
 
 @protected void sse_encode_box_autoadd_create_order_item_request(CreateOrderItemRequest self, SseSerializer serializer);
 
@@ -203,7 +281,13 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected void sse_encode_box_autoadd_create_supplier_request(CreateSupplierRequest self, SseSerializer serializer);
 
+@protected void sse_encode_box_autoadd_create_supply_item_request(CreateSupplyItemRequest self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_delivery_type(DeliveryType self, SseSerializer serializer);
+
 @protected void sse_encode_box_autoadd_f_64(double self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_i_32(int self, SseSerializer serializer);
 
 @protected void sse_encode_box_autoadd_order_status(OrderStatus self, SseSerializer serializer);
 
@@ -211,9 +295,17 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected void sse_encode_box_autoadd_ship(Ship self, SseSerializer serializer);
 
+@protected void sse_encode_box_autoadd_supplier(Supplier self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_supply_item(SupplyItem self, SseSerializer serializer);
+
 @protected void sse_encode_box_autoadd_update_order_item_request(UpdateOrderItemRequest self, SseSerializer serializer);
 
 @protected void sse_encode_box_autoadd_update_ship_request(UpdateShipRequest self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_update_supplier_request(UpdateSupplierRequest self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_update_supply_item_request(UpdateSupplyItemRequest self, SseSerializer serializer);
 
 @protected void sse_encode_create_order_item_request(CreateOrderItemRequest self, SseSerializer serializer);
 
@@ -222,6 +314,10 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 @protected void sse_encode_create_ship_request(CreateShipRequest self, SseSerializer serializer);
 
 @protected void sse_encode_create_supplier_request(CreateSupplierRequest self, SseSerializer serializer);
+
+@protected void sse_encode_create_supply_item_request(CreateSupplyItemRequest self, SseSerializer serializer);
+
+@protected void sse_encode_delivery_type(DeliveryType self, SseSerializer serializer);
 
 @protected void sse_encode_f_64(double self, SseSerializer serializer);
 
@@ -241,15 +337,27 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected void sse_encode_list_supplier(List<Supplier> self, SseSerializer serializer);
 
+@protected void sse_encode_list_supply_item(List<SupplyItem> self, SseSerializer serializer);
+
 @protected void sse_encode_opt_String(String? self, SseSerializer serializer);
 
+@protected void sse_encode_opt_box_autoadd_bool(bool? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_delivery_type(DeliveryType? self, SseSerializer serializer);
+
 @protected void sse_encode_opt_box_autoadd_f_64(double? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_i_32(int? self, SseSerializer serializer);
 
 @protected void sse_encode_opt_box_autoadd_order_status(OrderStatus? self, SseSerializer serializer);
 
 @protected void sse_encode_opt_box_autoadd_order_with_items(OrderWithItems? self, SseSerializer serializer);
 
 @protected void sse_encode_opt_box_autoadd_ship(Ship? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_supplier(Supplier? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_supply_item(SupplyItem? self, SseSerializer serializer);
 
 @protected void sse_encode_order(Order self, SseSerializer serializer);
 
@@ -265,6 +373,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected void sse_encode_supplier(Supplier self, SseSerializer serializer);
 
+@protected void sse_encode_supply_item(SupplyItem self, SseSerializer serializer);
+
 @protected void sse_encode_u_8(int self, SseSerializer serializer);
 
 @protected void sse_encode_unit(void self, SseSerializer serializer);
@@ -272,6 +382,10 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 @protected void sse_encode_update_order_item_request(UpdateOrderItemRequest self, SseSerializer serializer);
 
 @protected void sse_encode_update_ship_request(UpdateShipRequest self, SseSerializer serializer);
+
+@protected void sse_encode_update_supplier_request(UpdateSupplierRequest self, SseSerializer serializer);
+
+@protected void sse_encode_update_supply_item_request(UpdateSupplyItemRequest self, SseSerializer serializer);
                 }
                 
 

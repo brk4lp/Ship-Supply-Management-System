@@ -1,7 +1,7 @@
 # 🚢 Ship Supply Management System (SSMS) - Proje Yol Haritası
 
-> **Son Güncelleme:** 5 Ocak 2026  
-> **Proje Durumu:** 🟢 Aktif Geliştirme (Faz 2)
+> **Son Güncelleme:** 8 Ocak 2026  
+> **Proje Durumu:** 🟢 Aktif Geliştirme (Faz 2 - Çekirdek Modüller Tamamlandı)
 
 ---
 
@@ -56,11 +56,19 @@ SSMS, gemi kumanyacılığı (ship chandler) operasyonlarını dijitalleştiren,
 - [x] **Dart binding'leri otomatik oluşturma** ✅
 - [x] **Windows FFI bağlantısı (DLL)** ✅
 - [x] **FRB API testleri** ✅
+- [x] **SQLite veritabanı bağlantısı** ✅
+- [x] **Ship CRUD API + UI (PlutoGrid)** ✅
+- [x] **Supplier CRUD API + UI** ✅
+- [x] **SupplyItem CRUD API + UI** ✅
+- [x] **Order CRUD API + UI** ✅
+- [x] **OrderItem CRUD (ürün bazlı teslimat tipi)** ✅
+- [x] **DeliveryType sistemi (Depo Üzerinden / Direkt Gemiye)** ✅
 
 ### Bekleyen Kritik İşler
-- [ ] PostgreSQL/SQLite veritabanı bağlantısı
-- [ ] CRUD operasyonları (Ships, Orders)
+- [ ] PostgreSQL uzak veritabanı bağlantısı
 - [ ] Kimlik doğrulama sistemi
+- [ ] Liman (Port) modülü
+- [ ] Kategorize edilmiş sidebar menü
 
 ---
 
@@ -126,15 +134,15 @@ c_output: frontend/rust/
 
 ## 🔶 Faz 2: Çekirdek İş Mantığı (Q2 2026)
 
-### 2.1 Gemi Yönetimi (Ships Module)
-**Süre:** 2 hafta | **Öncelik:** 🔴 Kritik
+### 2.1 Gemi Yönetimi (Ships Module) ✅
+**Süre:** 2 hafta | **Öncelik:** 🔴 Kritik | **Tamamlanma:** Ocak 2026
 
 | Görev | Durum | Açıklama |
 |-------|-------|----------|
-| Ship CRUD API (Rust) | ⬜ | create, read, update, delete |
-| Ship list UI (PlutoGrid) | ⬜ | Windows data grid |
-| Ship detail sayfası | ⬜ | Detay görüntüleme |
-| Ship form (create/edit) | ⬜ | Form validasyonu |
+| Ship CRUD API (Rust) | ✅ | create, read, update, delete |
+| Ship list UI (PlutoGrid) | ✅ | Windows data grid |
+| Ship detail sayfası | ✅ | Detay görüntüleme |
+| Ship form (create/edit) | ✅ | Form validasyonu |
 | IMO doğrulama | ⬜ | IMO numarası format kontrolü |
 | Ship arama/filtreleme | ⬜ | Bayrak, isim, IMO ile arama |
 
@@ -157,15 +165,16 @@ pub struct Ship {
 }
 ```
 
-### 2.2 Sipariş Yönetimi (Orders Module)
-**Süre:** 4 hafta | **Öncelik:** 🔴 Kritik
+### 2.2 Sipariş Yönetimi (Orders Module) ✅
+**Süre:** 4 hafta | **Öncelik:** 🔴 Kritik | **Tamamlanma:** Ocak 2026
 
 | Görev | Durum | Açıklama |
 |-------|-------|----------|
-| Order CRUD API | ⬜ | Sipariş işlemleri |
-| OrderItem CRUD API | ⬜ | Sipariş kalemleri |
-| Order list UI | ⬜ | Durum filtreleriyle liste |
-| Order detail sayfası | ⬜ | Kalemler ve özet |
+| Order CRUD API | ✅ | Sipariş işlemleri |
+| OrderItem CRUD API | ✅ | Sipariş kalemleri (ürün bazlı teslimat tipi) |
+| Order list UI | ✅ | Durum filtreleriyle liste |
+| Order detail sayfası | ✅ | Kalemler ve özet |
+| DeliveryType sistemi | ✅ | ViaWarehouse / DirectToShip per item |
 | Order form wizard | ⬜ | Adım adım sipariş oluşturma |
 | Status transition API | ⬜ | Durum geçiş validasyonu |
 | Status history | ⬜ | Durum değişiklik logu |
@@ -186,31 +195,86 @@ pub struct Ship {
               └───────────┘
 ```
 
-### 2.3 Tedarikçi Yönetimi (Suppliers Module)
-**Süre:** 2 hafta | **Öncelik:** 🟡 Yüksek
+### 2.3 Tedarikçi Yönetimi (Suppliers Module) ✅
+**Süre:** 2 hafta | **Öncelik:** 🟡 Yüksek | **Tamamlanma:** Ocak 2026
 
 | Görev | Durum | Açıklama |
 |-------|-------|----------|
-| Supplier CRUD API | ⬜ | Tedarikçi işlemleri |
-| Supplier list UI | ⬜ | PlutoGrid ile liste |
-| Supplier detail | ⬜ | İletişim bilgileri, geçmiş |
+| Supplier CRUD API | ✅ | Tedarikçi işlemleri |
+| Supplier list UI | ✅ | PlutoGrid ile liste |
+| Supplier detail | ✅ | İletişim bilgileri, geçmiş |
 | Supplier categories | ⬜ | Kategori bazlı gruplama |
 | Supplier rating | ⬜ | Performans puanlama |
 | Contact management | ⬜ | Çoklu iletişim kişisi |
 
-### 2.4 Ürün/Malzeme Yönetimi (Supply Items Module)
-**Süre:** 2 hafta | **Öncelik:** 🟡 Yüksek
+### 2.4 Ürün/Malzeme Yönetimi (Supply Items Module) ✅
+**Süre:** 2 hafta | **Öncelik:** 🟡 Yüksek | **Tamamlanma:** Ocak 2026
 
 | Görev | Durum | Açıklama |
 |-------|-------|----------|
-| SupplyItem CRUD API | ⬜ | Ürün kataloğu |
+| SupplyItem CRUD API | ✅ | Ürün kataloğu |
+| SupplyItem list UI | ✅ | PlutoGrid ile liste |
 | Category hierarchy | ⬜ | Kategori/alt kategori yapısı |
 | Unit management | ⬜ | Birim tanımları (kg, lt, adet) |
 | Price history | ⬜ | Fiyat değişiklik takibi |
 | Barcode/SKU support | ⬜ | Ürün kodu sistemi |
 | Image upload | ⬜ | Ürün görselleri |
 
-### 2.5 Karlılık Hesaplama Servisi
+### 2.5 Depo Yönetimi & Stok Takibi (Warehouse Module) 🆕
+**Süre:** 3 hafta | **Öncelik:** 🟡 Yüksek
+
+| Görev | Durum | Açıklama |
+|-------|-------|----------|
+| Stok giriş/çıkış API | ⬜ | Depo hareketleri |
+| Stok durumu görünümü | ⬜ | Mevcut stok seviyeleri |
+| Minimum stok uyarısı | ⬜ | Kritik seviye bildirimi |
+| Stok hareketi logu | ⬜ | Giriş/çıkış geçmişi |
+| Depo lokasyonları | ⬜ | Çoklu depo desteği |
+| Stok sayımı | ⬜ | Envanter sayım ekranı |
+
+**Stok Hareketi Akışı:**
+```
+┌────────────────┐     ┌────────────────┐     ┌────────────────┐
+│ Tedarikçiden   │────>│     DEPO       │────>│   Gemiye       │
+│ Alım (IN)      │     │   (STOCK)      │     │   Teslimat(OUT)│
+└────────────────┘     └────────────────┘     └────────────────┘
+                              │
+                       ┌──────┴──────┐
+                       │ Sayım/Ayar  │
+                       │ (ADJUSTMENT)│
+                       └─────────────┘
+```
+
+### 2.6 Kategorize Edilmiş Navigasyon (Sidebar Reorganization) 🆕
+**Süre:** 1 hafta | **Öncelik:** 🟢 Orta
+
+| Görev | Durum | Açıklama |
+|-------|-------|----------|
+| Sidebar kategori yapısı | ⬜ | Genişleyebilir kategoriler |
+| Depo Yönetimi grubu | ⬜ | Ürünler, Tedarikçiler, Stok Takibi |
+| Denizcilik grubu | ⬜ | Gemiler, Limanlar, Ziyaretler |
+| Operasyon grubu | ⬜ | Siparişler, Takvim, Teslimatlar |
+| Collapse/Expand animasyonu | ⬜ | Smooth geçişler |
+
+**Sidebar Yapısı:**
+```
+📦 Depo Yönetimi
+   ├── 📋 Ürünler (Supply Items)
+   ├── 🏭 Tedarikçiler (Suppliers)
+   └── 📊 Stok Takibi (Stock)
+
+⚓ Denizcilik
+   ├── 🚢 Gemiler (Ships)
+   ├── 🏗️ Limanlar (Ports)
+   └── 📅 Gemi Ziyaretleri (Ship Visits)
+
+📝 Operasyon
+   ├── 📦 Siparişler (Orders)
+   ├── 📆 Takvim (Calendar)
+   └── 🚚 Teslimatlar (Deliveries)
+```
+
+### 2.7 Karlılık Hesaplama Servisi
 **Süre:** 1 hafta | **Öncelik:** 🔴 Kritik
 
 | Görev | Durum | Açıklama |
@@ -237,17 +301,55 @@ profit_margin = (order_profit / total_revenue) * 100
 
 ## 🟢 Faz 3: Gelişmiş Özellikler (Q3 2026)
 
-### 3.1 Liman & Ziyaret Yönetimi
-**Süre:** 2 hafta | **Öncelik:** 🟡 Yüksek
+### 3.1 Liman & Ziyaret Yönetimi (Ports & Ship Visits Module)
+**Süre:** 3 hafta | **Öncelik:** 🔴 Kritik
 
 | Görev | Durum | Açıklama |
 |-------|-------|----------|
-| Port CRUD API | ⬜ | Liman yönetimi |
-| ShipVisit CRUD API | ⬜ | Ziyaret planlama |
+| Port CRUD API | ⬜ | Liman yönetimi (name, country, city, timezone, coordinates) |
+| Port list UI | ⬜ | PlutoGrid ile liman listesi |
+| Port detail sayfası | ⬜ | Liman bilgileri ve istatistikleri |
+| ShipVisit CRUD API | ⬜ | Ziyaret planlama (ETA, ETD, status) |
+| ShipVisit list UI | ⬜ | Ziyaret listesi ve filtreleme |
 | Calendar FFI entegrasyonu | ⬜ | Rust'tan veri çekme |
+| Resource view by Port | ⬜ | Takvimde limana göre gruplama |
 | Drag & drop rescheduling | ⬜ | Takvimde sürükle-bırak |
 | Visit notifications | ⬜ | Yaklaşan ziyaret bildirimi |
 | Port capacity planning | ⬜ | Liman yoğunluk görünümü |
+
+**Port Entity:**
+```rust
+pub struct Port {
+    pub id: i32,
+    pub name: String,          // "Tuzla Limanı"
+    pub country: String,       // "TR"
+    pub city: Option<String>,  // "İstanbul"
+    pub timezone: String,      // "Europe/Istanbul"
+    pub latitude: Option<f64>,
+    pub longitude: Option<f64>,
+    pub notes: Option<String>,
+    pub is_active: bool,
+    pub created_at: DateTime,
+    pub updated_at: DateTime,
+}
+```
+
+**ShipVisit Entity:**
+```rust
+pub struct ShipVisit {
+    pub id: i32,
+    pub ship_id: i32,
+    pub port_id: i32,
+    pub eta: DateTime,         // Estimated Time of Arrival
+    pub etd: DateTime,         // Estimated Time of Departure
+    pub ata: Option<DateTime>, // Actual Time of Arrival
+    pub atd: Option<DateTime>, // Actual Time of Departure
+    pub status: VisitStatus,   // Planned, Arrived, Departed, Cancelled
+    pub notes: Option<String>,
+    pub created_at: DateTime,
+    pub updated_at: DateTime,
+}
+```
 
 ### 3.2 Raporlama & Analytics
 **Süre:** 3 hafta | **Öncelik:** 🟡 Yüksek

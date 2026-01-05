@@ -16,6 +16,9 @@ class CreateOrderItemRequest {
   final double buyingPrice;
   final double sellingPrice;
   final String currency;
+  final DeliveryType deliveryType;
+  final String? warehouseDeliveryDate;
+  final String? shipDeliveryDate;
   final String? notes;
 
   const CreateOrderItemRequest({
@@ -28,6 +31,9 @@ class CreateOrderItemRequest {
     required this.buyingPrice,
     required this.sellingPrice,
     required this.currency,
+    required this.deliveryType,
+    this.warehouseDeliveryDate,
+    this.shipDeliveryDate,
     this.notes,
   });
 
@@ -42,6 +48,9 @@ class CreateOrderItemRequest {
       buyingPrice.hashCode ^
       sellingPrice.hashCode ^
       currency.hashCode ^
+      deliveryType.hashCode ^
+      warehouseDeliveryDate.hashCode ^
+      shipDeliveryDate.hashCode ^
       notes.hashCode;
 
   @override
@@ -58,20 +67,21 @@ class CreateOrderItemRequest {
           buyingPrice == other.buyingPrice &&
           sellingPrice == other.sellingPrice &&
           currency == other.currency &&
+          deliveryType == other.deliveryType &&
+          warehouseDeliveryDate == other.warehouseDeliveryDate &&
+          shipDeliveryDate == other.shipDeliveryDate &&
           notes == other.notes;
 }
 
 class CreateOrderRequest {
   final int shipId;
   final String? deliveryPort;
-  final String? deliveryDate;
   final String? notes;
   final String currency;
 
   const CreateOrderRequest({
     required this.shipId,
     this.deliveryPort,
-    this.deliveryDate,
     this.notes,
     required this.currency,
   });
@@ -80,7 +90,6 @@ class CreateOrderRequest {
   int get hashCode =>
       shipId.hashCode ^
       deliveryPort.hashCode ^
-      deliveryDate.hashCode ^
       notes.hashCode ^
       currency.hashCode;
 
@@ -91,7 +100,6 @@ class CreateOrderRequest {
           runtimeType == other.runtimeType &&
           shipId == other.shipId &&
           deliveryPort == other.deliveryPort &&
-          deliveryDate == other.deliveryDate &&
           notes == other.notes &&
           currency == other.currency;
 }
@@ -178,6 +186,67 @@ class CreateSupplierRequest {
           category == other.category;
 }
 
+class CreateSupplyItemRequest {
+  final int supplierId;
+  final String? impaCode;
+  final String name;
+  final String? description;
+  final String category;
+  final String unit;
+  final double unitPrice;
+  final String currency;
+  final int? minimumOrderQuantity;
+
+  const CreateSupplyItemRequest({
+    required this.supplierId,
+    this.impaCode,
+    required this.name,
+    this.description,
+    required this.category,
+    required this.unit,
+    required this.unitPrice,
+    required this.currency,
+    this.minimumOrderQuantity,
+  });
+
+  @override
+  int get hashCode =>
+      supplierId.hashCode ^
+      impaCode.hashCode ^
+      name.hashCode ^
+      description.hashCode ^
+      category.hashCode ^
+      unit.hashCode ^
+      unitPrice.hashCode ^
+      currency.hashCode ^
+      minimumOrderQuantity.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CreateSupplyItemRequest &&
+          runtimeType == other.runtimeType &&
+          supplierId == other.supplierId &&
+          impaCode == other.impaCode &&
+          name == other.name &&
+          description == other.description &&
+          category == other.category &&
+          unit == other.unit &&
+          unitPrice == other.unitPrice &&
+          currency == other.currency &&
+          minimumOrderQuantity == other.minimumOrderQuantity;
+}
+
+/// Delivery type - how the order will be delivered
+enum DeliveryType {
+  /// Supplier -> Warehouse -> Ship
+  viaWarehouse,
+
+  /// Supplier -> Ship (direct delivery)
+  directToShip,
+  ;
+}
+
 /// Profit calculation for a single item
 class ItemProfit {
   /// Total cost: buying_price * quantity
@@ -224,7 +293,6 @@ class Order {
   final String? shipName;
   final OrderStatus status;
   final String? deliveryPort;
-  final String? deliveryDate;
   final String? notes;
   final String currency;
   final String createdAt;
@@ -237,7 +305,6 @@ class Order {
     this.shipName,
     required this.status,
     this.deliveryPort,
-    this.deliveryDate,
     this.notes,
     required this.currency,
     required this.createdAt,
@@ -252,7 +319,6 @@ class Order {
       shipName.hashCode ^
       status.hashCode ^
       deliveryPort.hashCode ^
-      deliveryDate.hashCode ^
       notes.hashCode ^
       currency.hashCode ^
       createdAt.hashCode ^
@@ -269,7 +335,6 @@ class Order {
           shipName == other.shipName &&
           status == other.status &&
           deliveryPort == other.deliveryPort &&
-          deliveryDate == other.deliveryDate &&
           notes == other.notes &&
           currency == other.currency &&
           createdAt == other.createdAt &&
@@ -291,6 +356,15 @@ class OrderItem {
   /// Revenue price - what we charge the customer
   final double sellingPrice;
   final String currency;
+
+  /// Delivery type for this item
+  final DeliveryType deliveryType;
+
+  /// When supplier delivers to warehouse (if ViaWarehouse)
+  final String? warehouseDeliveryDate;
+
+  /// When delivered to ship
+  final String? shipDeliveryDate;
   final String? notes;
 
   const OrderItem({
@@ -304,6 +378,9 @@ class OrderItem {
     required this.buyingPrice,
     required this.sellingPrice,
     required this.currency,
+    required this.deliveryType,
+    this.warehouseDeliveryDate,
+    this.shipDeliveryDate,
     this.notes,
   });
 
@@ -319,6 +396,9 @@ class OrderItem {
       buyingPrice.hashCode ^
       sellingPrice.hashCode ^
       currency.hashCode ^
+      deliveryType.hashCode ^
+      warehouseDeliveryDate.hashCode ^
+      shipDeliveryDate.hashCode ^
       notes.hashCode;
 
   @override
@@ -336,6 +416,9 @@ class OrderItem {
           buyingPrice == other.buyingPrice &&
           sellingPrice == other.sellingPrice &&
           currency == other.currency &&
+          deliveryType == other.deliveryType &&
+          warehouseDeliveryDate == other.warehouseDeliveryDate &&
+          shipDeliveryDate == other.shipDeliveryDate &&
           notes == other.notes;
 }
 
@@ -528,6 +611,77 @@ class Supplier {
           updatedAt == other.updatedAt;
 }
 
+class SupplyItem {
+  final int id;
+  final int supplierId;
+  final String? supplierName;
+  final String? impaCode;
+  final String name;
+  final String? description;
+  final String category;
+  final String unit;
+  final double unitPrice;
+  final String currency;
+  final int? minimumOrderQuantity;
+  final bool isAvailable;
+  final String createdAt;
+  final String updatedAt;
+
+  const SupplyItem({
+    required this.id,
+    required this.supplierId,
+    this.supplierName,
+    this.impaCode,
+    required this.name,
+    this.description,
+    required this.category,
+    required this.unit,
+    required this.unitPrice,
+    required this.currency,
+    this.minimumOrderQuantity,
+    required this.isAvailable,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      supplierId.hashCode ^
+      supplierName.hashCode ^
+      impaCode.hashCode ^
+      name.hashCode ^
+      description.hashCode ^
+      category.hashCode ^
+      unit.hashCode ^
+      unitPrice.hashCode ^
+      currency.hashCode ^
+      minimumOrderQuantity.hashCode ^
+      isAvailable.hashCode ^
+      createdAt.hashCode ^
+      updatedAt.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is SupplyItem &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          supplierId == other.supplierId &&
+          supplierName == other.supplierName &&
+          impaCode == other.impaCode &&
+          name == other.name &&
+          description == other.description &&
+          category == other.category &&
+          unit == other.unit &&
+          unitPrice == other.unitPrice &&
+          currency == other.currency &&
+          minimumOrderQuantity == other.minimumOrderQuantity &&
+          isAvailable == other.isAvailable &&
+          createdAt == other.createdAt &&
+          updatedAt == other.updatedAt;
+}
+
 class UpdateOrderItemRequest {
   final String? productName;
   final String? impaCode;
@@ -536,6 +690,9 @@ class UpdateOrderItemRequest {
   final String? unit;
   final double? buyingPrice;
   final double? sellingPrice;
+  final DeliveryType? deliveryType;
+  final String? warehouseDeliveryDate;
+  final String? shipDeliveryDate;
   final String? notes;
 
   const UpdateOrderItemRequest({
@@ -546,6 +703,9 @@ class UpdateOrderItemRequest {
     this.unit,
     this.buyingPrice,
     this.sellingPrice,
+    this.deliveryType,
+    this.warehouseDeliveryDate,
+    this.shipDeliveryDate,
     this.notes,
   });
 
@@ -558,6 +718,9 @@ class UpdateOrderItemRequest {
       unit.hashCode ^
       buyingPrice.hashCode ^
       sellingPrice.hashCode ^
+      deliveryType.hashCode ^
+      warehouseDeliveryDate.hashCode ^
+      shipDeliveryDate.hashCode ^
       notes.hashCode;
 
   @override
@@ -572,6 +735,9 @@ class UpdateOrderItemRequest {
           unit == other.unit &&
           buyingPrice == other.buyingPrice &&
           sellingPrice == other.sellingPrice &&
+          deliveryType == other.deliveryType &&
+          warehouseDeliveryDate == other.warehouseDeliveryDate &&
+          shipDeliveryDate == other.shipDeliveryDate &&
           notes == other.notes;
 }
 
@@ -612,4 +778,102 @@ class UpdateShipRequest {
           shipType == other.shipType &&
           grossTonnage == other.grossTonnage &&
           owner == other.owner;
+}
+
+class UpdateSupplierRequest {
+  final String? name;
+  final String? contactPerson;
+  final String? email;
+  final String? phone;
+  final String? address;
+  final String? country;
+  final String? category;
+
+  const UpdateSupplierRequest({
+    this.name,
+    this.contactPerson,
+    this.email,
+    this.phone,
+    this.address,
+    this.country,
+    this.category,
+  });
+
+  @override
+  int get hashCode =>
+      name.hashCode ^
+      contactPerson.hashCode ^
+      email.hashCode ^
+      phone.hashCode ^
+      address.hashCode ^
+      country.hashCode ^
+      category.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is UpdateSupplierRequest &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          contactPerson == other.contactPerson &&
+          email == other.email &&
+          phone == other.phone &&
+          address == other.address &&
+          country == other.country &&
+          category == other.category;
+}
+
+class UpdateSupplyItemRequest {
+  final int? supplierId;
+  final String? impaCode;
+  final String? name;
+  final String? description;
+  final String? category;
+  final String? unit;
+  final double? unitPrice;
+  final String? currency;
+  final int? minimumOrderQuantity;
+  final bool? isAvailable;
+
+  const UpdateSupplyItemRequest({
+    this.supplierId,
+    this.impaCode,
+    this.name,
+    this.description,
+    this.category,
+    this.unit,
+    this.unitPrice,
+    this.currency,
+    this.minimumOrderQuantity,
+    this.isAvailable,
+  });
+
+  @override
+  int get hashCode =>
+      supplierId.hashCode ^
+      impaCode.hashCode ^
+      name.hashCode ^
+      description.hashCode ^
+      category.hashCode ^
+      unit.hashCode ^
+      unitPrice.hashCode ^
+      currency.hashCode ^
+      minimumOrderQuantity.hashCode ^
+      isAvailable.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is UpdateSupplyItemRequest &&
+          runtimeType == other.runtimeType &&
+          supplierId == other.supplierId &&
+          impaCode == other.impaCode &&
+          name == other.name &&
+          description == other.description &&
+          category == other.category &&
+          unit == other.unit &&
+          unitPrice == other.unitPrice &&
+          currency == other.currency &&
+          minimumOrderQuantity == other.minimumOrderQuantity &&
+          isAvailable == other.isAvailable;
 }

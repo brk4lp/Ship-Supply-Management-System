@@ -144,10 +144,10 @@ pub async fn delete(id: i32) -> Result<bool> {
         .await
         .ok_or_else(|| anyhow::anyhow!("Database not connected"))?;
 
-    // Soft delete
+    // Hard delete - actually remove the record
     let result = conn.execute(Statement::from_sql_and_values(
         DatabaseBackend::Sqlite,
-        "UPDATE ships SET is_active = 0, updated_at = datetime('now') WHERE id = ?",
+        "DELETE FROM ships WHERE id = ?",
         vec![Value::Int(Some(id))]
     )).await?;
 

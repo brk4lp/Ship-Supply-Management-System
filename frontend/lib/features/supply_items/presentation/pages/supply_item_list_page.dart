@@ -7,14 +7,15 @@ import '../../../../core/widgets/linear_components.dart';
 import '../../../../src/rust/api.dart' as rust_api;
 import '../../../../src/rust/models.dart';
 
-class SupplierListPage extends StatefulWidget {
-  const SupplierListPage({super.key});
+class SupplyItemListPage extends StatefulWidget {
+  const SupplyItemListPage({super.key});
 
   @override
-  State<SupplierListPage> createState() => _SupplierListPageState();
+  State<SupplyItemListPage> createState() => _SupplyItemListPageState();
 }
 
-class _SupplierListPageState extends State<SupplierListPage> {
+class _SupplyItemListPageState extends State<SupplyItemListPage> {
+  List<SupplyItem> _items = [];
   List<Supplier> _suppliers = [];
   bool _isLoading = true;
   String _searchQuery = '';
@@ -25,7 +26,7 @@ class _SupplierListPageState extends State<SupplierListPage> {
   List<PlutoRow> _rows = [];
   Key _gridKey = UniqueKey();
 
-  // Supplier categories
+  // Item categories
   static const List<String> _categories = [
     'Gıda',
     'Teknik Malzeme',
@@ -37,11 +38,29 @@ class _SupplierListPageState extends State<SupplierListPage> {
     'Diğer',
   ];
 
+  // Units
+  static const List<String> _units = [
+    'Adet',
+    'Kg',
+    'Lt',
+    'Metre',
+    'Kutu',
+    'Paket',
+    'Çift',
+    'Set',
+    'Ton',
+    'M²',
+    'M³',
+  ];
+
+  // Currencies
+  static const List<String> _currencies = ['USD', 'EUR', 'TRY', 'GBP'];
+
   @override
   void initState() {
     super.initState();
     _initColumns();
-    _loadSuppliers();
+    _loadData();
   }
 
   @override
@@ -61,7 +80,13 @@ class _SupplierListPageState extends State<SupplierListPage> {
         frozen: PlutoColumnFrozen.start,
       ),
       PlutoColumn(
-        title: 'Firma Adı',
+        title: 'IMPA Kodu',
+        field: 'impa_code',
+        type: PlutoColumnType.text(),
+        width: 110,
+      ),
+      PlutoColumn(
+        title: 'Ürün Adı',
         field: 'name',
         type: PlutoColumnType.text(),
         width: 200,
@@ -70,52 +95,64 @@ class _SupplierListPageState extends State<SupplierListPage> {
         title: 'Kategori',
         field: 'category',
         type: PlutoColumnType.text(),
-        width: 140,
+        width: 130,
       ),
       PlutoColumn(
-        title: 'İletişim Kişisi',
-        field: 'contact_person',
+        title: 'Tedarikçi',
+        field: 'supplier_name',
         type: PlutoColumnType.text(),
         width: 150,
       ),
       PlutoColumn(
-        title: 'Telefon',
-        field: 'phone',
-        type: PlutoColumnType.text(),
-        width: 130,
-      ),
-      PlutoColumn(
-        title: 'E-posta',
-        field: 'email',
-        type: PlutoColumnType.text(),
-        width: 180,
-      ),
-      PlutoColumn(
-        title: 'Ülke',
-        field: 'country',
-        type: PlutoColumnType.text(),
+        title: 'Birim Fiyat',
+        field: 'unit_price',
+        type: PlutoColumnType.number(),
         width: 100,
+        renderer: (rendererContext) {
+          final rawPrice = rendererContext.cell.value;
+          final price = rawPrice is num ? rawPrice.toDouble() : null;
+          final currency = rendererContext.row.cells['currency']?.value as String?;
+          return Text(
+            price != null ? '${price.toStringAsFixed(2)} ${currency ?? ''}' : '-',
+            style: GoogleFonts.inter(
+              fontSize: 13,
+              fontWeight: FontWeight.w500,
+              color: AppTheme.accent,
+            ),
+          );
+        },
+      ),
+      PlutoColumn(
+        title: 'Birim',
+        field: 'unit',
+        type: PlutoColumnType.text(),
+        width: 80,
+      ),
+      PlutoColumn(
+        title: 'Min. Sipariş',
+        field: 'min_qty',
+        type: PlutoColumnType.number(),
+        width: 90,
       ),
       PlutoColumn(
         title: 'İşlemler',
         field: 'actions',
         type: PlutoColumnType.text(),
         width: 100,
-        enableEditingMode: false,
         enableSorting: false,
         enableFilterMenuItem: false,
         renderer: (rendererContext) {
-          final supplierId = rendererContext.row.cells['id']?.value as int?;
-          final supplierName = rendererContext.row.cells['name']?.value as String?;
+          final itemId = rendererContext.row.cells['id']?.value as int?;
+          final itemName = rendererContext.row.cells['name']?.value as String?;
           return Row(
             mainAxisAlignment: MainAxisAlignment.center,
             mainAxisSize: MainAxisSize.min,
             children: [
               InkWell(
                 onTap: () {
-                  if (supplierId != null) {
-                    final supplier = _suppliers.firstWhere((s) => s.id == supplierId);
-                    _showEditSupplierDialog(supplier);
+                  if (itemId != null) {
+                    final item = _items.firstWhere((s) => s.id == itemId);
+                    _showEditItemDialog(item);
                   }
                 },
                 borderRadius: BorderRadius.circular(4),
@@ -127,8 +164,8 @@ class _SupplierListPageState extends State<SupplierListPage> {
               const SizedBox(width: 4),
               InkWell(
                 onTap: () {
-                  if (supplierId != null && supplierName != null) {
-                    _deleteSupplier(supplierId, supplierName);
+                  if (itemId != null && itemName != null) {
+                    _deleteItem(itemId, itemName);
                   }
                 },
                 borderRadius: BorderRadius.circular(4),
@@ -144,12 +181,16 @@ class _SupplierListPageState extends State<SupplierListPage> {
     ];
   }
 
-  Future<void> _loadSuppliers() async {
+  Future<void> _loadData() async {
     setState(() => _isLoading = true);
     try {
-      final suppliers = await rust_api.getAllSuppliers();
+      final results = await Future.wait([
+        rust_api.getAllSupplyItems(),
+        rust_api.getAllSuppliers(),
+      ]);
       setState(() {
-        _suppliers = suppliers;
+        _items = results[0] as List<SupplyItem>;
+        _suppliers = results[1] as List<Supplier>;
         _updateRows();
         _gridKey = UniqueKey();
         _isLoading = false;
@@ -159,7 +200,7 @@ class _SupplierListPageState extends State<SupplierListPage> {
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
           SnackBar(
-            content: Text('Tedarikçiler yüklenirken hata: $e'),
+            content: Text('Veriler yüklenirken hata: $e'),
             backgroundColor: Colors.red.shade700,
           ),
         );
@@ -167,17 +208,17 @@ class _SupplierListPageState extends State<SupplierListPage> {
     }
   }
 
-  Future<void> _searchSuppliers(String query) async {
+  Future<void> _searchItems(String query) async {
     if (query.isEmpty) {
-      _loadSuppliers();
+      _loadData();
       return;
     }
-    
+
     setState(() => _isLoading = true);
     try {
-      final suppliers = await rust_api.searchSuppliers(query: query);
+      final items = await rust_api.searchSupplyItems(query: query);
       setState(() {
-        _suppliers = suppliers;
+        _items = items;
         _updateRows();
         _gridKey = UniqueKey();
         _isLoading = false;
@@ -188,28 +229,30 @@ class _SupplierListPageState extends State<SupplierListPage> {
   }
 
   void _updateRows() {
-    _rows = _suppliers.map((supplier) {
+    _rows = _items.map((item) {
       return PlutoRow(
         cells: {
-          'id': PlutoCell(value: supplier.id),
-          'name': PlutoCell(value: supplier.name),
-          'category': PlutoCell(value: supplier.category),
-          'contact_person': PlutoCell(value: supplier.contactPerson ?? '-'),
-          'phone': PlutoCell(value: supplier.phone ?? '-'),
-          'email': PlutoCell(value: supplier.email ?? '-'),
-          'country': PlutoCell(value: supplier.country ?? '-'),
+          'id': PlutoCell(value: item.id),
+          'impa_code': PlutoCell(value: item.impaCode ?? '-'),
+          'name': PlutoCell(value: item.name),
+          'category': PlutoCell(value: item.category),
+          'supplier_name': PlutoCell(value: item.supplierName ?? '-'),
+          'unit_price': PlutoCell(value: item.unitPrice),
+          'currency': PlutoCell(value: item.currency),
+          'unit': PlutoCell(value: item.unit),
+          'min_qty': PlutoCell(value: item.minimumOrderQuantity ?? 1),
           'actions': PlutoCell(value: ''),
         },
       );
     }).toList();
   }
 
-  Future<void> _deleteSupplier(int id, String name) async {
+  Future<void> _deleteItem(int id, String name) async {
     final confirmed = await showDialog<bool>(
       context: context,
       builder: (context) => AlertDialog(
-        title: Text('Tedarikçi Sil', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
-        content: Text('$name tedarikçisini silmek istediğinize emin misiniz?'),
+        title: Text('Ürün Sil', style: GoogleFonts.inter(fontWeight: FontWeight.w600)),
+        content: Text('$name ürününü silmek istediğinize emin misiniz?'),
         actions: [
           TextButton(
             onPressed: () => Navigator.pop(context, false),
@@ -226,8 +269,8 @@ class _SupplierListPageState extends State<SupplierListPage> {
 
     if (confirmed == true) {
       try {
-        await rust_api.deleteSupplier(id: id);
-        _loadSuppliers();
+        await rust_api.deleteSupplyItem(id: id);
+        _loadData();
         if (mounted) {
           ScaffoldMessenger.of(context).showSnackBar(
             SnackBar(
@@ -249,21 +292,24 @@ class _SupplierListPageState extends State<SupplierListPage> {
     }
   }
 
-  void _showAddSupplierDialog() {
+  void _showAddItemDialog() {
     showDialog<bool>(
       context: context,
-      builder: (dialogContext) => _SupplierFormDialog(
+      builder: (dialogContext) => _SupplyItemFormDialog(
+        suppliers: _suppliers,
         categories: _categories,
-        onSave: (supplier) async {
-          await rust_api.createSupplier(supplier: supplier);
+        units: _units,
+        currencies: _currencies,
+        onSave: (item) async {
+          await rust_api.createSupplyItem(item: item);
         },
       ),
     ).then((result) {
       if (result == true) {
-        _loadSuppliers();
+        _loadData();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Tedarikçi başarıyla eklendi'),
+            content: Text('Ürün başarıyla eklendi'),
             backgroundColor: Color(0xFF10B981),
           ),
         );
@@ -271,31 +317,36 @@ class _SupplierListPageState extends State<SupplierListPage> {
     });
   }
 
-  void _showEditSupplierDialog(Supplier supplier) {
+  void _showEditItemDialog(SupplyItem item) {
     showDialog<bool>(
       context: context,
-      builder: (dialogContext) => _SupplierFormDialog(
-        supplier: supplier,
+      builder: (dialogContext) => _SupplyItemFormDialog(
+        item: item,
+        suppliers: _suppliers,
         categories: _categories,
+        units: _units,
+        currencies: _currencies,
         onSave: (request) async {
-          final updateRequest = UpdateSupplierRequest(
+          final updateRequest = UpdateSupplyItemRequest(
+            supplierId: request.supplierId,
+            impaCode: request.impaCode,
             name: request.name,
-            contactPerson: request.contactPerson,
-            email: request.email,
-            phone: request.phone,
-            address: request.address,
-            country: request.country,
+            description: request.description,
             category: request.category,
+            unit: request.unit,
+            unitPrice: request.unitPrice,
+            currency: request.currency,
+            minimumOrderQuantity: request.minimumOrderQuantity,
           );
-          await rust_api.updateSupplier(id: supplier.id, supplier: updateRequest);
+          await rust_api.updateSupplyItem(id: item.id, item: updateRequest);
         },
       ),
     ).then((result) {
       if (result == true) {
-        _loadSuppliers();
+        _loadData();
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
-            content: Text('Tedarikçi başarıyla güncellendi'),
+            content: Text('Ürün başarıyla güncellendi'),
             backgroundColor: Color(0xFF10B981),
           ),
         );
@@ -318,72 +369,82 @@ class _SupplierListPageState extends State<SupplierListPage> {
       appBar: AppBar(
         backgroundColor: AppTheme.surface,
         elevation: 0,
-        title: Text(
-          'Tedarikçiler',
-          style: GoogleFonts.inter(
-            fontWeight: FontWeight.w600,
-            color: AppTheme.primaryText,
+        leadingWidth: 200,
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 24),
+          child: Row(
+            children: [
+              Icon(Icons.inventory_2_outlined, color: AppTheme.brandColor, size: 24),
+              const SizedBox(width: 12),
+              Text(
+                'Ürün Kataloğu',
+                style: GoogleFonts.inter(
+                  fontWeight: FontWeight.w600,
+                  fontSize: 18,
+                  color: AppTheme.primaryText,
+                ),
+              ),
+            ],
           ),
         ),
         actions: [
-          // Search Field
-          SizedBox(
+          // Search
+          Container(
             width: 300,
-            child: Padding(
-              padding: const EdgeInsets.symmetric(vertical: 8),
-              child: TextField(
-                controller: _searchController,
-                onChanged: (value) {
-                  setState(() => _searchQuery = value);
-                },
-                onSubmitted: _searchSuppliers,
-                decoration: InputDecoration(
-                  hintText: 'Tedarikçi ara (isim, kategori, ülke)...',
-                  hintStyle: GoogleFonts.inter(color: AppTheme.secondaryText, fontSize: 13),
-                  prefixIcon: const Icon(Icons.search, color: AppTheme.secondaryText, size: 20),
-                  suffixIcon: _searchQuery.isNotEmpty
-                      ? IconButton(
-                          icon: const Icon(Icons.clear, size: 18),
-                          onPressed: () {
-                            _searchController.clear();
-                            setState(() => _searchQuery = '');
-                            _loadSuppliers();
-                          },
-                        )
-                      : null,
-                  filled: true,
-                  fillColor: AppTheme.background,
-                  border: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: AppTheme.border),
-                  ),
-                  enabledBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: AppTheme.border),
-                  ),
-                  focusedBorder: OutlineInputBorder(
-                    borderRadius: BorderRadius.circular(8),
-                    borderSide: const BorderSide(color: AppTheme.accent),
-                  ),
-                  contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+            height: 36,
+            margin: const EdgeInsets.symmetric(vertical: 10),
+            child: TextField(
+              controller: _searchController,
+              onChanged: (value) {
+                _searchQuery = value;
+                _searchItems(value);
+              },
+              decoration: InputDecoration(
+                hintText: 'Ürün ara (isim, IMPA kodu)...',
+                hintStyle: GoogleFonts.inter(fontSize: 13, color: AppTheme.secondaryText),
+                prefixIcon: const Icon(Icons.search, size: 18, color: AppTheme.secondaryText),
+                suffixIcon: _searchQuery.isNotEmpty
+                    ? IconButton(
+                        icon: const Icon(Icons.clear, size: 16),
+                        onPressed: () {
+                          _searchController.clear();
+                          _searchQuery = '';
+                          _loadData();
+                        },
+                      )
+                    : null,
+                filled: true,
+                fillColor: AppTheme.background,
+                border: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: AppTheme.border),
                 ),
-                style: GoogleFonts.inter(fontSize: 14),
+                enabledBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: AppTheme.border),
+                ),
+                focusedBorder: OutlineInputBorder(
+                  borderRadius: BorderRadius.circular(8),
+                  borderSide: const BorderSide(color: AppTheme.accent),
+                ),
+                contentPadding: const EdgeInsets.symmetric(horizontal: 12),
               ),
+              style: GoogleFonts.inter(fontSize: 14),
             ),
           ),
           const SizedBox(width: 16),
           IconButton(
             icon: const Icon(Icons.refresh, color: AppTheme.secondaryText),
-            onPressed: _loadSuppliers,
+            onPressed: _loadData,
             tooltip: 'Yenile',
           ),
           const SizedBox(width: 8),
           Padding(
             padding: const EdgeInsets.only(right: 16),
             child: ElevatedButton.icon(
-              onPressed: _showAddSupplierDialog,
+              onPressed: _showAddItemDialog,
               icon: const Icon(Icons.add, size: 18),
-              label: Text('Yeni Tedarikçi', style: GoogleFonts.inter(fontWeight: FontWeight.w500)),
+              label: Text('Yeni Ürün', style: GoogleFonts.inter(fontWeight: FontWeight.w500)),
               style: ElevatedButton.styleFrom(
                 backgroundColor: AppTheme.accent,
                 foregroundColor: Colors.white,
@@ -403,11 +464,11 @@ class _SupplierListPageState extends State<SupplierListPage> {
           padding: EdgeInsets.zero,
           child: _isLoading
               ? const Center(child: CircularProgressIndicator())
-              : _suppliers.isEmpty
+              : _items.isEmpty
                   ? const EmptyState(
-                      icon: Icons.store_outlined,
-                      title: 'Henüz tedarikçi bulunmuyor',
-                      subtitle: 'Yeni bir tedarikçi ekleyerek başlayın',
+                      icon: Icons.inventory_2_outlined,
+                      title: 'Henüz ürün bulunmuyor',
+                      subtitle: 'Yeni bir ürün ekleyerek başlayın',
                     )
                   : Column(
                       children: [
@@ -419,10 +480,10 @@ class _SupplierListPageState extends State<SupplierListPage> {
                           ),
                           child: Row(
                             children: [
-                              Icon(Icons.store, size: 20, color: AppTheme.accent),
+                              Icon(Icons.inventory_2, size: 20, color: AppTheme.accent),
                               const SizedBox(width: 8),
                               Text(
-                                '${_suppliers.length} tedarikçi',
+                                '${_items.length} ürün',
                                 style: GoogleFonts.inter(
                                   fontWeight: FontWeight.w600,
                                   color: AppTheme.primaryText,
@@ -446,10 +507,10 @@ class _SupplierListPageState extends State<SupplierListPage> {
                             columns: _columns,
                             rows: _rows,
                             onRowDoubleTap: (event) {
-                              final supplierId = event.row.cells['id']?.value as int?;
-                              if (supplierId != null) {
-                                final supplier = _suppliers.firstWhere((s) => s.id == supplierId);
-                                _showEditSupplierDialog(supplier);
+                              final itemId = event.row.cells['id']?.value as int?;
+                              if (itemId != null) {
+                                final item = _items.firstWhere((s) => s.id == itemId);
+                                _showEditItemDialog(item);
                               }
                             },
                             createFooter: (stateManager) {
@@ -498,7 +559,7 @@ class _SupplierListPageState extends State<SupplierListPage> {
         mainAxisAlignment: MainAxisAlignment.spaceBetween,
         children: [
           Text(
-            'Toplam: ${_suppliers.length} tedarikçi',
+            'Toplam: ${_items.length} ürün',
             style: GoogleFonts.inter(
               fontSize: 12,
               color: AppTheme.secondaryText,
@@ -523,7 +584,7 @@ class _SupplierListPageState extends State<SupplierListPage> {
         backgroundColor: AppTheme.surface,
         elevation: 0,
         title: Text(
-          'Tedarikçiler',
+          'Ürün Kataloğu',
           style: GoogleFonts.inter(
             fontWeight: FontWeight.w600,
             color: AppTheme.primaryText,
@@ -539,31 +600,31 @@ class _SupplierListPageState extends State<SupplierListPage> {
           ),
           IconButton(
             icon: const Icon(Icons.refresh, color: AppTheme.secondaryText),
-            onPressed: _loadSuppliers,
+            onPressed: _loadData,
           ),
         ],
       ),
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
-          : _suppliers.isEmpty
+          : _items.isEmpty
               ? const EmptyState(
-                  icon: Icons.store_outlined,
-                  title: 'Henüz tedarikçi bulunmuyor',
-                  subtitle: 'Yeni bir tedarikçi ekleyerek başlayın',
+                  icon: Icons.inventory_2_outlined,
+                  title: 'Henüz ürün bulunmuyor',
                 )
-              : ListView.builder(
+              : ListView.separated(
                   padding: const EdgeInsets.all(16),
-                  itemCount: _suppliers.length,
+                  itemCount: _items.length,
+                  separatorBuilder: (_, __) => const SizedBox(height: 8),
                   itemBuilder: (context, index) {
-                    final supplier = _suppliers[index];
-                    return _SupplierCard(
-                      supplier: supplier,
-                      onTap: () => _showEditSupplierDialog(supplier),
+                    final item = _items[index];
+                    return _SupplyItemCard(
+                      item: item,
+                      onTap: () => _showEditItemDialog(item),
                     );
                   },
                 ),
       floatingActionButton: FloatingActionButton(
-        onPressed: _showAddSupplierDialog,
+        onPressed: _showAddItemDialog,
         backgroundColor: AppTheme.accent,
         child: const Icon(Icons.add),
       ),
@@ -571,24 +632,18 @@ class _SupplierListPageState extends State<SupplierListPage> {
   }
 }
 
-/// Supplier Card for mobile view
-class _SupplierCard extends StatelessWidget {
-  final Supplier supplier;
+/// Mobile card for supply item
+class _SupplyItemCard extends StatelessWidget {
+  final SupplyItem item;
   final VoidCallback onTap;
 
-  const _SupplierCard({required this.supplier, required this.onTap});
+  const _SupplyItemCard({required this.item, required this.onTap});
 
   @override
   Widget build(BuildContext context) {
-    return Card(
-      margin: const EdgeInsets.only(bottom: 12),
-      elevation: 0,
-      shape: RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(12),
-        side: const BorderSide(color: AppTheme.border),
-      ),
+    return LinearContainer(
+      padding: EdgeInsets.zero,
       child: ListTile(
-        contentPadding: const EdgeInsets.all(16),
         leading: Container(
           width: 48,
           height: 48,
@@ -596,16 +651,25 @@ class _SupplierCard extends StatelessWidget {
             color: AppTheme.accent.withOpacity(0.1),
             borderRadius: BorderRadius.circular(8),
           ),
-          child: const Center(
-            child: Icon(Icons.store, color: AppTheme.accent),
+          child: Center(
+            child: Text(
+              item.impaCode ?? '?',
+              style: GoogleFonts.inter(
+                fontWeight: FontWeight.w700,
+                fontSize: 10,
+                color: AppTheme.accent,
+              ),
+              textAlign: TextAlign.center,
+              overflow: TextOverflow.ellipsis,
+            ),
           ),
         ),
         title: Text(
-          supplier.name,
+          item.name,
           style: GoogleFonts.inter(fontWeight: FontWeight.w600),
         ),
         subtitle: Text(
-          '${supplier.category} • ${supplier.country ?? "Ülke belirtilmemiş"}',
+          '${item.category} • ${item.unitPrice.toStringAsFixed(2)} ${item.currency}/${item.unit}',
           style: GoogleFonts.inter(fontSize: 12, color: AppTheme.secondaryText),
         ),
         trailing: const Icon(Icons.chevron_right, color: AppTheme.secondaryText),
@@ -615,77 +679,98 @@ class _SupplierCard extends StatelessWidget {
   }
 }
 
-/// Supplier Form Dialog for Create/Edit
-class _SupplierFormDialog extends StatefulWidget {
-  final Supplier? supplier;
+/// Supply Item Form Dialog for Create/Edit
+class _SupplyItemFormDialog extends StatefulWidget {
+  final SupplyItem? item;
+  final List<Supplier> suppliers;
   final List<String> categories;
-  final Future<void> Function(CreateSupplierRequest) onSave;
+  final List<String> units;
+  final List<String> currencies;
+  final Future<void> Function(CreateSupplyItemRequest) onSave;
 
-  const _SupplierFormDialog({
-    this.supplier,
+  const _SupplyItemFormDialog({
+    this.item,
+    required this.suppliers,
     required this.categories,
+    required this.units,
+    required this.currencies,
     required this.onSave,
   });
 
   @override
-  State<_SupplierFormDialog> createState() => _SupplierFormDialogState();
+  State<_SupplyItemFormDialog> createState() => _SupplyItemFormDialogState();
 }
 
-class _SupplierFormDialogState extends State<_SupplierFormDialog> {
+class _SupplyItemFormDialogState extends State<_SupplyItemFormDialog> {
   final _formKey = GlobalKey<FormState>();
   late TextEditingController _nameController;
-  late TextEditingController _contactPersonController;
-  late TextEditingController _emailController;
-  late TextEditingController _phoneController;
-  late TextEditingController _addressController;
-  late TextEditingController _countryController;
+  late TextEditingController _impaCodeController;
+  late TextEditingController _descriptionController;
+  late TextEditingController _unitPriceController;
+  late TextEditingController _minQtyController;
+  late int? _selectedSupplierId;
   late String _selectedCategory;
+  late String _selectedUnit;
+  late String _selectedCurrency;
   bool _isLoading = false;
 
-  bool get isEditing => widget.supplier != null;
+  bool get isEditing => widget.item != null;
 
   @override
   void initState() {
     super.initState();
-    _nameController = TextEditingController(text: widget.supplier?.name ?? '');
-    _contactPersonController = TextEditingController(text: widget.supplier?.contactPerson ?? '');
-    _emailController = TextEditingController(text: widget.supplier?.email ?? '');
-    _phoneController = TextEditingController(text: widget.supplier?.phone ?? '');
-    _addressController = TextEditingController(text: widget.supplier?.address ?? '');
-    _countryController = TextEditingController(text: widget.supplier?.country ?? '');
-    _selectedCategory = widget.supplier?.category ?? widget.categories.first;
+    _nameController = TextEditingController(text: widget.item?.name ?? '');
+    _impaCodeController = TextEditingController(text: widget.item?.impaCode ?? '');
+    _descriptionController = TextEditingController(text: widget.item?.description ?? '');
+    _unitPriceController = TextEditingController(
+      text: widget.item?.unitPrice.toStringAsFixed(2) ?? '',
+    );
+    _minQtyController = TextEditingController(
+      text: widget.item?.minimumOrderQuantity?.toString() ?? '',
+    );
+    _selectedSupplierId = widget.item?.supplierId ?? (widget.suppliers.isNotEmpty ? widget.suppliers.first.id : null);
+    _selectedCategory = widget.item?.category ?? widget.categories.first;
+    _selectedUnit = widget.item?.unit ?? widget.units.first;
+    _selectedCurrency = widget.item?.currency ?? widget.currencies.first;
   }
 
   @override
   void dispose() {
     _nameController.dispose();
-    _contactPersonController.dispose();
-    _emailController.dispose();
-    _phoneController.dispose();
-    _addressController.dispose();
-    _countryController.dispose();
+    _impaCodeController.dispose();
+    _descriptionController.dispose();
+    _unitPriceController.dispose();
+    _minQtyController.dispose();
     super.dispose();
   }
 
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) return;
+    if (_selectedSupplierId == null) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Lütfen bir tedarikçi seçin'), backgroundColor: Colors.red),
+      );
+      return;
+    }
 
     setState(() => _isLoading = true);
 
-    final request = CreateSupplierRequest(
+    final request = CreateSupplyItemRequest(
+      supplierId: _selectedSupplierId!,
+      impaCode: _impaCodeController.text.trim().isEmpty ? null : _impaCodeController.text.trim(),
       name: _nameController.text.trim(),
-      contactPerson: _contactPersonController.text.trim().isEmpty ? null : _contactPersonController.text.trim(),
-      email: _emailController.text.trim().isEmpty ? null : _emailController.text.trim(),
-      phone: _phoneController.text.trim().isEmpty ? null : _phoneController.text.trim(),
-      address: _addressController.text.trim().isEmpty ? null : _addressController.text.trim(),
-      country: _countryController.text.trim().isEmpty ? null : _countryController.text.trim().toUpperCase(),
+      description: _descriptionController.text.trim().isEmpty ? null : _descriptionController.text.trim(),
       category: _selectedCategory,
+      unit: _selectedUnit,
+      unitPrice: double.tryParse(_unitPriceController.text) ?? 0.0,
+      currency: _selectedCurrency,
+      minimumOrderQuantity: int.tryParse(_minQtyController.text),
     );
 
     try {
       await widget.onSave(request);
       if (mounted) {
-        Navigator.pop(context, true); // Return true on success
+        Navigator.pop(context, true);
       }
     } catch (e) {
       setState(() => _isLoading = false);
@@ -705,7 +790,7 @@ class _SupplierFormDialogState extends State<_SupplierFormDialog> {
     return Dialog(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
       child: Container(
-        width: 550,
+        width: 600,
         padding: const EdgeInsets.all(24),
         child: Form(
           key: _formKey,
@@ -719,7 +804,7 @@ class _SupplierFormDialogState extends State<_SupplierFormDialog> {
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
                     Text(
-                      isEditing ? 'Tedarikçi Düzenle' : 'Yeni Tedarikçi Ekle',
+                      isEditing ? 'Ürün Düzenle' : 'Yeni Ürün Ekle',
                       style: GoogleFonts.inter(
                         fontSize: 20,
                         fontWeight: FontWeight.w600,
@@ -727,92 +812,130 @@ class _SupplierFormDialogState extends State<_SupplierFormDialog> {
                       ),
                     ),
                     IconButton(
-                      onPressed: () => Navigator.pop(context),
                       icon: const Icon(Icons.close),
+                      onPressed: () => Navigator.pop(context),
                     ),
                   ],
                 ),
                 const SizedBox(height: 24),
 
-                // Form fields
+                // Form fields - Row 1
                 Row(
                   children: [
+                    // IMPA Code
                     Expanded(
-                      flex: 3,
+                      flex: 1,
                       child: _buildTextField(
-                        controller: _nameController,
-                        label: 'Firma Adı *',
-                        hint: 'ABC Tedarik Ltd.',
-                        validator: (v) => v?.isEmpty == true ? 'Firma adı gerekli' : null,
+                        controller: _impaCodeController,
+                        label: 'IMPA Kodu',
+                        hint: '123456',
+                        icon: Icons.qr_code,
                       ),
                     ),
                     const SizedBox(width: 16),
+                    // Product Name
                     Expanded(
                       flex: 2,
-                      child: _buildDropdown(
-                        label: 'Kategori *',
+                      child: _buildTextField(
+                        controller: _nameController,
+                        label: 'Ürün Adı *',
+                        hint: 'Ürün adı girin',
+                        icon: Icons.inventory_2_outlined,
+                        validator: (v) => v?.isEmpty == true ? 'Zorunlu alan' : null,
+                      ),
+                    ),
+                  ],
+                ),
+                const SizedBox(height: 16),
+
+                // Row 2 - Category & Supplier
+                Row(
+                  children: [
+                    // Category
+                    Expanded(
+                      child: _buildDropdownField(
+                        label: 'Kategori',
                         value: _selectedCategory,
                         items: widget.categories,
                         onChanged: (v) => setState(() => _selectedCategory = v!),
-                      ),
-                    ),
-                  ],
-                ),
-                const SizedBox(height: 16),
-
-                Row(
-                  children: [
-                    Expanded(
-                      child: _buildTextField(
-                        controller: _contactPersonController,
-                        label: 'İletişim Kişisi',
-                        hint: 'Ahmet Yılmaz',
+                        icon: Icons.category_outlined,
                       ),
                     ),
                     const SizedBox(width: 16),
+                    // Supplier
                     Expanded(
-                      child: _buildTextField(
-                        controller: _phoneController,
-                        label: 'Telefon',
-                        hint: '+90 555 123 4567',
-                      ),
+                      child: _buildSupplierDropdown(),
                     ),
                   ],
                 ),
                 const SizedBox(height: 16),
 
+                // Row 3 - Price, Currency, Unit
                 Row(
                   children: [
+                    // Unit Price
                     Expanded(
                       flex: 2,
                       child: _buildTextField(
-                        controller: _emailController,
-                        label: 'E-posta',
-                        hint: 'info@firma.com',
-                        keyboardType: TextInputType.emailAddress,
+                        controller: _unitPriceController,
+                        label: 'Birim Fiyat *',
+                        hint: '0.00',
+                        icon: Icons.attach_money,
+                        keyboardType: TextInputType.number,
+                        validator: (v) {
+                          if (v?.isEmpty == true) return 'Zorunlu alan';
+                          if (double.tryParse(v!) == null) return 'Geçersiz fiyat';
+                          return null;
+                        },
                       ),
                     ),
                     const SizedBox(width: 16),
+                    // Currency
                     Expanded(
-                      child: _buildTextField(
-                        controller: _countryController,
-                        label: 'Ülke',
-                        hint: 'TR',
+                      child: _buildDropdownField(
+                        label: 'Para Birimi',
+                        value: _selectedCurrency,
+                        items: widget.currencies,
+                        onChanged: (v) => setState(() => _selectedCurrency = v!),
+                        icon: Icons.currency_exchange,
+                      ),
+                    ),
+                    const SizedBox(width: 16),
+                    // Unit
+                    Expanded(
+                      child: _buildDropdownField(
+                        label: 'Birim',
+                        value: _selectedUnit,
+                        items: widget.units,
+                        onChanged: (v) => setState(() => _selectedUnit = v!),
+                        icon: Icons.straighten,
                       ),
                     ),
                   ],
                 ),
                 const SizedBox(height: 16),
 
+                // Row 4 - Min Qty
                 _buildTextField(
-                  controller: _addressController,
-                  label: 'Adres',
-                  hint: 'Liman Cad. No:123, Tuzla/İstanbul',
+                  controller: _minQtyController,
+                  label: 'Min. Sipariş Miktarı',
+                  hint: '1',
+                  icon: Icons.production_quantity_limits,
+                  keyboardType: TextInputType.number,
+                ),
+                const SizedBox(height: 16),
+
+                // Description
+                _buildTextField(
+                  controller: _descriptionController,
+                  label: 'Açıklama',
+                  hint: 'Ürün açıklaması (opsiyonel)',
+                  icon: Icons.description_outlined,
                   maxLines: 2,
                 ),
                 const SizedBox(height: 24),
 
-                // Actions
+                // Buttons
                 Row(
                   mainAxisAlignment: MainAxisAlignment.end,
                   children: [
@@ -829,6 +952,7 @@ class _SupplierFormDialogState extends State<_SupplierFormDialog> {
                       style: ElevatedButton.styleFrom(
                         backgroundColor: AppTheme.accent,
                         foregroundColor: Colors.white,
+                        elevation: 0,
                         padding: const EdgeInsets.symmetric(horizontal: 24, vertical: 12),
                         shape: RoundedRectangleBorder(
                           borderRadius: BorderRadius.circular(8),
@@ -838,13 +962,10 @@ class _SupplierFormDialogState extends State<_SupplierFormDialog> {
                           ? const SizedBox(
                               width: 20,
                               height: 20,
-                              child: CircularProgressIndicator(
-                                strokeWidth: 2,
-                                color: Colors.white,
-                              ),
+                              child: CircularProgressIndicator(strokeWidth: 2, color: Colors.white),
                             )
                           : Text(
-                              isEditing ? 'Güncelle' : 'Ekle',
+                              isEditing ? 'Güncelle' : 'Kaydet',
                               style: GoogleFonts.inter(fontWeight: FontWeight.w500),
                             ),
                     ),
@@ -862,8 +983,9 @@ class _SupplierFormDialogState extends State<_SupplierFormDialog> {
     required TextEditingController controller,
     required String label,
     required String hint,
-    String? Function(String?)? validator,
+    required IconData icon,
     TextInputType? keyboardType,
+    String? Function(String?)? validator,
     int maxLines = 1,
   }) {
     return Column(
@@ -874,7 +996,7 @@ class _SupplierFormDialogState extends State<_SupplierFormDialog> {
           style: GoogleFonts.inter(
             fontSize: 13,
             fontWeight: FontWeight.w500,
-            color: AppTheme.primaryText,
+            color: AppTheme.secondaryText,
           ),
         ),
         const SizedBox(height: 6),
@@ -883,10 +1005,10 @@ class _SupplierFormDialogState extends State<_SupplierFormDialog> {
           validator: validator,
           keyboardType: keyboardType,
           maxLines: maxLines,
-          style: GoogleFonts.inter(fontSize: 14),
           decoration: InputDecoration(
             hintText: hint,
-            hintStyle: GoogleFonts.inter(color: AppTheme.secondaryText),
+            hintStyle: GoogleFonts.inter(color: AppTheme.secondaryText.withOpacity(0.5)),
+            prefixIcon: Icon(icon, size: 18, color: AppTheme.secondaryText),
             filled: true,
             fillColor: AppTheme.background,
             border: OutlineInputBorder(
@@ -903,20 +1025,22 @@ class _SupplierFormDialogState extends State<_SupplierFormDialog> {
             ),
             errorBorder: OutlineInputBorder(
               borderRadius: BorderRadius.circular(8),
-              borderSide: const BorderSide(color: Colors.red),
+              borderSide: BorderSide(color: Colors.red.shade300),
             ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
           ),
+          style: GoogleFonts.inter(fontSize: 14),
         ),
       ],
     );
   }
 
-  Widget _buildDropdown({
+  Widget _buildDropdownField({
     required String label,
     required String value,
     required List<String> items,
     required void Function(String?) onChanged,
+    required IconData icon,
   }) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
@@ -926,19 +1050,16 @@ class _SupplierFormDialogState extends State<_SupplierFormDialog> {
           style: GoogleFonts.inter(
             fontSize: 13,
             fontWeight: FontWeight.w500,
-            color: AppTheme.primaryText,
+            color: AppTheme.secondaryText,
           ),
         ),
         const SizedBox(height: 6),
         DropdownButtonFormField<String>(
           value: value,
           isExpanded: true,
-          items: items.map((item) => DropdownMenuItem(
-            value: item,
-            child: Text(item, style: GoogleFonts.inter(fontSize: 14), overflow: TextOverflow.ellipsis),
-          )).toList(),
           onChanged: onChanged,
           decoration: InputDecoration(
+            prefixIcon: Icon(icon, size: 18, color: AppTheme.secondaryText),
             filled: true,
             fillColor: AppTheme.background,
             border: OutlineInputBorder(
@@ -955,6 +1076,66 @@ class _SupplierFormDialogState extends State<_SupplierFormDialog> {
             ),
             contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
           ),
+          items: items.map((item) {
+            return DropdownMenuItem(
+              value: item,
+              child: Text(
+                item,
+                style: GoogleFonts.inter(fontSize: 14),
+                overflow: TextOverflow.ellipsis,
+              ),
+            );
+          }).toList(),
+        ),
+      ],
+    );
+  }
+
+  Widget _buildSupplierDropdown() {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(
+          'Tedarikçi *',
+          style: GoogleFonts.inter(
+            fontSize: 13,
+            fontWeight: FontWeight.w500,
+            color: AppTheme.secondaryText,
+          ),
+        ),
+        const SizedBox(height: 6),
+        DropdownButtonFormField<int>(
+          value: _selectedSupplierId,
+          isExpanded: true,
+          onChanged: (v) => setState(() => _selectedSupplierId = v),
+          decoration: InputDecoration(
+            prefixIcon: const Icon(Icons.business_outlined, size: 18, color: AppTheme.secondaryText),
+            filled: true,
+            fillColor: AppTheme.background,
+            border: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: AppTheme.border),
+            ),
+            enabledBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: AppTheme.border),
+            ),
+            focusedBorder: OutlineInputBorder(
+              borderRadius: BorderRadius.circular(8),
+              borderSide: const BorderSide(color: AppTheme.accent),
+            ),
+            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 12),
+          ),
+          items: widget.suppliers.map((supplier) {
+            return DropdownMenuItem(
+              value: supplier.id,
+              child: Text(
+                supplier.name,
+                style: GoogleFonts.inter(fontSize: 14),
+                overflow: TextOverflow.ellipsis,
+              ),
+            );
+          }).toList(),
         ),
       ],
     );

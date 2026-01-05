@@ -4,4 +4,5 @@ pub mod ship_service;
 pub mod order_service;
 pub mod order_item_service;
 pub mod supplier_service;
+pub mod supply_item_service;
 pub mod calculation_service;

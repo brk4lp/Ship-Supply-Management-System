@@ -97,7 +97,6 @@ async fn create_tables(conn: &DatabaseConnection) -> Result<(), DbErr> {
             ship_id INTEGER NOT NULL,
             status TEXT NOT NULL DEFAULT 'NEW',
             delivery_port TEXT,
-            delivery_date TEXT,
             currency TEXT NOT NULL DEFAULT 'USD',
             notes TEXT,
             created_at TEXT NOT NULL DEFAULT (datetime('now')),
@@ -122,10 +121,36 @@ async fn create_tables(conn: &DatabaseConnection) -> Result<(), DbErr> {
             buying_price REAL NOT NULL,
             selling_price REAL NOT NULL,
             currency TEXT NOT NULL DEFAULT 'USD',
+            delivery_type TEXT NOT NULL DEFAULT 'VIA_WAREHOUSE',
+            warehouse_delivery_date TEXT,
+            ship_delivery_date TEXT,
             notes TEXT,
             created_at TEXT NOT NULL DEFAULT (datetime('now')),
             updated_at TEXT NOT NULL DEFAULT (datetime('now')),
             FOREIGN KEY (order_id) REFERENCES orders(id) ON DELETE CASCADE
+        )
+        "#.to_string()
+    )).await?;
+
+    // Supply items table (Product Catalog)
+    conn.execute(Statement::from_string(
+        DatabaseBackend::Sqlite,
+        r#"
+        CREATE TABLE IF NOT EXISTS supply_items (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            supplier_id INTEGER NOT NULL,
+            impa_code TEXT,
+            name TEXT NOT NULL,
+            description TEXT,
+            category TEXT NOT NULL,
+            unit TEXT NOT NULL,
+            unit_price REAL NOT NULL,
+            currency TEXT NOT NULL DEFAULT 'USD',
+            minimum_order_quantity INTEGER,
+            is_available INTEGER NOT NULL DEFAULT 1,
+            created_at TEXT NOT NULL DEFAULT (datetime('now')),
+            updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+            FOREIGN KEY (supplier_id) REFERENCES suppliers(id)
         )
         "#.to_string()
     )).await?;
@@ -144,6 +169,16 @@ async fn create_tables(conn: &DatabaseConnection) -> Result<(), DbErr> {
     conn.execute(Statement::from_string(
         DatabaseBackend::Sqlite,
         "CREATE INDEX IF NOT EXISTS idx_order_items_order_id ON order_items(order_id)".to_string()
+    )).await?;
+
+    conn.execute(Statement::from_string(
+        DatabaseBackend::Sqlite,
+        "CREATE INDEX IF NOT EXISTS idx_supply_items_supplier_id ON supply_items(supplier_id)".to_string()
+    )).await?;
+
+    conn.execute(Statement::from_string(
+        DatabaseBackend::Sqlite,
+        "CREATE INDEX IF NOT EXISTS idx_supply_items_category ON supply_items(category)".to_string()
     )).await?;
 
     tracing::info!("SQLite tables created successfully");

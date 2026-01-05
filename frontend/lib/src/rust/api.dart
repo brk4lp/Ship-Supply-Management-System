@@ -52,6 +52,10 @@ Future<Order> updateOrderStatus(
     RustLib.instance.api
         .crateApiUpdateOrderStatus(id: id, newStatus: newStatus);
 
+/// Get all items for an order
+Future<List<OrderItem>> getOrderItems({required int orderId}) =>
+    RustLib.instance.api.crateApiGetOrderItems(orderId: orderId);
+
 /// Add item to an order
 Future<OrderItem> addOrderItem({required CreateOrderItemRequest item}) =>
     RustLib.instance.api.crateApiAddOrderItem(item: item);
@@ -83,9 +87,72 @@ Future<ItemProfit> calculateItemProfit(
 Future<List<Supplier>> getAllSuppliers() =>
     RustLib.instance.api.crateApiGetAllSuppliers();
 
+/// Get a single supplier by ID
+Future<Supplier?> getSupplierById({required int id}) =>
+    RustLib.instance.api.crateApiGetSupplierById(id: id);
+
 /// Create a new supplier
 Future<Supplier> createSupplier({required CreateSupplierRequest supplier}) =>
     RustLib.instance.api.crateApiCreateSupplier(supplier: supplier);
+
+/// Update an existing supplier
+Future<Supplier> updateSupplier(
+        {required int id, required UpdateSupplierRequest supplier}) =>
+    RustLib.instance.api.crateApiUpdateSupplier(id: id, supplier: supplier);
+
+/// Delete a supplier
+Future<bool> deleteSupplier({required int id}) =>
+    RustLib.instance.api.crateApiDeleteSupplier(id: id);
+
+/// Search suppliers by name, category, or country
+Future<List<Supplier>> searchSuppliers({required String query}) =>
+    RustLib.instance.api.crateApiSearchSuppliers(query: query);
+
+/// Get suppliers by category
+Future<List<Supplier>> getSuppliersByCategory({required String category}) =>
+    RustLib.instance.api.crateApiGetSuppliersByCategory(category: category);
+
+/// Get total supplier count
+Future<PlatformInt64> getSupplierCount() =>
+    RustLib.instance.api.crateApiGetSupplierCount();
+
+/// Get all supply items
+Future<List<SupplyItem>> getAllSupplyItems() =>
+    RustLib.instance.api.crateApiGetAllSupplyItems();
+
+/// Get a single supply item by ID
+Future<SupplyItem?> getSupplyItemById({required int id}) =>
+    RustLib.instance.api.crateApiGetSupplyItemById(id: id);
+
+/// Get supply items by supplier
+Future<List<SupplyItem>> getSupplyItemsBySupplier({required int supplierId}) =>
+    RustLib.instance.api
+        .crateApiGetSupplyItemsBySupplier(supplierId: supplierId);
+
+/// Get supply items by category
+Future<List<SupplyItem>> getSupplyItemsByCategory({required String category}) =>
+    RustLib.instance.api.crateApiGetSupplyItemsByCategory(category: category);
+
+/// Create a new supply item
+Future<SupplyItem> createSupplyItem({required CreateSupplyItemRequest item}) =>
+    RustLib.instance.api.crateApiCreateSupplyItem(item: item);
+
+/// Update an existing supply item
+Future<SupplyItem> updateSupplyItem(
+        {required int id, required UpdateSupplyItemRequest item}) =>
+    RustLib.instance.api.crateApiUpdateSupplyItem(id: id, item: item);
+
+/// Delete a supply item
+Future<bool> deleteSupplyItem({required int id}) =>
+    RustLib.instance.api.crateApiDeleteSupplyItem(id: id);
+
+/// Search supply items by name, IMPA code, or description
+Future<List<SupplyItem>> searchSupplyItems({required String query}) =>
+    RustLib.instance.api.crateApiSearchSupplyItems(query: query);
+
+/// Get total supply item count
+Future<PlatformInt64> getSupplyItemCount() =>
+    RustLib.instance.api.crateApiGetSupplyItemCount();
 
 /// Initialize the database connection with custom URL
 Future<void> initDatabase({required String databaseUrl}) =>

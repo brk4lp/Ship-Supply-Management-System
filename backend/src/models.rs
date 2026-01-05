@@ -106,6 +106,24 @@ pub struct UpdateShipRequest {
 // Order Models
 // ============================================================================
 
+/// Delivery type - how the order will be delivered
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum DeliveryType {
+    /// Supplier -> Warehouse -> Ship
+    ViaWarehouse,
+    /// Supplier -> Ship (direct delivery)
+    DirectToShip,
+}
+
+impl DeliveryType {
+    pub fn display_name(&self) -> &'static str {
+        match self {
+            DeliveryType::ViaWarehouse => "Depo Üzerinden",
+            DeliveryType::DirectToShip => "Direkt Gemiye",
+        }
+    }
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Order {
     pub id: i32,
@@ -114,7 +132,6 @@ pub struct Order {
     pub ship_name: Option<String>,
     pub status: OrderStatus,
     pub delivery_port: Option<String>,
-    pub delivery_date: Option<String>,
     pub notes: Option<String>,
     pub currency: String,
     pub created_at: String,
@@ -132,7 +149,6 @@ pub struct OrderWithItems {
 pub struct CreateOrderRequest {
     pub ship_id: i32,
     pub delivery_port: Option<String>,
-    pub delivery_date: Option<String>,
     pub notes: Option<String>,
     pub currency: String,
 }
@@ -155,6 +171,12 @@ pub struct OrderItem {
     /// Revenue price - what we charge the customer
     pub selling_price: f64,
     pub currency: String,
+    /// Delivery type for this item
+    pub delivery_type: DeliveryType,
+    /// When supplier delivers to warehouse (if ViaWarehouse)
+    pub warehouse_delivery_date: Option<String>,
+    /// When delivered to ship
+    pub ship_delivery_date: Option<String>,
     pub notes: Option<String>,
 }
 
@@ -169,6 +191,9 @@ pub struct CreateOrderItemRequest {
     pub buying_price: f64,
     pub selling_price: f64,
     pub currency: String,
+    pub delivery_type: DeliveryType,
+    pub warehouse_delivery_date: Option<String>,
+    pub ship_delivery_date: Option<String>,
     pub notes: Option<String>,
 }
 
@@ -181,6 +206,9 @@ pub struct UpdateOrderItemRequest {
     pub unit: Option<String>,
     pub buying_price: Option<f64>,
     pub selling_price: Option<f64>,
+    pub delivery_type: Option<DeliveryType>,
+    pub warehouse_delivery_date: Option<String>,
+    pub ship_delivery_date: Option<String>,
     pub notes: Option<String>,
 }
 
@@ -240,4 +268,64 @@ pub struct CreateSupplierRequest {
     pub address: Option<String>,
     pub country: Option<String>,
     pub category: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UpdateSupplierRequest {
+    pub name: Option<String>,
+    pub contact_person: Option<String>,
+    pub email: Option<String>,
+    pub phone: Option<String>,
+    pub address: Option<String>,
+    pub country: Option<String>,
+    pub category: Option<String>,
+}
+
+// ============================================================================
+// Supply Item Models (Product Catalog)
+// ============================================================================
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct SupplyItem {
+    pub id: i32,
+    pub supplier_id: i32,
+    pub supplier_name: Option<String>,
+    pub impa_code: Option<String>,
+    pub name: String,
+    pub description: Option<String>,
+    pub category: String,
+    pub unit: String,
+    pub unit_price: f64,
+    pub currency: String,
+    pub minimum_order_quantity: Option<i32>,
+    pub is_available: bool,
+    pub created_at: String,
+    pub updated_at: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CreateSupplyItemRequest {
+    pub supplier_id: i32,
+    pub impa_code: Option<String>,
+    pub name: String,
+    pub description: Option<String>,
+    pub category: String,
+    pub unit: String,
+    pub unit_price: f64,
+    pub currency: String,
+    pub minimum_order_quantity: Option<i32>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UpdateSupplyItemRequest {
+    pub supplier_id: Option<i32>,
+    pub impa_code: Option<String>,
+    pub name: Option<String>,
+    pub description: Option<String>,
+    pub category: Option<String>,
+    pub unit: Option<String>,
+    pub unit_price: Option<f64>,
+    pub currency: Option<String>,
+    pub minimum_order_quantity: Option<i32>,
+    pub is_available: Option<bool>,
 }

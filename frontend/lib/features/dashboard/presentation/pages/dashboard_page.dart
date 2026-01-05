@@ -16,6 +16,8 @@ class _DashboardPageState extends State<DashboardPage> {
   String _rustVersion = 'Yükleniyor...';
   String _greetMessage = '';
   int _shipCount = 0;
+  int _supplierCount = 0;
+  int _supplyItemCount = 0;
   bool _dbConnected = false;
 
   @override
@@ -31,8 +33,12 @@ class _DashboardPageState extends State<DashboardPage> {
       final dbConnected = await rust_api.isDatabaseConnected();
       
       int shipCount = 0;
+      int supplierCount = 0;
+      int supplyItemCount = 0;
       if (dbConnected) {
         shipCount = (await rust_api.getShipCount()).toInt();
+        supplierCount = (await rust_api.getSupplierCount()).toInt();
+        supplyItemCount = (await rust_api.getSupplyItemCount()).toInt();
       }
       
       setState(() {
@@ -40,6 +46,8 @@ class _DashboardPageState extends State<DashboardPage> {
         _greetMessage = greeting;
         _dbConnected = dbConnected;
         _shipCount = shipCount;
+        _supplierCount = supplierCount;
+        _supplyItemCount = supplyItemCount;
       });
     } catch (e) {
       setState(() {
@@ -105,24 +113,24 @@ class _DashboardPageState extends State<DashboardPage> {
                 )),
                 const SizedBox(width: 16),
                 Expanded(child: _SummaryCard(
-                  title: 'Bekleyen Sipariş',
-                  value: '0',
-                  icon: Icons.hourglass_empty_outlined,
-                  color: const Color(0xFFF59E0B),
-                )),
-                const SizedBox(width: 16),
-                Expanded(child: _SummaryCard(
-                  title: 'Teslim Edilen',
-                  value: '0',
-                  icon: Icons.check_circle_outline,
-                  color: const Color(0xFF10B981),
-                )),
-                const SizedBox(width: 16),
-                Expanded(child: _SummaryCard(
                   title: 'Toplam Gemi',
                   value: '$_shipCount',
                   icon: Icons.directions_boat_outlined,
                   color: const Color(0xFF0EA5E9),
+                )),
+                const SizedBox(width: 16),
+                Expanded(child: _SummaryCard(
+                  title: 'Tedarikçi',
+                  value: '$_supplierCount',
+                  icon: Icons.store_outlined,
+                  color: const Color(0xFF10B981),
+                )),
+                const SizedBox(width: 16),
+                Expanded(child: _SummaryCard(
+                  title: 'Ürün Kataloğu',
+                  value: '$_supplyItemCount',
+                  icon: Icons.inventory_2_outlined,
+                  color: const Color(0xFFF59E0B),
                 )),
               ],
             ),

@@ -94,6 +94,13 @@ pub async fn update_order_status(id: i32, new_status: OrderStatus) -> Result<Ord
 // Order Item Operations  
 // ============================================================================
 
+/// Get all items for an order
+pub async fn get_order_items(order_id: i32) -> Result<Vec<OrderItem>, String> {
+    services::order_item_service::get_by_order_id(order_id)
+        .await
+        .map_err(|e| e.to_string())
+}
+
 /// Add item to an order
 pub async fn add_order_item(item: CreateOrderItemRequest) -> Result<OrderItem, String> {
     services::order_item_service::create(item)
@@ -142,9 +149,118 @@ pub async fn get_all_suppliers() -> Result<Vec<Supplier>, String> {
         .map_err(|e| e.to_string())
 }
 
+/// Get a single supplier by ID
+pub async fn get_supplier_by_id(id: i32) -> Result<Option<Supplier>, String> {
+    services::supplier_service::get_by_id(id)
+        .await
+        .map_err(|e| e.to_string())
+}
+
 /// Create a new supplier
 pub async fn create_supplier(supplier: CreateSupplierRequest) -> Result<Supplier, String> {
     services::supplier_service::create(supplier)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Update an existing supplier
+pub async fn update_supplier(id: i32, supplier: UpdateSupplierRequest) -> Result<Supplier, String> {
+    services::supplier_service::update(id, supplier)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Delete a supplier
+pub async fn delete_supplier(id: i32) -> Result<bool, String> {
+    services::supplier_service::delete(id)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Search suppliers by name, category, or country
+pub async fn search_suppliers(query: String) -> Result<Vec<Supplier>, String> {
+    services::supplier_service::search(&query)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Get suppliers by category
+pub async fn get_suppliers_by_category(category: String) -> Result<Vec<Supplier>, String> {
+    services::supplier_service::get_by_category(&category)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Get total supplier count
+pub async fn get_supplier_count() -> Result<i64, String> {
+    services::supplier_service::count()
+        .await
+        .map_err(|e| e.to_string())
+}
+
+// ============================================================================
+// Supply Item Operations (Product Catalog)
+// ============================================================================
+
+/// Get all supply items
+pub async fn get_all_supply_items() -> Result<Vec<SupplyItem>, String> {
+    services::supply_item_service::get_all()
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Get a single supply item by ID
+pub async fn get_supply_item_by_id(id: i32) -> Result<Option<SupplyItem>, String> {
+    services::supply_item_service::get_by_id(id)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Get supply items by supplier
+pub async fn get_supply_items_by_supplier(supplier_id: i32) -> Result<Vec<SupplyItem>, String> {
+    services::supply_item_service::get_by_supplier(supplier_id)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Get supply items by category
+pub async fn get_supply_items_by_category(category: String) -> Result<Vec<SupplyItem>, String> {
+    services::supply_item_service::get_by_category(&category)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Create a new supply item
+pub async fn create_supply_item(item: CreateSupplyItemRequest) -> Result<SupplyItem, String> {
+    services::supply_item_service::create(item)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Update an existing supply item
+pub async fn update_supply_item(id: i32, item: UpdateSupplyItemRequest) -> Result<SupplyItem, String> {
+    services::supply_item_service::update(id, item)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Delete a supply item
+pub async fn delete_supply_item(id: i32) -> Result<bool, String> {
+    services::supply_item_service::delete(id)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Search supply items by name, IMPA code, or description
+pub async fn search_supply_items(query: String) -> Result<Vec<SupplyItem>, String> {
+    services::supply_item_service::search(&query)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Get total supply item count
+pub async fn get_supply_item_count() -> Result<i64, String> {
+    services::supply_item_service::count()
         .await
         .map_err(|e| e.to_string())
 }
