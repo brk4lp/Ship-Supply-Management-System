@@ -170,12 +170,16 @@ class CreateOrderItemRequest {
 
 class CreateOrderRequest {
   final int shipId;
+
+  /// Optional ship visit ID - links order to a specific port call
+  final int? shipVisitId;
   final String? deliveryPort;
   final String? notes;
   final String currency;
 
   const CreateOrderRequest({
     required this.shipId,
+    this.shipVisitId,
     this.deliveryPort,
     this.notes,
     required this.currency,
@@ -184,6 +188,7 @@ class CreateOrderRequest {
   @override
   int get hashCode =>
       shipId.hashCode ^
+      shipVisitId.hashCode ^
       deliveryPort.hashCode ^
       notes.hashCode ^
       currency.hashCode;
@@ -194,6 +199,7 @@ class CreateOrderRequest {
       other is CreateOrderRequest &&
           runtimeType == other.runtimeType &&
           shipId == other.shipId &&
+          shipVisitId == other.shipVisitId &&
           deliveryPort == other.deliveryPort &&
           notes == other.notes &&
           currency == other.currency;
@@ -546,6 +552,10 @@ class Order {
   final String orderNumber;
   final int shipId;
   final String? shipName;
+
+  /// Optional link to a ship visit - when the order will be delivered
+  final int? shipVisitId;
+  final String? shipVisitInfo;
   final OrderStatus status;
   final String? deliveryPort;
   final String? notes;
@@ -558,6 +568,8 @@ class Order {
     required this.orderNumber,
     required this.shipId,
     this.shipName,
+    this.shipVisitId,
+    this.shipVisitInfo,
     required this.status,
     this.deliveryPort,
     this.notes,
@@ -572,6 +584,8 @@ class Order {
       orderNumber.hashCode ^
       shipId.hashCode ^
       shipName.hashCode ^
+      shipVisitId.hashCode ^
+      shipVisitInfo.hashCode ^
       status.hashCode ^
       deliveryPort.hashCode ^
       notes.hashCode ^
@@ -588,6 +602,8 @@ class Order {
           orderNumber == other.orderNumber &&
           shipId == other.shipId &&
           shipName == other.shipName &&
+          shipVisitId == other.shipVisitId &&
+          shipVisitInfo == other.shipVisitInfo &&
           status == other.status &&
           deliveryPort == other.deliveryPort &&
           notes == other.notes &&
@@ -675,6 +691,54 @@ class OrderItem {
           warehouseDeliveryDate == other.warehouseDeliveryDate &&
           shipDeliveryDate == other.shipDeliveryDate &&
           notes == other.notes;
+}
+
+/// Order profit information
+class OrderProfitInfo {
+  final int orderId;
+  final String orderNumber;
+  final String shipName;
+  final double totalRevenue;
+  final double totalCost;
+  final double profit;
+  final double marginPercent;
+  final String currency;
+
+  const OrderProfitInfo({
+    required this.orderId,
+    required this.orderNumber,
+    required this.shipName,
+    required this.totalRevenue,
+    required this.totalCost,
+    required this.profit,
+    required this.marginPercent,
+    required this.currency,
+  });
+
+  @override
+  int get hashCode =>
+      orderId.hashCode ^
+      orderNumber.hashCode ^
+      shipName.hashCode ^
+      totalRevenue.hashCode ^
+      totalCost.hashCode ^
+      profit.hashCode ^
+      marginPercent.hashCode ^
+      currency.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is OrderProfitInfo &&
+          runtimeType == other.runtimeType &&
+          orderId == other.orderId &&
+          orderNumber == other.orderNumber &&
+          shipName == other.shipName &&
+          totalRevenue == other.totalRevenue &&
+          totalCost == other.totalCost &&
+          profit == other.profit &&
+          marginPercent == other.marginPercent &&
+          currency == other.currency;
 }
 
 /// Order Status - Enforced state machine flow
@@ -813,6 +877,46 @@ class Port {
           isActive == other.isActive &&
           createdAt == other.createdAt &&
           updatedAt == other.updatedAt;
+}
+
+/// Profit summary for dashboard
+class ProfitSummary {
+  final int totalOrders;
+  final double totalRevenue;
+  final double totalCost;
+  final double totalProfit;
+  final double? averageMargin;
+  final String currency;
+
+  const ProfitSummary({
+    required this.totalOrders,
+    required this.totalRevenue,
+    required this.totalCost,
+    required this.totalProfit,
+    this.averageMargin,
+    required this.currency,
+  });
+
+  @override
+  int get hashCode =>
+      totalOrders.hashCode ^
+      totalRevenue.hashCode ^
+      totalCost.hashCode ^
+      totalProfit.hashCode ^
+      averageMargin.hashCode ^
+      currency.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ProfitSummary &&
+          runtimeType == other.runtimeType &&
+          totalOrders == other.totalOrders &&
+          totalRevenue == other.totalRevenue &&
+          totalCost == other.totalCost &&
+          totalProfit == other.totalProfit &&
+          averageMargin == other.averageMargin &&
+          currency == other.currency;
 }
 
 class Ship {
@@ -1306,6 +1410,41 @@ class UpdateOrderItemRequest {
           warehouseDeliveryDate == other.warehouseDeliveryDate &&
           shipDeliveryDate == other.shipDeliveryDate &&
           notes == other.notes;
+}
+
+class UpdateOrderRequest {
+  final int? shipId;
+  final int? shipVisitId;
+  final String? deliveryPort;
+  final String? notes;
+  final String? currency;
+
+  const UpdateOrderRequest({
+    this.shipId,
+    this.shipVisitId,
+    this.deliveryPort,
+    this.notes,
+    this.currency,
+  });
+
+  @override
+  int get hashCode =>
+      shipId.hashCode ^
+      shipVisitId.hashCode ^
+      deliveryPort.hashCode ^
+      notes.hashCode ^
+      currency.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is UpdateOrderRequest &&
+          runtimeType == other.runtimeType &&
+          shipId == other.shipId &&
+          shipVisitId == other.shipVisitId &&
+          deliveryPort == other.deliveryPort &&
+          notes == other.notes &&
+          currency == other.currency;
 }
 
 class UpdatePortRequest {

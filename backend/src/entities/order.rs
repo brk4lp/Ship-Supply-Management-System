@@ -34,12 +34,11 @@ pub struct Model {
     pub id: i32,
     pub order_number: String,
     pub ship_id: i32,
-    pub supplier_id: i32,
+    /// Optional ship visit reference - links order to a specific port call
+    pub ship_visit_id: Option<i32>,
     pub status: OrderStatus,
-    pub total_amount: Decimal,
     pub currency: String,
     pub delivery_port: Option<String>,
-    pub delivery_date: Option<Date>,
     pub notes: Option<String>,
     pub created_at: DateTimeUtc,
     pub updated_at: DateTimeUtc,
@@ -54,11 +53,11 @@ pub enum Relation {
     )]
     Ship,
     #[sea_orm(
-        belongs_to = "super::supplier::Entity",
-        from = "Column::SupplierId",
-        to = "super::supplier::Column::Id"
+        belongs_to = "super::ship_visit::Entity",
+        from = "Column::ShipVisitId",
+        to = "super::ship_visit::Column::Id"
     )]
-    Supplier,
+    ShipVisit,
     #[sea_orm(has_many = "super::order_item::Entity")]
     OrderItems,
 }
@@ -69,19 +68,15 @@ impl Related<super::ship::Entity> for Entity {
     }
 }
 
-impl Related<super::supplier::Entity> for Entity {
+impl Related<super::ship_visit::Entity> for Entity {
     fn to() -> RelationDef {
-        Relation::Supplier.def()
+        Relation::ShipVisit.def()
     }
 }
 
 impl Related<super::order_item::Entity> for Entity {
     fn to() -> RelationDef {
         Relation::OrderItems.def()
-    }
-}
-    fn to() -> RelationDef {
-        Relation::Supplier.def()
     }
 }
 

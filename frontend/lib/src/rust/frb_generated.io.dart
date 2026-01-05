@@ -101,6 +101,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       dynamic raw);
 
   @protected
+  UpdateOrderRequest dco_decode_box_autoadd_update_order_request(dynamic raw);
+
+  @protected
   UpdatePortRequest dco_decode_box_autoadd_update_port_request(dynamic raw);
 
   @protected
@@ -186,6 +189,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<OrderItem> dco_decode_list_order_item(dynamic raw);
 
   @protected
+  List<OrderProfitInfo> dco_decode_list_order_profit_info(dynamic raw);
+
+  @protected
   List<Port> dco_decode_list_port(dynamic raw);
 
   @protected
@@ -262,6 +268,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   OrderItem dco_decode_order_item(dynamic raw);
 
   @protected
+  OrderProfitInfo dco_decode_order_profit_info(dynamic raw);
+
+  @protected
   OrderStatus dco_decode_order_status(dynamic raw);
 
   @protected
@@ -272,6 +281,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Port dco_decode_port(dynamic raw);
+
+  @protected
+  ProfitSummary dco_decode_profit_summary(dynamic raw);
 
   @protected
   Ship dco_decode_ship(dynamic raw);
@@ -308,6 +320,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   UpdateOrderItemRequest dco_decode_update_order_item_request(dynamic raw);
+
+  @protected
+  UpdateOrderRequest dco_decode_update_order_request(dynamic raw);
 
   @protected
   UpdatePortRequest dco_decode_update_port_request(dynamic raw);
@@ -420,6 +435,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  UpdateOrderRequest sse_decode_box_autoadd_update_order_request(
+      SseDeserializer deserializer);
+
+  @protected
   UpdatePortRequest sse_decode_box_autoadd_update_port_request(
       SseDeserializer deserializer);
 
@@ -518,6 +537,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<OrderItem> sse_decode_list_order_item(SseDeserializer deserializer);
 
   @protected
+  List<OrderProfitInfo> sse_decode_list_order_profit_info(
+      SseDeserializer deserializer);
+
+  @protected
   List<Port> sse_decode_list_port(SseDeserializer deserializer);
 
   @protected
@@ -601,6 +624,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   OrderItem sse_decode_order_item(SseDeserializer deserializer);
 
   @protected
+  OrderProfitInfo sse_decode_order_profit_info(SseDeserializer deserializer);
+
+  @protected
   OrderStatus sse_decode_order_status(SseDeserializer deserializer);
 
   @protected
@@ -611,6 +637,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   Port sse_decode_port(SseDeserializer deserializer);
+
+  @protected
+  ProfitSummary sse_decode_profit_summary(SseDeserializer deserializer);
 
   @protected
   Ship sse_decode_ship(SseDeserializer deserializer);
@@ -649,6 +678,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   UpdateOrderItemRequest sse_decode_update_order_item_request(
+      SseDeserializer deserializer);
+
+  @protected
+  UpdateOrderRequest sse_decode_update_order_request(
       SseDeserializer deserializer);
 
   @protected
@@ -770,6 +803,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       UpdateOrderItemRequest self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_update_order_request(
+      UpdateOrderRequest self, SseSerializer serializer);
+
+  @protected
   void sse_encode_box_autoadd_update_port_request(
       UpdatePortRequest self, SseSerializer serializer);
 
@@ -870,6 +907,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       List<OrderItem> self, SseSerializer serializer);
 
   @protected
+  void sse_encode_list_order_profit_info(
+      List<OrderProfitInfo> self, SseSerializer serializer);
+
+  @protected
   void sse_encode_list_port(List<Port> self, SseSerializer serializer);
 
   @protected
@@ -957,6 +998,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_order_item(OrderItem self, SseSerializer serializer);
 
   @protected
+  void sse_encode_order_profit_info(
+      OrderProfitInfo self, SseSerializer serializer);
+
+  @protected
   void sse_encode_order_status(OrderStatus self, SseSerializer serializer);
 
   @protected
@@ -968,6 +1013,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   void sse_encode_port(Port self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_profit_summary(ProfitSummary self, SseSerializer serializer);
 
   @protected
   void sse_encode_ship(Ship self, SseSerializer serializer);
@@ -1007,6 +1055,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_update_order_item_request(
       UpdateOrderItemRequest self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_update_order_request(
+      UpdateOrderRequest self, SseSerializer serializer);
 
   @protected
   void sse_encode_update_port_request(

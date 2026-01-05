@@ -37,7 +37,7 @@ flutter_rust_bridge::frb_generated_boilerplate!(
                     default_rust_auto_opaque = RustAutoOpaqueMoi,
                 );
                 pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_VERSION: &str = "2.11.1";
-                pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = -1861400095;
+                pub(crate) const FLUTTER_RUST_BRIDGE_CODEGEN_CONTENT_HASH: i32 = 1380362590;
             
 
 // Section: executor
@@ -145,6 +145,15 @@ let api_quantity = <f64>::sse_decode(&mut deserializer);deserializer.end(); move
             let api_item = <crate::models::CreateSupplyItemRequest>::sse_decode(&mut deserializer);deserializer.end(); move |context| async move {
                     transform_result_sse::<_, String>((move || async move {
                          let output_ok = crate::api::create_supply_item(api_item).await?;   Ok(output_ok)
+                    })().await)
+                } })
+            }fn wire__crate__api__delete_order_impl(port_: flutter_rust_bridge::for_generated::MessagePort,ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,rust_vec_len_: i32,data_len_: i32)  {
+                FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec,_,_,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "delete_order", port: Some(port_), mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_id = <i32>::sse_decode(&mut deserializer);deserializer.end(); move |context| async move {
+                    transform_result_sse::<_, String>((move || async move {
+                         let output_ok = crate::api::delete_order(api_id).await?;   Ok(output_ok)
                     })().await)
                 } })
             }fn wire__crate__api__delete_order_item_impl(port_: flutter_rust_bridge::for_generated::MessagePort,ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,rust_vec_len_: i32,data_len_: i32)  {
@@ -310,6 +319,15 @@ let api_end_date = <String>::sse_decode(&mut deserializer);deserializer.end(); m
                          let output_ok = crate::api::get_order_items(api_order_id).await?;   Ok(output_ok)
                     })().await)
                 } })
+            }fn wire__crate__api__get_order_totals_impl(port_: flutter_rust_bridge::for_generated::MessagePort,ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,rust_vec_len_: i32,data_len_: i32)  {
+                FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec,_,_,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "get_order_totals", port: Some(port_), mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_order_id = <i32>::sse_decode(&mut deserializer);deserializer.end(); move |context| async move {
+                    transform_result_sse::<_, String>((move || async move {
+                         let output_ok = crate::api::get_order_totals(api_order_id).await?;   Ok(output_ok)
+                    })().await)
+                } })
             }fn wire__crate__api__get_order_with_items_impl(port_: flutter_rust_bridge::for_generated::MessagePort,ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,rust_vec_len_: i32,data_len_: i32)  {
                 FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec,_,_,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "get_order_with_items", port: Some(port_), mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal }, move || { 
             let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
@@ -317,6 +335,15 @@ let api_end_date = <String>::sse_decode(&mut deserializer);deserializer.end(); m
             let api_id = <i32>::sse_decode(&mut deserializer);deserializer.end(); move |context| async move {
                     transform_result_sse::<_, String>((move || async move {
                          let output_ok = crate::api::get_order_with_items(api_id).await?;   Ok(output_ok)
+                    })().await)
+                } })
+            }fn wire__crate__api__get_orders_by_ship_visit_impl(port_: flutter_rust_bridge::for_generated::MessagePort,ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,rust_vec_len_: i32,data_len_: i32)  {
+                FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec,_,_,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "get_orders_by_ship_visit", port: Some(port_), mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_ship_visit_id = <i32>::sse_decode(&mut deserializer);deserializer.end(); move |context| async move {
+                    transform_result_sse::<_, String>((move || async move {
+                         let output_ok = crate::api::get_orders_by_ship_visit(api_ship_visit_id).await?;   Ok(output_ok)
                     })().await)
                 } })
             }fn wire__crate__api__get_port_by_id_impl(port_: flutter_rust_bridge::for_generated::MessagePort,ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,rust_vec_len_: i32,data_len_: i32)  {
@@ -335,6 +362,15 @@ let api_end_date = <String>::sse_decode(&mut deserializer);deserializer.end(); m
             let api_country = <String>::sse_decode(&mut deserializer);deserializer.end(); move |context| async move {
                     transform_result_sse::<_, String>((move || async move {
                          let output_ok = crate::api::get_ports_by_country(api_country).await?;   Ok(output_ok)
+                    })().await)
+                } })
+            }fn wire__crate__api__get_profit_summary_impl(port_: flutter_rust_bridge::for_generated::MessagePort,ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,rust_vec_len_: i32,data_len_: i32)  {
+                FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec,_,_,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "get_profit_summary", port: Some(port_), mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end(); move |context| async move {
+                    transform_result_sse::<_, String>((move || async move {
+                         let output_ok = crate::api::get_profit_summary().await?;   Ok(output_ok)
                     })().await)
                 } })
             }fn wire__crate__api__get_recent_stock_movements_impl(port_: flutter_rust_bridge::for_generated::MessagePort,ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,rust_vec_len_: i32,data_len_: i32)  {
@@ -509,6 +545,15 @@ let api_end_date = <String>::sse_decode(&mut deserializer);deserializer.end(); m
                          let output_ok = crate::api::get_supply_items_by_supplier(api_supplier_id).await?;   Ok(output_ok)
                     })().await)
                 } })
+            }fn wire__crate__api__get_top_profitable_orders_impl(port_: flutter_rust_bridge::for_generated::MessagePort,ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,rust_vec_len_: i32,data_len_: i32)  {
+                FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec,_,_,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "get_top_profitable_orders", port: Some(port_), mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_limit = <i32>::sse_decode(&mut deserializer);deserializer.end(); move |context| async move {
+                    transform_result_sse::<_, String>((move || async move {
+                         let output_ok = crate::api::get_top_profitable_orders(api_limit).await?;   Ok(output_ok)
+                    })().await)
+                } })
             }fn wire__crate__api__get_upcoming_ship_visits_impl(port_: flutter_rust_bridge::for_generated::MessagePort,ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,rust_vec_len_: i32,data_len_: i32)  {
                 FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec,_,_,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "get_upcoming_ship_visits", port: Some(port_), mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal }, move || { 
             let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
@@ -563,6 +608,15 @@ let api_end_date = <String>::sse_decode(&mut deserializer);deserializer.end(); m
                          let output_ok = Result::<_,()>::Ok(crate::api::is_database_connected().await)?;   Ok(output_ok)
                     })().await)
                 } })
+            }fn wire__crate__api__load_seed_data_impl(port_: flutter_rust_bridge::for_generated::MessagePort,ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,rust_vec_len_: i32,data_len_: i32)  {
+                FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec,_,_,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "load_seed_data", port: Some(port_), mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            deserializer.end(); move |context| async move {
+                    transform_result_sse::<_, String>((move || async move {
+                         let output_ok = crate::api::load_seed_data().await?;   Ok(output_ok)
+                    })().await)
+                } })
             }fn wire__crate__api__search_ships_impl(port_: flutter_rust_bridge::for_generated::MessagePort,ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,rust_vec_len_: i32,data_len_: i32)  {
                 FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec,_,_,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "search_ships", port: Some(port_), mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal }, move || { 
             let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
@@ -588,6 +642,16 @@ let api_end_date = <String>::sse_decode(&mut deserializer);deserializer.end(); m
             let api_query = <String>::sse_decode(&mut deserializer);deserializer.end(); move |context| async move {
                     transform_result_sse::<_, String>((move || async move {
                          let output_ok = crate::api::search_supply_items(api_query).await?;   Ok(output_ok)
+                    })().await)
+                } })
+            }fn wire__crate__api__update_order_impl(port_: flutter_rust_bridge::for_generated::MessagePort,ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,rust_vec_len_: i32,data_len_: i32)  {
+                FLUTTER_RUST_BRIDGE_HANDLER.wrap_async::<flutter_rust_bridge::for_generated::SseCodec,_,_,_>(flutter_rust_bridge::for_generated::TaskInfo{ debug_name: "update_order", port: Some(port_), mode: flutter_rust_bridge::for_generated::FfiCallMode::Normal }, move || { 
+            let message = unsafe { flutter_rust_bridge::for_generated::Dart2RustMessageSse::from_wire(ptr_, rust_vec_len_, data_len_) };
+            let mut deserializer = flutter_rust_bridge::for_generated::SseDeserializer::new(message);
+            let api_id = <i32>::sse_decode(&mut deserializer);
+let api_order = <crate::models::UpdateOrderRequest>::sse_decode(&mut deserializer);deserializer.end(); move |context| async move {
+                    transform_result_sse::<_, String>((move || async move {
+                         let output_ok = crate::api::update_order(api_id, api_order).await?;   Ok(output_ok)
                     })().await)
                 } })
             }fn wire__crate__api__update_order_item_impl(port_: flutter_rust_bridge::for_generated::MessagePort,ptr_: flutter_rust_bridge::for_generated::PlatformGeneralizedUint8ListPtr,rust_vec_len_: i32,data_len_: i32)  {
@@ -753,10 +817,11 @@ return crate::models::CreateOrderItemRequest{order_id: var_orderId, product_name
                 impl SseDecode for crate::models::CreateOrderRequest {
                     // Codec=Sse (Serialization based), see doc to use other codecs
                     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {let mut var_shipId = <i32>::sse_decode(deserializer);
+let mut var_shipVisitId = <Option<i32>>::sse_decode(deserializer);
 let mut var_deliveryPort = <Option<String>>::sse_decode(deserializer);
 let mut var_notes = <Option<String>>::sse_decode(deserializer);
 let mut var_currency = <String>::sse_decode(deserializer);
-return crate::models::CreateOrderRequest{ship_id: var_shipId, delivery_port: var_deliveryPort, notes: var_notes, currency: var_currency};}
+return crate::models::CreateOrderRequest{ship_id: var_shipId, ship_visit_id: var_shipVisitId, delivery_port: var_deliveryPort, notes: var_notes, currency: var_currency};}
                 }
                 
                 impl SseDecode for crate::models::CreatePortRequest {
@@ -896,6 +961,14 @@ return crate::models::ItemProfit{total_cost: var_totalCost, total_revenue: var_t
                     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {let mut len_ = <i32>::sse_decode(deserializer);
         let mut ans_ = vec![];
         for idx_ in 0..len_ { ans_.push(<crate::models::OrderItem>::sse_decode(deserializer)); }
+        return ans_;}
+                }
+                
+                impl SseDecode for Vec<crate::models::OrderProfitInfo> {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {let mut len_ = <i32>::sse_decode(deserializer);
+        let mut ans_ = vec![];
+        for idx_ in 0..len_ { ans_.push(<crate::models::OrderProfitInfo>::sse_decode(deserializer)); }
         return ans_;}
                 }
                 
@@ -1104,13 +1177,15 @@ return crate::models::ItemProfit{total_cost: var_totalCost, total_revenue: var_t
 let mut var_orderNumber = <String>::sse_decode(deserializer);
 let mut var_shipId = <i32>::sse_decode(deserializer);
 let mut var_shipName = <Option<String>>::sse_decode(deserializer);
+let mut var_shipVisitId = <Option<i32>>::sse_decode(deserializer);
+let mut var_shipVisitInfo = <Option<String>>::sse_decode(deserializer);
 let mut var_status = <crate::models::OrderStatus>::sse_decode(deserializer);
 let mut var_deliveryPort = <Option<String>>::sse_decode(deserializer);
 let mut var_notes = <Option<String>>::sse_decode(deserializer);
 let mut var_currency = <String>::sse_decode(deserializer);
 let mut var_createdAt = <String>::sse_decode(deserializer);
 let mut var_updatedAt = <String>::sse_decode(deserializer);
-return crate::models::Order{id: var_id, order_number: var_orderNumber, ship_id: var_shipId, ship_name: var_shipName, status: var_status, delivery_port: var_deliveryPort, notes: var_notes, currency: var_currency, created_at: var_createdAt, updated_at: var_updatedAt};}
+return crate::models::Order{id: var_id, order_number: var_orderNumber, ship_id: var_shipId, ship_name: var_shipName, ship_visit_id: var_shipVisitId, ship_visit_info: var_shipVisitInfo, status: var_status, delivery_port: var_deliveryPort, notes: var_notes, currency: var_currency, created_at: var_createdAt, updated_at: var_updatedAt};}
                 }
                 
                 impl SseDecode for crate::models::OrderItem {
@@ -1130,6 +1205,19 @@ let mut var_warehouseDeliveryDate = <Option<String>>::sse_decode(deserializer);
 let mut var_shipDeliveryDate = <Option<String>>::sse_decode(deserializer);
 let mut var_notes = <Option<String>>::sse_decode(deserializer);
 return crate::models::OrderItem{id: var_id, order_id: var_orderId, product_name: var_productName, impa_code: var_impaCode, description: var_description, quantity: var_quantity, unit: var_unit, buying_price: var_buyingPrice, selling_price: var_sellingPrice, currency: var_currency, delivery_type: var_deliveryType, warehouse_delivery_date: var_warehouseDeliveryDate, ship_delivery_date: var_shipDeliveryDate, notes: var_notes};}
+                }
+                
+                impl SseDecode for crate::models::OrderProfitInfo {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {let mut var_orderId = <i32>::sse_decode(deserializer);
+let mut var_orderNumber = <String>::sse_decode(deserializer);
+let mut var_shipName = <String>::sse_decode(deserializer);
+let mut var_totalRevenue = <f64>::sse_decode(deserializer);
+let mut var_totalCost = <f64>::sse_decode(deserializer);
+let mut var_profit = <f64>::sse_decode(deserializer);
+let mut var_marginPercent = <f64>::sse_decode(deserializer);
+let mut var_currency = <String>::sse_decode(deserializer);
+return crate::models::OrderProfitInfo{order_id: var_orderId, order_number: var_orderNumber, ship_name: var_shipName, total_revenue: var_totalRevenue, total_cost: var_totalCost, profit: var_profit, margin_percent: var_marginPercent, currency: var_currency};}
                 }
                 
                 impl SseDecode for crate::models::OrderStatus {
@@ -1182,6 +1270,17 @@ let mut var_isActive = <bool>::sse_decode(deserializer);
 let mut var_createdAt = <String>::sse_decode(deserializer);
 let mut var_updatedAt = <String>::sse_decode(deserializer);
 return crate::models::Port{id: var_id, name: var_name, country: var_country, city: var_city, timezone: var_timezone, latitude: var_latitude, longitude: var_longitude, notes: var_notes, is_active: var_isActive, created_at: var_createdAt, updated_at: var_updatedAt};}
+                }
+                
+                impl SseDecode for crate::models::ProfitSummary {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {let mut var_totalOrders = <i32>::sse_decode(deserializer);
+let mut var_totalRevenue = <f64>::sse_decode(deserializer);
+let mut var_totalCost = <f64>::sse_decode(deserializer);
+let mut var_totalProfit = <f64>::sse_decode(deserializer);
+let mut var_averageMargin = <Option<f64>>::sse_decode(deserializer);
+let mut var_currency = <String>::sse_decode(deserializer);
+return crate::models::ProfitSummary{total_orders: var_totalOrders, total_revenue: var_totalRevenue, total_cost: var_totalCost, total_profit: var_totalProfit, average_margin: var_averageMargin, currency: var_currency};}
                 }
                 
                 impl SseDecode for crate::models::Ship {
@@ -1336,6 +1435,16 @@ let mut var_notes = <Option<String>>::sse_decode(deserializer);
 return crate::models::UpdateOrderItemRequest{product_name: var_productName, impa_code: var_impaCode, description: var_description, quantity: var_quantity, unit: var_unit, buying_price: var_buyingPrice, selling_price: var_sellingPrice, delivery_type: var_deliveryType, warehouse_delivery_date: var_warehouseDeliveryDate, ship_delivery_date: var_shipDeliveryDate, notes: var_notes};}
                 }
                 
+                impl SseDecode for crate::models::UpdateOrderRequest {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {let mut var_shipId = <Option<i32>>::sse_decode(deserializer);
+let mut var_shipVisitId = <Option<i32>>::sse_decode(deserializer);
+let mut var_deliveryPort = <Option<String>>::sse_decode(deserializer);
+let mut var_notes = <Option<String>>::sse_decode(deserializer);
+let mut var_currency = <Option<String>>::sse_decode(deserializer);
+return crate::models::UpdateOrderRequest{ship_id: var_shipId, ship_visit_id: var_shipVisitId, delivery_port: var_deliveryPort, notes: var_notes, currency: var_currency};}
+                }
+                
                 impl SseDecode for crate::models::UpdatePortRequest {
                     // Codec=Sse (Serialization based), see doc to use other codecs
                     fn sse_decode(deserializer: &mut flutter_rust_bridge::for_generated::SseDeserializer) -> Self {let mut var_name = <Option<String>>::sse_decode(deserializer);
@@ -1439,64 +1548,71 @@ return crate::models::UpdateSupplyItemRequest{supplier_id: var_supplierId, impa_
 9 => wire__crate__api__create_stock_movement_impl(port, ptr, rust_vec_len, data_len),
 10 => wire__crate__api__create_supplier_impl(port, ptr, rust_vec_len, data_len),
 11 => wire__crate__api__create_supply_item_impl(port, ptr, rust_vec_len, data_len),
-12 => wire__crate__api__delete_order_item_impl(port, ptr, rust_vec_len, data_len),
-13 => wire__crate__api__delete_port_impl(port, ptr, rust_vec_len, data_len),
-14 => wire__crate__api__delete_ship_impl(port, ptr, rust_vec_len, data_len),
-15 => wire__crate__api__delete_ship_visit_impl(port, ptr, rust_vec_len, data_len),
-16 => wire__crate__api__delete_stock_impl(port, ptr, rust_vec_len, data_len),
-17 => wire__crate__api__delete_supplier_impl(port, ptr, rust_vec_len, data_len),
-18 => wire__crate__api__delete_supply_item_impl(port, ptr, rust_vec_len, data_len),
-19 => wire__crate__api__get_active_ports_impl(port, ptr, rust_vec_len, data_len),
-20 => wire__crate__api__get_all_orders_impl(port, ptr, rust_vec_len, data_len),
-21 => wire__crate__api__get_all_ports_impl(port, ptr, rust_vec_len, data_len),
-22 => wire__crate__api__get_all_ship_visits_impl(port, ptr, rust_vec_len, data_len),
-23 => wire__crate__api__get_all_ships_impl(port, ptr, rust_vec_len, data_len),
-24 => wire__crate__api__get_all_stock_impl(port, ptr, rust_vec_len, data_len),
-25 => wire__crate__api__get_all_suppliers_impl(port, ptr, rust_vec_len, data_len),
-26 => wire__crate__api__get_all_supply_items_impl(port, ptr, rust_vec_len, data_len),
-27 => wire__crate__api__get_calendar_data_impl(port, ptr, rust_vec_len, data_len),
-28 => wire__crate__api__get_low_stock_impl(port, ptr, rust_vec_len, data_len),
-29 => wire__crate__api__get_order_items_impl(port, ptr, rust_vec_len, data_len),
-30 => wire__crate__api__get_order_with_items_impl(port, ptr, rust_vec_len, data_len),
-31 => wire__crate__api__get_port_by_id_impl(port, ptr, rust_vec_len, data_len),
-32 => wire__crate__api__get_ports_by_country_impl(port, ptr, rust_vec_len, data_len),
-33 => wire__crate__api__get_recent_stock_movements_impl(port, ptr, rust_vec_len, data_len),
-34 => wire__crate__api__get_ship_by_id_impl(port, ptr, rust_vec_len, data_len),
-35 => wire__crate__api__get_ship_count_impl(port, ptr, rust_vec_len, data_len),
-36 => wire__crate__api__get_ship_visit_by_id_impl(port, ptr, rust_vec_len, data_len),
-37 => wire__crate__api__get_ship_visits_by_date_range_impl(port, ptr, rust_vec_len, data_len),
-38 => wire__crate__api__get_ship_visits_by_port_impl(port, ptr, rust_vec_len, data_len),
-39 => wire__crate__api__get_ship_visits_by_ship_impl(port, ptr, rust_vec_len, data_len),
-40 => wire__crate__api__get_stock_by_id_impl(port, ptr, rust_vec_len, data_len),
-41 => wire__crate__api__get_stock_by_supply_item_impl(port, ptr, rust_vec_len, data_len),
-42 => wire__crate__api__get_stock_movements_impl(port, ptr, rust_vec_len, data_len),
-43 => wire__crate__api__get_stock_summary_impl(port, ptr, rust_vec_len, data_len),
-44 => wire__crate__api__get_stock_with_movements_impl(port, ptr, rust_vec_len, data_len),
-45 => wire__crate__api__get_supplier_by_id_impl(port, ptr, rust_vec_len, data_len),
-46 => wire__crate__api__get_supplier_count_impl(port, ptr, rust_vec_len, data_len),
-47 => wire__crate__api__get_suppliers_by_category_impl(port, ptr, rust_vec_len, data_len),
-48 => wire__crate__api__get_supply_item_by_id_impl(port, ptr, rust_vec_len, data_len),
-49 => wire__crate__api__get_supply_item_count_impl(port, ptr, rust_vec_len, data_len),
-50 => wire__crate__api__get_supply_items_by_category_impl(port, ptr, rust_vec_len, data_len),
-51 => wire__crate__api__get_supply_items_by_supplier_impl(port, ptr, rust_vec_len, data_len),
-52 => wire__crate__api__get_upcoming_ship_visits_impl(port, ptr, rust_vec_len, data_len),
-53 => wire__crate__api__get_version_impl(port, ptr, rust_vec_len, data_len),
-54 => wire__crate__api__greet_impl(port, ptr, rust_vec_len, data_len),
-55 => wire__crate__api__init_database_impl(port, ptr, rust_vec_len, data_len),
-56 => wire__crate__api__init_local_database_impl(port, ptr, rust_vec_len, data_len),
-57 => wire__crate__api__is_database_connected_impl(port, ptr, rust_vec_len, data_len),
-58 => wire__crate__api__search_ships_impl(port, ptr, rust_vec_len, data_len),
-59 => wire__crate__api__search_suppliers_impl(port, ptr, rust_vec_len, data_len),
-60 => wire__crate__api__search_supply_items_impl(port, ptr, rust_vec_len, data_len),
-61 => wire__crate__api__update_order_item_impl(port, ptr, rust_vec_len, data_len),
-62 => wire__crate__api__update_order_status_impl(port, ptr, rust_vec_len, data_len),
-63 => wire__crate__api__update_port_impl(port, ptr, rust_vec_len, data_len),
-64 => wire__crate__api__update_ship_impl(port, ptr, rust_vec_len, data_len),
-65 => wire__crate__api__update_ship_visit_impl(port, ptr, rust_vec_len, data_len),
-66 => wire__crate__api__update_ship_visit_status_impl(port, ptr, rust_vec_len, data_len),
-67 => wire__crate__api__update_stock_impl(port, ptr, rust_vec_len, data_len),
-68 => wire__crate__api__update_supplier_impl(port, ptr, rust_vec_len, data_len),
-69 => wire__crate__api__update_supply_item_impl(port, ptr, rust_vec_len, data_len),
+12 => wire__crate__api__delete_order_impl(port, ptr, rust_vec_len, data_len),
+13 => wire__crate__api__delete_order_item_impl(port, ptr, rust_vec_len, data_len),
+14 => wire__crate__api__delete_port_impl(port, ptr, rust_vec_len, data_len),
+15 => wire__crate__api__delete_ship_impl(port, ptr, rust_vec_len, data_len),
+16 => wire__crate__api__delete_ship_visit_impl(port, ptr, rust_vec_len, data_len),
+17 => wire__crate__api__delete_stock_impl(port, ptr, rust_vec_len, data_len),
+18 => wire__crate__api__delete_supplier_impl(port, ptr, rust_vec_len, data_len),
+19 => wire__crate__api__delete_supply_item_impl(port, ptr, rust_vec_len, data_len),
+20 => wire__crate__api__get_active_ports_impl(port, ptr, rust_vec_len, data_len),
+21 => wire__crate__api__get_all_orders_impl(port, ptr, rust_vec_len, data_len),
+22 => wire__crate__api__get_all_ports_impl(port, ptr, rust_vec_len, data_len),
+23 => wire__crate__api__get_all_ship_visits_impl(port, ptr, rust_vec_len, data_len),
+24 => wire__crate__api__get_all_ships_impl(port, ptr, rust_vec_len, data_len),
+25 => wire__crate__api__get_all_stock_impl(port, ptr, rust_vec_len, data_len),
+26 => wire__crate__api__get_all_suppliers_impl(port, ptr, rust_vec_len, data_len),
+27 => wire__crate__api__get_all_supply_items_impl(port, ptr, rust_vec_len, data_len),
+28 => wire__crate__api__get_calendar_data_impl(port, ptr, rust_vec_len, data_len),
+29 => wire__crate__api__get_low_stock_impl(port, ptr, rust_vec_len, data_len),
+30 => wire__crate__api__get_order_items_impl(port, ptr, rust_vec_len, data_len),
+31 => wire__crate__api__get_order_totals_impl(port, ptr, rust_vec_len, data_len),
+32 => wire__crate__api__get_order_with_items_impl(port, ptr, rust_vec_len, data_len),
+33 => wire__crate__api__get_orders_by_ship_visit_impl(port, ptr, rust_vec_len, data_len),
+34 => wire__crate__api__get_port_by_id_impl(port, ptr, rust_vec_len, data_len),
+35 => wire__crate__api__get_ports_by_country_impl(port, ptr, rust_vec_len, data_len),
+36 => wire__crate__api__get_profit_summary_impl(port, ptr, rust_vec_len, data_len),
+37 => wire__crate__api__get_recent_stock_movements_impl(port, ptr, rust_vec_len, data_len),
+38 => wire__crate__api__get_ship_by_id_impl(port, ptr, rust_vec_len, data_len),
+39 => wire__crate__api__get_ship_count_impl(port, ptr, rust_vec_len, data_len),
+40 => wire__crate__api__get_ship_visit_by_id_impl(port, ptr, rust_vec_len, data_len),
+41 => wire__crate__api__get_ship_visits_by_date_range_impl(port, ptr, rust_vec_len, data_len),
+42 => wire__crate__api__get_ship_visits_by_port_impl(port, ptr, rust_vec_len, data_len),
+43 => wire__crate__api__get_ship_visits_by_ship_impl(port, ptr, rust_vec_len, data_len),
+44 => wire__crate__api__get_stock_by_id_impl(port, ptr, rust_vec_len, data_len),
+45 => wire__crate__api__get_stock_by_supply_item_impl(port, ptr, rust_vec_len, data_len),
+46 => wire__crate__api__get_stock_movements_impl(port, ptr, rust_vec_len, data_len),
+47 => wire__crate__api__get_stock_summary_impl(port, ptr, rust_vec_len, data_len),
+48 => wire__crate__api__get_stock_with_movements_impl(port, ptr, rust_vec_len, data_len),
+49 => wire__crate__api__get_supplier_by_id_impl(port, ptr, rust_vec_len, data_len),
+50 => wire__crate__api__get_supplier_count_impl(port, ptr, rust_vec_len, data_len),
+51 => wire__crate__api__get_suppliers_by_category_impl(port, ptr, rust_vec_len, data_len),
+52 => wire__crate__api__get_supply_item_by_id_impl(port, ptr, rust_vec_len, data_len),
+53 => wire__crate__api__get_supply_item_count_impl(port, ptr, rust_vec_len, data_len),
+54 => wire__crate__api__get_supply_items_by_category_impl(port, ptr, rust_vec_len, data_len),
+55 => wire__crate__api__get_supply_items_by_supplier_impl(port, ptr, rust_vec_len, data_len),
+56 => wire__crate__api__get_top_profitable_orders_impl(port, ptr, rust_vec_len, data_len),
+57 => wire__crate__api__get_upcoming_ship_visits_impl(port, ptr, rust_vec_len, data_len),
+58 => wire__crate__api__get_version_impl(port, ptr, rust_vec_len, data_len),
+59 => wire__crate__api__greet_impl(port, ptr, rust_vec_len, data_len),
+60 => wire__crate__api__init_database_impl(port, ptr, rust_vec_len, data_len),
+61 => wire__crate__api__init_local_database_impl(port, ptr, rust_vec_len, data_len),
+62 => wire__crate__api__is_database_connected_impl(port, ptr, rust_vec_len, data_len),
+63 => wire__crate__api__load_seed_data_impl(port, ptr, rust_vec_len, data_len),
+64 => wire__crate__api__search_ships_impl(port, ptr, rust_vec_len, data_len),
+65 => wire__crate__api__search_suppliers_impl(port, ptr, rust_vec_len, data_len),
+66 => wire__crate__api__search_supply_items_impl(port, ptr, rust_vec_len, data_len),
+67 => wire__crate__api__update_order_impl(port, ptr, rust_vec_len, data_len),
+68 => wire__crate__api__update_order_item_impl(port, ptr, rust_vec_len, data_len),
+69 => wire__crate__api__update_order_status_impl(port, ptr, rust_vec_len, data_len),
+70 => wire__crate__api__update_port_impl(port, ptr, rust_vec_len, data_len),
+71 => wire__crate__api__update_ship_impl(port, ptr, rust_vec_len, data_len),
+72 => wire__crate__api__update_ship_visit_impl(port, ptr, rust_vec_len, data_len),
+73 => wire__crate__api__update_ship_visit_status_impl(port, ptr, rust_vec_len, data_len),
+74 => wire__crate__api__update_stock_impl(port, ptr, rust_vec_len, data_len),
+75 => wire__crate__api__update_supplier_impl(port, ptr, rust_vec_len, data_len),
+76 => wire__crate__api__update_supply_item_impl(port, ptr, rust_vec_len, data_len),
                         _ => unreachable!(),
                     }
                 }
@@ -1606,6 +1722,7 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::CreateOrderItemRequest> fo
                 fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
                     [
                     self.ship_id.into_into_dart().into_dart(),
+self.ship_visit_id.into_into_dart().into_dart(),
 self.delivery_port.into_into_dart().into_dart(),
 self.notes.into_into_dart().into_dart(),
 self.currency.into_into_dart().into_dart()
@@ -1797,6 +1914,8 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::ItemProfit> for crate::mod
 self.order_number.into_into_dart().into_dart(),
 self.ship_id.into_into_dart().into_dart(),
 self.ship_name.into_into_dart().into_dart(),
+self.ship_visit_id.into_into_dart().into_dart(),
+self.ship_visit_info.into_into_dart().into_dart(),
 self.status.into_into_dart().into_dart(),
 self.delivery_port.into_into_dart().into_dart(),
 self.notes.into_into_dart().into_dart(),
@@ -1836,6 +1955,27 @@ self.notes.into_into_dart().into_dart()
             impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for crate::models::OrderItem {}
 impl flutter_rust_bridge::IntoIntoDart<crate::models::OrderItem> for crate::models::OrderItem {
             fn into_into_dart(self) -> crate::models::OrderItem {
+                self
+            }
+        }
+// Codec=Dco (DartCObject based), see doc to use other codecs
+            impl flutter_rust_bridge::IntoDart for crate::models::OrderProfitInfo {
+                fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+                    [
+                    self.order_id.into_into_dart().into_dart(),
+self.order_number.into_into_dart().into_dart(),
+self.ship_name.into_into_dart().into_dart(),
+self.total_revenue.into_into_dart().into_dart(),
+self.total_cost.into_into_dart().into_dart(),
+self.profit.into_into_dart().into_dart(),
+self.margin_percent.into_into_dart().into_dart(),
+self.currency.into_into_dart().into_dart()
+                ].into_dart()
+                }
+            }
+            impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for crate::models::OrderProfitInfo {}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::OrderProfitInfo> for crate::models::OrderProfitInfo {
+            fn into_into_dart(self) -> crate::models::OrderProfitInfo {
                 self
             }
         }
@@ -1918,6 +2058,25 @@ self.updated_at.into_into_dart().into_dart()
             impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for crate::models::Port {}
 impl flutter_rust_bridge::IntoIntoDart<crate::models::Port> for crate::models::Port {
             fn into_into_dart(self) -> crate::models::Port {
+                self
+            }
+        }
+// Codec=Dco (DartCObject based), see doc to use other codecs
+            impl flutter_rust_bridge::IntoDart for crate::models::ProfitSummary {
+                fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+                    [
+                    self.total_orders.into_into_dart().into_dart(),
+self.total_revenue.into_into_dart().into_dart(),
+self.total_cost.into_into_dart().into_dart(),
+self.total_profit.into_into_dart().into_dart(),
+self.average_margin.into_into_dart().into_dart(),
+self.currency.into_into_dart().into_dart()
+                ].into_dart()
+                }
+            }
+            impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for crate::models::ProfitSummary {}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::ProfitSummary> for crate::models::ProfitSummary {
+            fn into_into_dart(self) -> crate::models::ProfitSummary {
                 self
             }
         }
@@ -2142,6 +2301,24 @@ impl flutter_rust_bridge::IntoIntoDart<crate::models::UpdateOrderItemRequest> fo
             }
         }
 // Codec=Dco (DartCObject based), see doc to use other codecs
+            impl flutter_rust_bridge::IntoDart for crate::models::UpdateOrderRequest {
+                fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
+                    [
+                    self.ship_id.into_into_dart().into_dart(),
+self.ship_visit_id.into_into_dart().into_dart(),
+self.delivery_port.into_into_dart().into_dart(),
+self.notes.into_into_dart().into_dart(),
+self.currency.into_into_dart().into_dart()
+                ].into_dart()
+                }
+            }
+            impl flutter_rust_bridge::for_generated::IntoDartExceptPrimitive for crate::models::UpdateOrderRequest {}
+impl flutter_rust_bridge::IntoIntoDart<crate::models::UpdateOrderRequest> for crate::models::UpdateOrderRequest {
+            fn into_into_dart(self) -> crate::models::UpdateOrderRequest {
+                self
+            }
+        }
+// Codec=Dco (DartCObject based), see doc to use other codecs
             impl flutter_rust_bridge::IntoDart for crate::models::UpdatePortRequest {
                 fn into_dart(self) -> flutter_rust_bridge::for_generated::DartAbi {
                     [
@@ -2341,6 +2518,7 @@ crate::models::CalendarEventType::ShipDelivery => { 3 }
                 impl SseEncode for crate::models::CreateOrderRequest {
                     // Codec=Sse (Serialization based), see doc to use other codecs
                     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {<i32>::sse_encode(self.ship_id, serializer);
+<Option<i32>>::sse_encode(self.ship_visit_id, serializer);
 <Option<String>>::sse_encode(self.delivery_port, serializer);
 <Option<String>>::sse_encode(self.notes, serializer);
 <String>::sse_encode(self.currency, serializer);}
@@ -2467,6 +2645,12 @@ crate::models::DeliveryType::DirectToShip => { 1 }
                     // Codec=Sse (Serialization based), see doc to use other codecs
                     fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {<i32>::sse_encode(self.len() as _, serializer);
         for item in self { <crate::models::OrderItem>::sse_encode(item, serializer); }}
+                }
+                
+                impl SseEncode for Vec<crate::models::OrderProfitInfo> {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {<i32>::sse_encode(self.len() as _, serializer);
+        for item in self { <crate::models::OrderProfitInfo>::sse_encode(item, serializer); }}
                 }
                 
                 impl SseEncode for Vec<crate::models::Port> {
@@ -2643,6 +2827,8 @@ crate::models::DeliveryType::DirectToShip => { 1 }
 <String>::sse_encode(self.order_number, serializer);
 <i32>::sse_encode(self.ship_id, serializer);
 <Option<String>>::sse_encode(self.ship_name, serializer);
+<Option<i32>>::sse_encode(self.ship_visit_id, serializer);
+<Option<String>>::sse_encode(self.ship_visit_info, serializer);
 <crate::models::OrderStatus>::sse_encode(self.status, serializer);
 <Option<String>>::sse_encode(self.delivery_port, serializer);
 <Option<String>>::sse_encode(self.notes, serializer);
@@ -2667,6 +2853,18 @@ crate::models::DeliveryType::DirectToShip => { 1 }
 <Option<String>>::sse_encode(self.warehouse_delivery_date, serializer);
 <Option<String>>::sse_encode(self.ship_delivery_date, serializer);
 <Option<String>>::sse_encode(self.notes, serializer);}
+                }
+                
+                impl SseEncode for crate::models::OrderProfitInfo {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {<i32>::sse_encode(self.order_id, serializer);
+<String>::sse_encode(self.order_number, serializer);
+<String>::sse_encode(self.ship_name, serializer);
+<f64>::sse_encode(self.total_revenue, serializer);
+<f64>::sse_encode(self.total_cost, serializer);
+<f64>::sse_encode(self.profit, serializer);
+<f64>::sse_encode(self.margin_percent, serializer);
+<String>::sse_encode(self.currency, serializer);}
                 }
                 
                 impl SseEncode for crate::models::OrderStatus {
@@ -2713,6 +2911,16 @@ crate::models::OrderStatus::Cancelled => { 8 }
 <bool>::sse_encode(self.is_active, serializer);
 <String>::sse_encode(self.created_at, serializer);
 <String>::sse_encode(self.updated_at, serializer);}
+                }
+                
+                impl SseEncode for crate::models::ProfitSummary {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {<i32>::sse_encode(self.total_orders, serializer);
+<f64>::sse_encode(self.total_revenue, serializer);
+<f64>::sse_encode(self.total_cost, serializer);
+<f64>::sse_encode(self.total_profit, serializer);
+<Option<f64>>::sse_encode(self.average_margin, serializer);
+<String>::sse_encode(self.currency, serializer);}
                 }
                 
                 impl SseEncode for crate::models::Ship {
@@ -2853,6 +3061,15 @@ crate::models::StockMovementType::Return => { 3 }
 <Option<String>>::sse_encode(self.warehouse_delivery_date, serializer);
 <Option<String>>::sse_encode(self.ship_delivery_date, serializer);
 <Option<String>>::sse_encode(self.notes, serializer);}
+                }
+                
+                impl SseEncode for crate::models::UpdateOrderRequest {
+                    // Codec=Sse (Serialization based), see doc to use other codecs
+                    fn sse_encode(self, serializer: &mut flutter_rust_bridge::for_generated::SseSerializer) {<Option<i32>>::sse_encode(self.ship_id, serializer);
+<Option<i32>>::sse_encode(self.ship_visit_id, serializer);
+<Option<String>>::sse_encode(self.delivery_port, serializer);
+<Option<String>>::sse_encode(self.notes, serializer);
+<Option<String>>::sse_encode(self.currency, serializer);}
                 }
                 
                 impl SseEncode for crate::models::UpdatePortRequest {

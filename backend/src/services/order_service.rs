@@ -1,6 +1,6 @@
 //! Order Service - CRUD operations and state machine for orders
 
-use crate::models::{Order, OrderWithItems, OrderTotals, OrderStatus, DeliveryType, CreateOrderRequest, OrderItem};
+use crate::models::{Order, OrderWithItems, OrderTotals, OrderStatus, CreateOrderRequest, UpdateOrderRequest};
 use crate::database;
 use crate::services::order_item_service;
 use anyhow::Result;
@@ -12,6 +12,8 @@ struct OrderRow {
     order_number: String,
     ship_id: i32,
     ship_name: Option<String>,
+    ship_visit_id: Option<i32>,
+    ship_visit_info: Option<String>,
     status: String,
     delivery_port: Option<String>,
     currency: String,
@@ -40,6 +42,8 @@ impl From<OrderRow> for Order {
             order_number: row.order_number,
             ship_id: row.ship_id,
             ship_name: row.ship_name,
+            ship_visit_id: row.ship_visit_id,
+            ship_visit_info: row.ship_visit_info,
             status,
             delivery_port: row.delivery_port,
             notes: row.notes,
@@ -55,12 +59,24 @@ struct IdRow {
     id: i32,
 }
 
-const SELECT_FIELDS: &str = "o.id, o.order_number, o.ship_id, s.name as ship_name, o.status, o.delivery_port, o.currency, o.notes, o.created_at, o.updated_at";
+const SELECT_FIELDS: &str = r#"
+    o.id, o.order_number, o.ship_id, s.name as ship_name, 
+    o.ship_visit_id, 
+    CASE WHEN sv.id IS NOT NULL THEN p.name || ' (' || sv.eta || ' - ' || sv.etd || ')' ELSE NULL END as ship_visit_info,
+    o.status, o.delivery_port, o.currency, o.notes, o.created_at, o.updated_at
+"#;
 
 pub async fn get_all(status_filter: Option<OrderStatus>) -> Result<Vec<Order>> {
     let conn = database::get_connection()
         .await
         .ok_or_else(|| anyhow::anyhow!("Database not connected"))?;
+
+    let base_join = r#"
+        FROM orders o 
+        LEFT JOIN ships s ON o.ship_id = s.id 
+        LEFT JOIN ship_visits sv ON o.ship_visit_id = sv.id
+        LEFT JOIN ports p ON sv.port_id = p.id
+    "#;
 
     let sql = if let Some(status) = status_filter {
         let status_str = match status {
@@ -75,13 +91,13 @@ pub async fn get_all(status_filter: Option<OrderStatus>) -> Result<Vec<Order>> {
             OrderStatus::Cancelled => "CANCELLED",
         };
         format!(
-            "SELECT {} FROM orders o LEFT JOIN ships s ON o.ship_id = s.id WHERE o.status = '{}' ORDER BY o.id DESC",
-            SELECT_FIELDS, status_str
+            "SELECT {} {} WHERE o.status = '{}' ORDER BY o.id DESC",
+            SELECT_FIELDS, base_join, status_str
         )
     } else {
         format!(
-            "SELECT {} FROM orders o LEFT JOIN ships s ON o.ship_id = s.id ORDER BY o.id DESC",
-            SELECT_FIELDS
+            "SELECT {} {} ORDER BY o.id DESC",
+            SELECT_FIELDS, base_join
         )
     };
 
@@ -100,7 +116,12 @@ pub async fn get_by_id(id: i32) -> Result<Option<Order>> {
         .ok_or_else(|| anyhow::anyhow!("Database not connected"))?;
 
     let sql = format!(
-        "SELECT {} FROM orders o LEFT JOIN ships s ON o.ship_id = s.id WHERE o.id = ?",
+        r#"SELECT {} 
+           FROM orders o 
+           LEFT JOIN ships s ON o.ship_id = s.id 
+           LEFT JOIN ship_visits sv ON o.ship_visit_id = sv.id
+           LEFT JOIN ports p ON sv.port_id = p.id
+           WHERE o.id = ?"#,
         SELECT_FIELDS
     );
 
@@ -156,8 +177,8 @@ pub async fn create(order: CreateOrderRequest) -> Result<Order> {
     let order_number = format!("ORD-{}", chrono::Utc::now().format("%Y%m%d%H%M%S"));
 
     let sql = r#"
-        INSERT INTO orders (order_number, ship_id, status, delivery_port, currency, notes)
-        VALUES (?, ?, 'NEW', ?, ?, ?)
+        INSERT INTO orders (order_number, ship_id, ship_visit_id, status, delivery_port, currency, notes)
+        VALUES (?, ?, ?, 'NEW', ?, ?, ?)
     "#;
 
     conn.execute(Statement::from_sql_and_values(
@@ -166,6 +187,7 @@ pub async fn create(order: CreateOrderRequest) -> Result<Order> {
         [
             order_number.clone().into(),
             order.ship_id.into(),
+            order.ship_visit_id.into(),
             order.delivery_port.clone().into(),
             order.currency.clone().into(),
             order.notes.clone().into(),
@@ -173,7 +195,7 @@ pub async fn create(order: CreateOrderRequest) -> Result<Order> {
     ))
     .await?;
 
-    // Get the last inserted ID
+    // Get the last inserted ID and return full order with joins
     let id_row: Option<IdRow> = IdRow::find_by_statement(
         Statement::from_string(DatabaseBackend::Sqlite, "SELECT last_insert_rowid() as id".to_string())
     )
@@ -181,31 +203,89 @@ pub async fn create(order: CreateOrderRequest) -> Result<Order> {
     .await?;
 
     let id = id_row.map(|r| r.id).unwrap_or(0);
-    let now = chrono::Utc::now().to_rfc3339();
+    
+    // Return full order with ship and visit info
+    get_by_id(id).await?.ok_or_else(|| anyhow::anyhow!("Failed to fetch created order"))
+}
 
-    // Fetch ship name
-    let ship_row: Option<ShipNameRow> = ShipNameRow::find_by_statement(
-        Statement::from_sql_and_values(
-            DatabaseBackend::Sqlite,
-            "SELECT name FROM ships WHERE id = ?",
-            [order.ship_id.into()]
-        )
-    )
-    .one(&conn)
+/// Update order (ship_visit_id, delivery_port, notes, currency)
+pub async fn update(id: i32, request: UpdateOrderRequest) -> Result<Order> {
+    let conn = database::get_connection()
+        .await
+        .ok_or_else(|| anyhow::anyhow!("Database not connected"))?;
+
+    // Verify order exists
+    let _ = get_by_id(id).await?
+        .ok_or_else(|| anyhow::anyhow!("Order not found"))?;
+
+    // Build dynamic update
+    let mut updates = Vec::new();
+    let mut values: Vec<sea_orm::Value> = Vec::new();
+
+    if let Some(ship_id) = request.ship_id {
+        updates.push("ship_id = ?");
+        values.push(ship_id.into());
+    }
+    if let Some(ship_visit_id) = request.ship_visit_id {
+        updates.push("ship_visit_id = ?");
+        values.push(ship_visit_id.into());
+    }
+    if let Some(delivery_port) = request.delivery_port {
+        updates.push("delivery_port = ?");
+        values.push(delivery_port.into());
+    }
+    if let Some(notes) = request.notes {
+        updates.push("notes = ?");
+        values.push(notes.into());
+    }
+    if let Some(currency) = request.currency {
+        updates.push("currency = ?");
+        values.push(currency.into());
+    }
+
+    if updates.is_empty() {
+        return get_by_id(id).await?.ok_or_else(|| anyhow::anyhow!("Order not found"));
+    }
+
+    updates.push("updated_at = datetime('now')");
+    values.push(id.into());
+
+    let sql = format!("UPDATE orders SET {} WHERE id = ?", updates.join(", "));
+
+    conn.execute(Statement::from_sql_and_values(
+        DatabaseBackend::Sqlite,
+        &sql,
+        values,
+    ))
     .await?;
 
-    Ok(Order {
-        id,
-        order_number,
-        ship_id: order.ship_id,
-        ship_name: ship_row.map(|r| r.name),
-        status: OrderStatus::New,
-        delivery_port: order.delivery_port,
-        notes: order.notes,
-        currency: order.currency,
-        created_at: now.clone(),
-        updated_at: now,
-    })
+    get_by_id(id).await?.ok_or_else(|| anyhow::anyhow!("Order not found after update"))
+}
+
+/// Get orders by ship visit ID
+pub async fn get_by_ship_visit(ship_visit_id: i32) -> Result<Vec<Order>> {
+    let conn = database::get_connection()
+        .await
+        .ok_or_else(|| anyhow::anyhow!("Database not connected"))?;
+
+    let sql = format!(
+        r#"SELECT {} 
+           FROM orders o 
+           LEFT JOIN ships s ON o.ship_id = s.id 
+           LEFT JOIN ship_visits sv ON o.ship_visit_id = sv.id
+           LEFT JOIN ports p ON sv.port_id = p.id
+           WHERE o.ship_visit_id = ?
+           ORDER BY o.id DESC"#,
+        SELECT_FIELDS
+    );
+
+    let rows: Vec<OrderRow> = OrderRow::find_by_statement(
+        Statement::from_sql_and_values(DatabaseBackend::Sqlite, &sql, [ship_visit_id.into()])
+    )
+    .all(&conn)
+    .await?;
+
+    Ok(rows.into_iter().map(Order::from).collect())
 }
 
 #[derive(Debug, FromQueryResult)]
@@ -254,4 +334,29 @@ pub async fn update_status(id: i32, new_status: OrderStatus) -> Result<Order> {
 
     // Return updated order
     get_by_id(id).await?.ok_or_else(|| anyhow::anyhow!("Order not found after update"))
+}
+
+/// Delete an order (with cascade - deletes order items first)
+pub async fn delete_order(id: i32) -> Result<bool> {
+    let conn = database::get_connection()
+        .await
+        .ok_or_else(|| anyhow::anyhow!("Database not connected"))?;
+
+    // CASCADE DELETE: Delete order_items first (though they have ON DELETE CASCADE, let's be explicit)
+    conn.execute(Statement::from_sql_and_values(
+        DatabaseBackend::Sqlite,
+        "DELETE FROM order_items WHERE order_id = ?",
+        [id.into()],
+    ))
+    .await?;
+
+    // Delete the order itself
+    let result = conn.execute(Statement::from_sql_and_values(
+        DatabaseBackend::Sqlite,
+        "DELETE FROM orders WHERE id = ?",
+        [id.into()],
+    ))
+    .await?;
+
+    Ok(result.rows_affected() > 0)
 }

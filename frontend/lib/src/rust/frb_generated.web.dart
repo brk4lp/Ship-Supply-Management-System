@@ -77,6 +77,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected UpdateOrderItemRequest dco_decode_box_autoadd_update_order_item_request(dynamic raw);
 
+@protected UpdateOrderRequest dco_decode_box_autoadd_update_order_request(dynamic raw);
+
 @protected UpdatePortRequest dco_decode_box_autoadd_update_port_request(dynamic raw);
 
 @protected UpdateShipRequest dco_decode_box_autoadd_update_ship_request(dynamic raw);
@@ -131,6 +133,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected List<OrderItem> dco_decode_list_order_item(dynamic raw);
 
+@protected List<OrderProfitInfo> dco_decode_list_order_profit_info(dynamic raw);
+
 @protected List<Port> dco_decode_list_port(dynamic raw);
 
 @protected Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
@@ -181,6 +185,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected OrderItem dco_decode_order_item(dynamic raw);
 
+@protected OrderProfitInfo dco_decode_order_profit_info(dynamic raw);
+
 @protected OrderStatus dco_decode_order_status(dynamic raw);
 
 @protected OrderTotals dco_decode_order_totals(dynamic raw);
@@ -188,6 +194,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 @protected OrderWithItems dco_decode_order_with_items(dynamic raw);
 
 @protected Port dco_decode_port(dynamic raw);
+
+@protected ProfitSummary dco_decode_profit_summary(dynamic raw);
 
 @protected Ship dco_decode_ship(dynamic raw);
 
@@ -212,6 +220,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 @protected void dco_decode_unit(dynamic raw);
 
 @protected UpdateOrderItemRequest dco_decode_update_order_item_request(dynamic raw);
+
+@protected UpdateOrderRequest dco_decode_update_order_request(dynamic raw);
 
 @protected UpdatePortRequest dco_decode_update_port_request(dynamic raw);
 
@@ -277,6 +287,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected UpdateOrderItemRequest sse_decode_box_autoadd_update_order_item_request(SseDeserializer deserializer);
 
+@protected UpdateOrderRequest sse_decode_box_autoadd_update_order_request(SseDeserializer deserializer);
+
 @protected UpdatePortRequest sse_decode_box_autoadd_update_port_request(SseDeserializer deserializer);
 
 @protected UpdateShipRequest sse_decode_box_autoadd_update_ship_request(SseDeserializer deserializer);
@@ -331,6 +343,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected List<OrderItem> sse_decode_list_order_item(SseDeserializer deserializer);
 
+@protected List<OrderProfitInfo> sse_decode_list_order_profit_info(SseDeserializer deserializer);
+
 @protected List<Port> sse_decode_list_port(SseDeserializer deserializer);
 
 @protected Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
@@ -381,6 +395,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected OrderItem sse_decode_order_item(SseDeserializer deserializer);
 
+@protected OrderProfitInfo sse_decode_order_profit_info(SseDeserializer deserializer);
+
 @protected OrderStatus sse_decode_order_status(SseDeserializer deserializer);
 
 @protected OrderTotals sse_decode_order_totals(SseDeserializer deserializer);
@@ -388,6 +404,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 @protected OrderWithItems sse_decode_order_with_items(SseDeserializer deserializer);
 
 @protected Port sse_decode_port(SseDeserializer deserializer);
+
+@protected ProfitSummary sse_decode_profit_summary(SseDeserializer deserializer);
 
 @protected Ship sse_decode_ship(SseDeserializer deserializer);
 
@@ -412,6 +430,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 @protected void sse_decode_unit(SseDeserializer deserializer);
 
 @protected UpdateOrderItemRequest sse_decode_update_order_item_request(SseDeserializer deserializer);
+
+@protected UpdateOrderRequest sse_decode_update_order_request(SseDeserializer deserializer);
 
 @protected UpdatePortRequest sse_decode_update_port_request(SseDeserializer deserializer);
 
@@ -477,6 +497,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected void sse_encode_box_autoadd_update_order_item_request(UpdateOrderItemRequest self, SseSerializer serializer);
 
+@protected void sse_encode_box_autoadd_update_order_request(UpdateOrderRequest self, SseSerializer serializer);
+
 @protected void sse_encode_box_autoadd_update_port_request(UpdatePortRequest self, SseSerializer serializer);
 
 @protected void sse_encode_box_autoadd_update_ship_request(UpdateShipRequest self, SseSerializer serializer);
@@ -531,6 +553,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected void sse_encode_list_order_item(List<OrderItem> self, SseSerializer serializer);
 
+@protected void sse_encode_list_order_profit_info(List<OrderProfitInfo> self, SseSerializer serializer);
+
 @protected void sse_encode_list_port(List<Port> self, SseSerializer serializer);
 
 @protected void sse_encode_list_prim_u_8_strict(Uint8List self, SseSerializer serializer);
@@ -581,6 +605,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected void sse_encode_order_item(OrderItem self, SseSerializer serializer);
 
+@protected void sse_encode_order_profit_info(OrderProfitInfo self, SseSerializer serializer);
+
 @protected void sse_encode_order_status(OrderStatus self, SseSerializer serializer);
 
 @protected void sse_encode_order_totals(OrderTotals self, SseSerializer serializer);
@@ -588,6 +614,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 @protected void sse_encode_order_with_items(OrderWithItems self, SseSerializer serializer);
 
 @protected void sse_encode_port(Port self, SseSerializer serializer);
+
+@protected void sse_encode_profit_summary(ProfitSummary self, SseSerializer serializer);
 
 @protected void sse_encode_ship(Ship self, SseSerializer serializer);
 
@@ -612,6 +640,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 @protected void sse_encode_unit(void self, SseSerializer serializer);
 
 @protected void sse_encode_update_order_item_request(UpdateOrderItemRequest self, SseSerializer serializer);
+
+@protected void sse_encode_update_order_request(UpdateOrderRequest self, SseSerializer serializer);
 
 @protected void sse_encode_update_port_request(UpdatePortRequest self, SseSerializer serializer);
 

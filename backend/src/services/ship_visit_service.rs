@@ -334,11 +334,19 @@ pub async fn update_status(id: i32, status: VisitStatus) -> Result<Option<ShipVi
     get_by_id(id).await
 }
 
-/// Delete a ship visit
+/// Delete a ship visit (with cascade - nullify order references)
 pub async fn delete(id: i32) -> Result<bool> {
     let conn = database::get_connection().await
         .ok_or_else(|| anyhow::anyhow!("Database not connected"))?;
 
+    // CASCADE: Set ship_visit_id to NULL for orders that reference this visit
+    conn.execute(Statement::from_sql_and_values(
+        DatabaseBackend::Sqlite,
+        "UPDATE orders SET ship_visit_id = NULL WHERE ship_visit_id = ?",
+        vec![Value::Int(Some(id))]
+    )).await?;
+
+    // Now delete the ship visit
     let result = conn.execute(Statement::from_sql_and_values(
         DatabaseBackend::Sqlite,
         "DELETE FROM ship_visits WHERE id = ?",
@@ -452,8 +460,83 @@ pub async fn get_calendar_data(start_date: &str, end_date: &str) -> Result<Calen
         }
     }).collect();
 
-    // TODO: Add order delivery events
-    // Get orders with delivery dates in range and convert to calendar events
+    // Add order events - orders linked to ship visits in range
+    #[derive(Debug, FromQueryResult)]
+    struct OrderRow {
+        id: i32,
+        order_number: String,
+        ship_name: String,
+        ship_visit_info: Option<String>,
+        ship_visit_id: Option<i32>,
+        ship_id: i32,
+        port_id: Option<i32>,
+        status: String,
+        visit_eta: Option<String>,
+        visit_etd: Option<String>,
+    }
+
+    let order_rows: Vec<OrderRow> = OrderRow::find_by_statement(Statement::from_string(
+        DatabaseBackend::Sqlite,
+        format!(r#"
+            SELECT 
+                o.id,
+                o.order_number,
+                s.name as ship_name,
+                CASE 
+                    WHEN sv.id IS NOT NULL THEN p.name || ' (' || DATE(sv.eta) || ')'
+                    ELSE NULL
+                END as ship_visit_info,
+                o.ship_visit_id,
+                o.ship_id,
+                sv.port_id,
+                o.status,
+                sv.eta as visit_eta,
+                sv.etd as visit_etd
+            FROM orders o
+            LEFT JOIN ships s ON o.ship_id = s.id
+            LEFT JOIN ship_visits sv ON o.ship_visit_id = sv.id
+            LEFT JOIN ports p ON sv.port_id = p.id
+            WHERE o.status != 'cancelled'
+              AND sv.eta IS NOT NULL
+              AND DATE(sv.eta) <= '{end_date}'
+              AND DATE(sv.etd) >= '{start_date}'
+            ORDER BY sv.eta ASC
+        "#)
+    ))
+    .all(&conn)
+    .await?;
+
+    // Add order events
+    for order in order_rows {
+        if let (Some(eta), Some(etd)) = (order.visit_eta, order.visit_etd) {
+            let status_display = match order.status.as_str() {
+                "new" => "Yeni",
+                "quoted" => "Fiyat Verildi",
+                "agreed" => "Onaylandı",
+                "waiting_goods" => "Mal Bekleniyor",
+                "prepared" => "Hazırlandı",
+                "on_way" => "Yolda",
+                "delivered" => "Teslim Edildi",
+                "invoiced" => "Faturalandı",
+                _ => &order.status,
+            };
+
+            events.push(CalendarEvent {
+                id: format!("order_{}", order.id),
+                event_type: CalendarEventType::OrderDelivery,
+                title: format!("📦 {}", order.order_number),
+                subtitle: Some(format!("{} - {}", order.ship_name, status_display)),
+                start_date: eta.clone(),
+                end_date: etd,
+                color: CalendarEventType::OrderDelivery.color().to_string(),
+                status: status_display.to_string(),
+                related_ship_id: Some(order.ship_id),
+                related_port_id: order.port_id,
+                related_order_id: Some(order.id),
+                metadata: order.ship_visit_info,
+            });
+        }
+    }
 
     Ok(CalendarData { events, ports })
 }

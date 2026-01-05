@@ -18,8 +18,8 @@ class _CalendarPageState extends State<CalendarPage> {
   CalendarView _currentView = CalendarView.timelineMonth;
   final CalendarController _calendarController = CalendarController();
 
-  // Real data from Rust API
-  List<rust_models.ShipVisit> _visits = [];
+  // Real data from Rust API - using CalendarData with events
+  List<rust_models.CalendarEvent> _events = [];
   List<rust_models.Port> _ports = [];
   bool _isLoading = true;
   String? _errorMessage;
@@ -37,14 +37,20 @@ class _CalendarPageState extends State<CalendarPage> {
     });
 
     try {
-      // Load all visits and ports for calendar
-      final visits = await rust_api.getAllShipVisits();
-      final ports = await rust_api.getActivePorts();
+      // Get calendar data for 1 year range (6 months past, 6 months future)
+      final now = DateTime.now();
+      final startDate = now.subtract(const Duration(days: 180));
+      final endDate = now.add(const Duration(days: 180));
+      
+      final calendarData = await rust_api.getCalendarData(
+        startDate: startDate.toIso8601String().substring(0, 10),
+        endDate: endDate.toIso8601String().substring(0, 10),
+      );
 
       if (mounted) {
         setState(() {
-          _visits = visits;
-          _ports = ports;
+          _events = calendarData.events;
+          _ports = calendarData.ports;
           _isLoading = false;
         });
       }
@@ -58,41 +64,34 @@ class _CalendarPageState extends State<CalendarPage> {
     }
   }
 
-  // Convert Rust ShipVisit to calendar-compatible format
-  List<_CalendarVisit> get _calendarVisits {
-    return _visits.map((v) {
-      return _CalendarVisit(
-        id: v.id.toString(),
-        shipName: v.shipName ?? 'Bilinmeyen Gemi',
-        portName: v.portName ?? 'Bilinmeyen Liman',
-        portId: v.portId.toString(),
-        arrivalDate: DateTime.parse(v.eta),
-        departureDate: DateTime.parse(v.etd),
-        status: _mapVisitStatus(v.status),
-        notes: v.notes,
+  // Convert CalendarEvents to display format
+  List<_CalendarItem> get _calendarItems {
+    return _events.map((e) {
+      return _CalendarItem(
+        id: e.id,
+        title: e.title,
+        subtitle: e.subtitle,
+        portId: e.relatedPortId?.toString() ?? '0',
+        startDate: DateTime.parse(e.startDate),
+        endDate: DateTime.parse(e.endDate),
+        color: _hexToColor(e.color),
+        eventType: e.eventType,
+        status: e.status,
       );
     }).toList();
   }
 
-  // Get upcoming visits (ETA >= today)
-  List<_CalendarVisit> get _upcomingVisits {
+  // Get upcoming events
+  List<_CalendarItem> get _upcomingEvents {
     final now = DateTime.now();
-    return _calendarVisits.where((v) => v.arrivalDate.isAfter(now)).toList()
-      ..sort((a, b) => a.arrivalDate.compareTo(b.arrivalDate));
+    return _calendarItems.where((e) => e.startDate.isAfter(now)).toList()
+      ..sort((a, b) => a.startDate.compareTo(b.startDate));
   }
-
-  // Map Rust VisitStatus to local enum
-  _VisitStatus _mapVisitStatus(rust_models.VisitStatus status) {
-    switch (status) {
-      case rust_models.VisitStatus.planned:
-        return _VisitStatus.planned;
-      case rust_models.VisitStatus.arrived:
-        return _VisitStatus.arrived;
-      case rust_models.VisitStatus.departed:
-        return _VisitStatus.departed;
-      case rust_models.VisitStatus.cancelled:
-        return _VisitStatus.cancelled;
-    }
+  
+  Color _hexToColor(String hex) {
+    hex = hex.replaceFirst('#', '');
+    if (hex.length == 6) hex = 'FF$hex';
+    return Color(int.parse(hex, radix: 16));
   }
 
   @override
@@ -228,38 +227,25 @@ class _CalendarPageState extends State<CalendarPage> {
               width: 280,
               child: Column(
                 children: [
-                  // Legend
+                  // Legend - Event Types
                   LinearContainer(
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        Text('Durum Açıklaması', style: AppTheme.headingSmall),
+                        Text('Etkinlik Türleri', style: AppTheme.headingSmall),
                         const SizedBox(height: 16),
-                        ..._VisitStatus.values.map((status) => Padding(
-                          padding: const EdgeInsets.only(bottom: 8),
-                          child: Row(
-                            children: [
-                              Container(
-                                width: 16,
-                                height: 16,
-                                decoration: BoxDecoration(
-                                  color: status.color,
-                                  borderRadius: BorderRadius.circular(4),
-                                ),
-                              ),
-                              const SizedBox(width: 12),
-                              Text(
-                                status.displayName,
-                                style: AppTheme.bodyMedium,
-                              ),
-                            ],
-                          ),
-                        )),
+                        _LegendItem(color: const Color(0xFF1E40AF), label: '🚢 Gemi Ziyareti'),
+                        const SizedBox(height: 8),
+                        _LegendItem(color: const Color(0xFF4F46E5), label: '📦 Sipariş'),
+                        const SizedBox(height: 8),
+                        _LegendItem(color: const Color(0xFFF59E0B), label: '🏭 Depo Teslimatı'),
+                        const SizedBox(height: 8),
+                        _LegendItem(color: const Color(0xFF10B981), label: '🚚 Gemi Teslimatı'),
                       ],
                     ),
                   ),
                   const SizedBox(height: 16),
-                  // Upcoming Visits
+                  // Upcoming Events
                   Expanded(
                     child: LinearContainer(
                       child: Column(
@@ -268,9 +254,9 @@ class _CalendarPageState extends State<CalendarPage> {
                           Row(
                             mainAxisAlignment: MainAxisAlignment.spaceBetween,
                             children: [
-                              Text('Yaklaşan Ziyaretler', style: AppTheme.headingSmall),
+                              Text('Yaklaşan Etkinlikler', style: AppTheme.headingSmall),
                               Text(
-                                '${_upcomingVisits.length}',
+                                '${_upcomingEvents.length}',
                                 style: GoogleFonts.inter(
                                   fontSize: 14,
                                   fontWeight: FontWeight.w600,
@@ -281,7 +267,7 @@ class _CalendarPageState extends State<CalendarPage> {
                           ),
                           const SizedBox(height: 16),
                           Expanded(
-                            child: _upcomingVisits.isEmpty
+                            child: _upcomingEvents.isEmpty
                               ? Center(
                                   child: Column(
                                     mainAxisAlignment: MainAxisAlignment.center,
@@ -289,17 +275,17 @@ class _CalendarPageState extends State<CalendarPage> {
                                       Icon(Icons.event_busy, size: 32, color: AppTheme.secondaryText),
                                       const SizedBox(height: 8),
                                       Text(
-                                        'Yaklaşan ziyaret yok',
+                                        'Yaklaşan etkinlik yok',
                                         style: AppTheme.bodySmall,
                                       ),
                                     ],
                                   ),
                                 )
                               : ListView.builder(
-                                  itemCount: _upcomingVisits.length,
+                                  itemCount: _upcomingEvents.length > 10 ? 10 : _upcomingEvents.length,
                                   itemBuilder: (context, index) {
-                                    final visit = _upcomingVisits[index];
-                                    return _UpcomingVisitCard(visit: visit);
+                                    final event = _upcomingEvents[index];
+                                    return _UpcomingEventCard(event: event);
                                   },
                                 ),
                           ),
@@ -343,7 +329,7 @@ class _CalendarPageState extends State<CalendarPage> {
       body: SfCalendar(
         controller: _calendarController,
         view: CalendarView.schedule,
-        dataSource: _ShipVisitDataSource(_calendarVisits),
+        dataSource: _CalendarDataSource(_calendarItems, _ports),
         scheduleViewSettings: ScheduleViewSettings(
           appointmentItemHeight: 70,
           monthHeaderSettings: MonthHeaderSettings(
@@ -383,13 +369,13 @@ class _CalendarPageState extends State<CalendarPage> {
           ),
         ),
         appointmentBuilder: (context, details) {
-          final visit = details.appointments.first as _CalendarVisit;
-          return _MobileAppointmentCard(visit: visit);
+          final item = details.appointments.first as _CalendarItem;
+          return _MobileAppointmentCard(item: item);
         },
         onTap: (details) {
           if (details.appointments != null && details.appointments!.isNotEmpty) {
-            final visit = details.appointments!.first as _CalendarVisit;
-            _showVisitDetails(context, visit);
+            final item = details.appointments!.first as _CalendarItem;
+            _showEventDetails(context, item);
           }
         },
       ),
@@ -401,7 +387,7 @@ class _CalendarPageState extends State<CalendarPage> {
       return SfCalendar(
         controller: _calendarController,
         view: CalendarView.month,
-        dataSource: _ShipVisitDataSource(_calendarVisits),
+        dataSource: _CalendarDataSource(_calendarItems, _ports),
         monthViewSettings: MonthViewSettings(
           appointmentDisplayMode: MonthAppointmentDisplayMode.appointment,
           showAgenda: true,
@@ -431,8 +417,8 @@ class _CalendarPageState extends State<CalendarPage> {
         ),
         onTap: (details) {
           if (details.appointments != null && details.appointments!.isNotEmpty) {
-            final visit = details.appointments!.first as _CalendarVisit;
-            _showVisitDetails(context, visit);
+            final item = details.appointments!.first as _CalendarItem;
+            _showEventDetails(context, item);
           }
         },
       );
@@ -442,7 +428,7 @@ class _CalendarPageState extends State<CalendarPage> {
     return SfCalendar(
       controller: _calendarController,
       view: _currentView,
-      dataSource: _ShipVisitDataSource(_calendarVisits),
+      dataSource: _CalendarDataSource(_calendarItems, _ports),
       resourceViewSettings: ResourceViewSettings(
         size: 120,
         displayNameTextStyle: GoogleFonts.inter(
@@ -464,13 +450,13 @@ class _CalendarPageState extends State<CalendarPage> {
       headerStyle: _calendarHeaderStyle,
       todayHighlightColor: AppTheme.accent,
       appointmentBuilder: (context, details) {
-        final visit = details.appointments.first as _CalendarVisit;
-        return _DesktopAppointmentCard(visit: visit);
+        final item = details.appointments.first as _CalendarItem;
+        return _DesktopAppointmentCard(item: item);
       },
       onTap: (details) {
         if (details.appointments != null && details.appointments!.isNotEmpty) {
-          final visit = details.appointments!.first as _CalendarVisit;
-          _showVisitDetails(context, visit);
+          final item = details.appointments!.first as _CalendarItem;
+          _showEventDetails(context, item);
         }
       },
     );
@@ -493,7 +479,8 @@ class _CalendarPageState extends State<CalendarPage> {
     });
   }
 
-  void _showVisitDetails(BuildContext context, _CalendarVisit visit) {
+  void _showEventDetails(BuildContext context, _CalendarItem item) {
+    final isOrder = item.eventType == rust_models.CalendarEventType.orderDelivery;
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -509,41 +496,48 @@ class _CalendarPageState extends State<CalendarPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Expanded(child: Text(visit.shipName, style: AppTheme.headingMedium)),
-                  StatusBadge(
-                    status: visit.status.displayName,
-                    color: visit.status.color,
+                  Expanded(child: Text(item.title, style: AppTheme.headingMedium)),
+                  Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
+                    decoration: BoxDecoration(
+                      color: item.color.withOpacity(0.15),
+                      borderRadius: BorderRadius.circular(4),
+                    ),
+                    child: Text(
+                      item.status,
+                      style: GoogleFonts.inter(fontSize: 12, fontWeight: FontWeight.w500, color: item.color),
+                    ),
                   ),
                 ],
               ),
+              if (item.subtitle != null) ...[
+                const SizedBox(height: 8),
+                Text(item.subtitle!, style: AppTheme.bodyMedium.copyWith(color: AppTheme.secondaryText)),
+              ],
               const Divider(height: 32),
-              _DetailRow(icon: Icons.location_on_outlined, label: 'Liman', value: visit.portName),
-              const SizedBox(height: 12),
               _DetailRow(
-                icon: Icons.calendar_today_outlined,
-                label: 'Varış',
-                value: _formatDate(visit.arrivalDate),
+                icon: isOrder ? Icons.inventory_2_outlined : Icons.directions_boat_outlined,
+                label: isOrder ? 'Tür' : 'Tür',
+                value: isOrder ? 'Sipariş' : 'Gemi Ziyareti',
               ),
               const SizedBox(height: 12),
               _DetailRow(
                 icon: Icons.calendar_today_outlined,
-                label: 'Ayrılış',
-                value: _formatDate(visit.departureDate),
+                label: 'Başlangıç',
+                value: _formatDate(item.startDate),
+              ),
+              const SizedBox(height: 12),
+              _DetailRow(
+                icon: Icons.calendar_today_outlined,
+                label: 'Bitiş',
+                value: _formatDate(item.endDate),
               ),
               const SizedBox(height: 12),
               _DetailRow(
                 icon: Icons.access_time_outlined,
                 label: 'Süre',
-                value: '${visit.durationDays} gün',
+                value: '${item.endDate.difference(item.startDate).inDays + 1} gün',
               ),
-              if (visit.notes != null && visit.notes!.isNotEmpty) ...[
-                const SizedBox(height: 12),
-                _DetailRow(
-                  icon: Icons.notes_outlined,
-                  label: 'Not',
-                  value: visit.notes!,
-                ),
-              ],
               const SizedBox(height: 24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -551,20 +545,6 @@ class _CalendarPageState extends State<CalendarPage> {
                   TextButton(
                     onPressed: () => Navigator.pop(context),
                     child: Text('Kapat', style: GoogleFonts.inter(color: AppTheme.secondaryText)),
-                  ),
-                  const SizedBox(width: 8),
-                  ElevatedButton(
-                    onPressed: () {
-                      Navigator.pop(context);
-                      // TODO: Navigate to order creation
-                    },
-                    style: ElevatedButton.styleFrom(
-                      backgroundColor: AppTheme.accent,
-                      foregroundColor: Colors.white,
-                      elevation: 0,
-                      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(8)),
-                    ),
-                    child: Text('Sipariş Oluştur', style: GoogleFonts.inter(fontWeight: FontWeight.w500)),
                   ),
                 ],
               ),
@@ -584,92 +564,71 @@ class _CalendarPageState extends State<CalendarPage> {
 // LOCAL MODELS FOR CALENDAR DISPLAY
 // ============================================================================
 
-/// Visit status enum for calendar display
-enum _VisitStatus {
-  planned,
-  arrived,
-  departed,
-  cancelled,
-}
-
-extension _VisitStatusExtension on _VisitStatus {
-  String get displayName {
-    switch (this) {
-      case _VisitStatus.planned:
-        return 'Planlandı';
-      case _VisitStatus.arrived:
-        return 'Vardı';
-      case _VisitStatus.departed:
-        return 'Ayrıldı';
-      case _VisitStatus.cancelled:
-        return 'İptal';
-    }
-  }
-
-  Color get color {
-    switch (this) {
-      case _VisitStatus.planned:
-        return AppTheme.info; // Blue
-      case _VisitStatus.arrived:
-        return AppTheme.success; // Green
-      case _VisitStatus.departed:
-        return const Color(0xFF64748B); // Slate 500
-      case _VisitStatus.cancelled:
-        return AppTheme.error; // Red
-    }
-  }
-}
-
-/// Local calendar visit model
-class _CalendarVisit {
+/// Unified calendar item for both visits and orders
+class _CalendarItem {
   final String id;
-  final String shipName;
-  final String portName;
+  final String title;
+  final String? subtitle;
   final String portId;
-  final DateTime arrivalDate;
-  final DateTime departureDate;
-  final _VisitStatus status;
-  final String? notes;
+  final DateTime startDate;
+  final DateTime endDate;
+  final Color color;
+  final rust_models.CalendarEventType eventType;
+  final String status;
 
-  const _CalendarVisit({
+  const _CalendarItem({
     required this.id,
-    required this.shipName,
-    required this.portName,
+    required this.title,
+    this.subtitle,
     required this.portId,
-    required this.arrivalDate,
-    required this.departureDate,
+    required this.startDate,
+    required this.endDate,
+    required this.color,
+    required this.eventType,
     required this.status,
-    this.notes,
   });
-
-  int get durationDays => departureDate.difference(arrivalDate).inDays + 1;
-  bool get isUpcoming => arrivalDate.isAfter(DateTime.now());
 }
 
 // ============================================================================
 // CALENDAR DATA SOURCE & WIDGETS
 // ============================================================================
 
-/// Calendar data source for _CalendarVisit
-class _ShipVisitDataSource extends CalendarDataSource {
-  _ShipVisitDataSource(List<_CalendarVisit> visits) {
-    appointments = visits;
+/// Calendar data source for unified events
+class _CalendarDataSource extends CalendarDataSource {
+  final List<CalendarResource> _resources;
+
+  _CalendarDataSource(List<_CalendarItem> items, List<rust_models.Port> ports)
+      : _resources = ports
+            .map((p) => CalendarResource(
+                  id: p.id.toString(),
+                  displayName: p.name,
+                  color: AppTheme.accent,
+                ))
+            .toList() {
+    appointments = items;
+    resources = _resources;
   }
 
   @override
-  DateTime getStartTime(int index) => (appointments![index] as _CalendarVisit).arrivalDate;
+  DateTime getStartTime(int index) => (appointments![index] as _CalendarItem).startDate;
 
   @override
-  DateTime getEndTime(int index) => (appointments![index] as _CalendarVisit).departureDate;
+  DateTime getEndTime(int index) => (appointments![index] as _CalendarItem).endDate;
 
   @override
-  String getSubject(int index) => (appointments![index] as _CalendarVisit).shipName;
+  String getSubject(int index) => (appointments![index] as _CalendarItem).title;
 
   @override
-  Color getColor(int index) => (appointments![index] as _CalendarVisit).status.color;
+  Color getColor(int index) => (appointments![index] as _CalendarItem).color;
 
   @override
-  String? getNotes(int index) => (appointments![index] as _CalendarVisit).notes;
+  String? getNotes(int index) => (appointments![index] as _CalendarItem).subtitle;
+
+  @override
+  List<Object> getResourceIds(int index) {
+    final item = appointments![index] as _CalendarItem;
+    return [item.portId];
+  }
 }
 
 /// View toggle button for desktop
@@ -721,11 +680,11 @@ class _ViewToggleButton extends StatelessWidget {
   }
 }
 
-/// Desktop appointment card
+/// Desktop appointment card - unified for visits and orders
 class _DesktopAppointmentCard extends StatelessWidget {
-  final _CalendarVisit visit;
+  final _CalendarItem item;
 
-  const _DesktopAppointmentCard({required this.visit});
+  const _DesktopAppointmentCard({required this.item});
 
   @override
   Widget build(BuildContext context) {
@@ -733,7 +692,7 @@ class _DesktopAppointmentCard extends StatelessWidget {
       margin: const EdgeInsets.symmetric(vertical: 2, horizontal: 1),
       padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
       decoration: BoxDecoration(
-        color: visit.status.color,
+        color: item.color,
         borderRadius: BorderRadius.circular(4),
       ),
       child: Column(
@@ -741,7 +700,7 @@ class _DesktopAppointmentCard extends StatelessWidget {
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
           Text(
-            visit.shipName,
+            item.title,
             style: GoogleFonts.inter(
               fontSize: 12,
               fontWeight: FontWeight.w600,
@@ -749,25 +708,52 @@ class _DesktopAppointmentCard extends StatelessWidget {
             ),
             overflow: TextOverflow.ellipsis,
           ),
-          Text(
-            visit.portName,
-            style: GoogleFonts.inter(
-              fontSize: 10,
-              color: Colors.white.withOpacity(0.8),
+          if (item.subtitle != null)
+            Text(
+              item.subtitle!,
+              style: GoogleFonts.inter(
+                fontSize: 10,
+                color: Colors.white.withOpacity(0.8),
+              ),
+              overflow: TextOverflow.ellipsis,
             ),
-            overflow: TextOverflow.ellipsis,
-          ),
         ],
       ),
     );
   }
 }
 
-/// Mobile appointment card
-class _MobileAppointmentCard extends StatelessWidget {
-  final _CalendarVisit visit;
+/// Legend item widget
+class _LegendItem extends StatelessWidget {
+  final Color color;
+  final String label;
 
-  const _MobileAppointmentCard({required this.visit});
+  const _LegendItem({required this.color, required this.label});
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        Container(
+          width: 16,
+          height: 16,
+          decoration: BoxDecoration(
+            color: color,
+            borderRadius: BorderRadius.circular(4),
+          ),
+        ),
+        const SizedBox(width: 12),
+        Text(label, style: AppTheme.bodyMedium),
+      ],
+    );
+  }
+}
+
+/// Mobile appointment card for schedule view
+class _MobileAppointmentCard extends StatelessWidget {
+  final _CalendarItem item;
+
+  const _MobileAppointmentCard({required this.item});
 
   @override
   Widget build(BuildContext context) {
@@ -778,7 +764,7 @@ class _MobileAppointmentCard extends StatelessWidget {
         color: AppTheme.surface,
         borderRadius: BorderRadius.circular(8),
         border: Border(
-          left: BorderSide(color: visit.status.color, width: 4),
+          left: BorderSide(color: item.color, width: 4),
         ),
         boxShadow: [
           BoxShadow(
@@ -796,36 +782,38 @@ class _MobileAppointmentCard extends StatelessWidget {
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
                 Text(
-                  visit.shipName,
+                  item.title,
                   style: GoogleFonts.inter(
                     fontSize: 14,
                     fontWeight: FontWeight.w600,
                     color: AppTheme.primaryText,
                   ),
                 ),
-                const SizedBox(height: 2),
-                Text(
-                  '${visit.portName} • ${visit.durationDays} gün',
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    color: AppTheme.secondaryText,
+                if (item.subtitle != null) ...[
+                  const SizedBox(height: 2),
+                  Text(
+                    item.subtitle!,
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: AppTheme.secondaryText,
+                    ),
                   ),
-                ),
+                ],
               ],
             ),
           ),
           Container(
             padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 4),
             decoration: BoxDecoration(
-              color: visit.status.color.withOpacity(0.1),
+              color: item.color.withOpacity(0.1),
               borderRadius: BorderRadius.circular(4),
             ),
             child: Text(
-              visit.status.displayName,
+              item.status,
               style: GoogleFonts.inter(
                 fontSize: 11,
                 fontWeight: FontWeight.w600,
-                color: visit.status.color,
+                color: item.color,
               ),
             ),
           ),
@@ -835,15 +823,17 @@ class _MobileAppointmentCard extends StatelessWidget {
   }
 }
 
-/// Upcoming visit card for sidebar
-class _UpcomingVisitCard extends StatelessWidget {
-  final _CalendarVisit visit;
+/// Upcoming event card for sidebar
+class _UpcomingEventCard extends StatelessWidget {
+  final _CalendarItem event;
 
-  const _UpcomingVisitCard({required this.visit});
+  const _UpcomingEventCard({required this.event});
 
   @override
   Widget build(BuildContext context) {
-    final daysUntil = visit.arrivalDate.difference(DateTime.now()).inDays;
+    final daysUntil = event.startDate.difference(DateTime.now()).inDays;
+    final isOrder = event.eventType == rust_models.CalendarEventType.orderDelivery;
+    
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(12),
@@ -860,7 +850,7 @@ class _UpcomingVisitCard extends StatelessWidget {
             children: [
               Expanded(
                 child: Text(
-                  visit.shipName,
+                  event.title,
                   style: GoogleFonts.inter(
                     fontSize: 13,
                     fontWeight: FontWeight.w600,
@@ -872,7 +862,7 @@ class _UpcomingVisitCard extends StatelessWidget {
               Container(
                 padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
                 decoration: BoxDecoration(
-                  color: AppTheme.accent.withOpacity(0.1),
+                  color: event.color.withOpacity(0.1),
                   borderRadius: BorderRadius.circular(4),
                 ),
                 child: Text(
@@ -880,29 +870,35 @@ class _UpcomingVisitCard extends StatelessWidget {
                   style: GoogleFonts.inter(
                     fontSize: 11,
                     fontWeight: FontWeight.w600,
-                    color: AppTheme.accent,
+                    color: event.color,
                   ),
                 ),
               ),
             ],
           ),
-          const SizedBox(height: 6),
-          Row(
-            children: [
-              Icon(Icons.location_on_outlined, size: 14, color: AppTheme.secondaryText),
-              const SizedBox(width: 4),
-              Expanded(
-                child: Text(
-                  visit.portName,
-                  style: GoogleFonts.inter(
-                    fontSize: 12,
-                    color: AppTheme.secondaryText,
-                  ),
-                  overflow: TextOverflow.ellipsis,
+          if (event.subtitle != null) ...[
+            const SizedBox(height: 6),
+            Row(
+              children: [
+                Icon(
+                  isOrder ? Icons.inventory_2_outlined : Icons.directions_boat_outlined,
+                  size: 14,
+                  color: AppTheme.secondaryText,
                 ),
-              ),
-            ],
-          ),
+                const SizedBox(width: 4),
+                Expanded(
+                  child: Text(
+                    event.subtitle!,
+                    style: GoogleFonts.inter(
+                      fontSize: 12,
+                      color: AppTheme.secondaryText,
+                    ),
+                    overflow: TextOverflow.ellipsis,
+                  ),
+                ),
+              ],
+            ),
+          ],
         ],
       ),
     );

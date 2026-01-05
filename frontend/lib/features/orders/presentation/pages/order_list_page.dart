@@ -18,6 +18,7 @@ class OrderListPage extends StatefulWidget {
 class _OrderListPageState extends State<OrderListPage> {
   List<Order> _orders = [];
   List<Ship> _ships = [];
+  List<ShipVisit> _visits = [];
   bool _isLoading = true;
   String? _error;
   OrderStatus? _selectedStatus;
@@ -39,11 +40,13 @@ class _OrderListPageState extends State<OrderListPage> {
       final results = await Future.wait([
         rust_api.getAllOrders(statusFilter: _selectedStatus),
         rust_api.getAllShips(),
+        rust_api.getUpcomingShipVisits(),
       ]);
       
       setState(() {
         _orders = results[0] as List<Order>;
         _ships = results[1] as List<Ship>;
+        _visits = results[2] as List<ShipVisit>;
         _isLoading = false;
         _gridKey = UniqueKey();
       });
@@ -246,7 +249,13 @@ class _OrderListPageState extends State<OrderListPage> {
         title: 'Gemi',
         field: 'shipName',
         type: PlutoColumnType.text(),
-        width: 180,
+        width: 160,
+      ),
+      PlutoColumn(
+        title: 'Ziyaret',
+        field: 'visitInfo',
+        type: PlutoColumnType.text(),
+        width: 200,
       ),
       PlutoColumn(
         title: 'Durum',
@@ -259,16 +268,10 @@ class _OrderListPageState extends State<OrderListPage> {
         },
       ),
       PlutoColumn(
-        title: 'Teslim Limanı',
-        field: 'deliveryPort',
-        type: PlutoColumnType.text(),
-        width: 140,
-      ),
-      PlutoColumn(
         title: 'Para Birimi',
         field: 'currency',
         type: PlutoColumnType.text(),
-        width: 100,
+        width: 90,
       ),
       PlutoColumn(
         title: 'Oluşturulma',
@@ -332,8 +335,8 @@ class _OrderListPageState extends State<OrderListPage> {
         'id': PlutoCell(value: order.id),
         'orderNumber': PlutoCell(value: order.orderNumber),
         'shipName': PlutoCell(value: order.shipName ?? '-'),
+        'visitInfo': PlutoCell(value: order.shipVisitInfo ?? '-'),
         'status': PlutoCell(value: statusDisplayNames[order.status] ?? order.status.name),
-        'deliveryPort': PlutoCell(value: order.deliveryPort ?? '-'),
         'currency': PlutoCell(value: order.currency),
         'createdAt': PlutoCell(value: order.createdAt.substring(0, 10)),
         'actions': PlutoCell(value: ''),
@@ -353,20 +356,29 @@ class _OrderListPageState extends State<OrderListPage> {
     }
 
     Ship? selectedShip;
+    ShipVisit? selectedVisit;
     final deliveryPortController = TextEditingController();
     final notesController = TextEditingController();
     String selectedCurrency = 'USD';
+
+    // Filter visits for selected ship
+    List<ShipVisit> getVisitsForShip(Ship? ship) {
+      if (ship == null) return [];
+      return _visits.where((v) => v.shipId == ship.id).toList();
+    }
 
     showDialog(
       context: context,
       builder: (context) => StatefulBuilder(
         builder: (context, setDialogState) {
+          final visitsForShip = getVisitsForShip(selectedShip);
+          
           return AlertDialog(
             backgroundColor: AppTheme.surface,
             shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
             title: Text('Yeni Sipariş', style: AppTheme.headingMedium),
             content: SizedBox(
-              width: 450,
+              width: 500,
               child: SingleChildScrollView(
                 child: Column(
                   mainAxisSize: MainAxisSize.min,
@@ -386,7 +398,7 @@ class _OrderListPageState extends State<OrderListPage> {
                           const SizedBox(width: 8),
                           Expanded(
                             child: Text(
-                              'Sipariş oluşturduktan sonra ürün ekleyebilirsiniz. Her ürün için teslimat tipi ayrı seçilir.',
+                              'Gemi ziyareti seçerseniz sipariş o ziyarete bağlanır ve takvimde görünür.',
                               style: GoogleFonts.inter(fontSize: 12, color: Colors.blue.shade700),
                             ),
                           ),
@@ -411,17 +423,74 @@ class _OrderListPageState extends State<OrderListPage> {
                           child: Text('${ship.name} (${ship.imoNumber})'),
                         );
                       }).toList(),
-                      onChanged: (value) => setDialogState(() => selectedShip = value),
+                      onChanged: (value) {
+                        setDialogState(() {
+                          selectedShip = value;
+                          selectedVisit = null; // Reset visit when ship changes
+                        });
+                      },
                     ),
                     const SizedBox(height: 16),
 
-                    // Delivery Port
+                    // Ship Visit Dropdown (only if ship is selected and has visits)
+                    if (selectedShip != null) ...[
+                      Text('Gemi Ziyareti (Opsiyonel)', style: AppTheme.labelMedium),
+                      const SizedBox(height: 8),
+                      if (visitsForShip.isEmpty)
+                        Container(
+                          padding: const EdgeInsets.all(12),
+                          decoration: BoxDecoration(
+                            color: Colors.grey.shade100,
+                            borderRadius: BorderRadius.circular(8),
+                          ),
+                          child: Row(
+                            children: [
+                              Icon(Icons.event_busy, size: 18, color: Colors.grey.shade600),
+                              const SizedBox(width: 8),
+                              Text(
+                                'Bu gemi için planlanmış ziyaret yok',
+                                style: GoogleFonts.inter(fontSize: 13, color: Colors.grey.shade600),
+                              ),
+                            ],
+                          ),
+                        )
+                      else
+                        DropdownButtonFormField<ShipVisit>(
+                          value: selectedVisit,
+                          decoration: InputDecoration(
+                            hintText: 'Ziyaret seçin (opsiyonel)',
+                            border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
+                            contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
+                          ),
+                          items: [
+                            const DropdownMenuItem<ShipVisit>(
+                              value: null,
+                              child: Text('Ziyaret seçilmedi'),
+                            ),
+                            ...visitsForShip.map((visit) {
+                              final etaDate = DateTime.parse(visit.eta);
+                              final portName = visit.portName ?? 'Bilinmeyen Liman';
+                              final dateStr = '${etaDate.day.toString().padLeft(2, '0')}.${etaDate.month.toString().padLeft(2, '0')}.${etaDate.year}';
+                              return DropdownMenuItem(
+                                value: visit,
+                                child: Text('$portName - $dateStr'),
+                              );
+                            }),
+                          ],
+                          onChanged: (value) => setDialogState(() => selectedVisit = value),
+                        ),
+                      const SizedBox(height: 16),
+                    ],
+
+                    // Delivery Port (auto-fill if visit selected)
                     Text('Teslim Limanı', style: AppTheme.labelMedium),
                     const SizedBox(height: 8),
                     TextField(
                       controller: deliveryPortController,
                       decoration: InputDecoration(
-                        hintText: 'Örn: İstanbul Limanı',
+                        hintText: selectedVisit != null 
+                          ? selectedVisit!.portName ?? 'Liman bilgisi yok'
+                          : 'Örn: İstanbul Limanı',
                         border: OutlineInputBorder(borderRadius: BorderRadius.circular(8)),
                         contentPadding: const EdgeInsets.symmetric(horizontal: 12, vertical: 14),
                       ),
@@ -475,9 +544,15 @@ class _OrderListPageState extends State<OrderListPage> {
                   }
 
                   try {
+                    // Use visit port if delivery port is empty and visit is selected
+                    String? deliveryPort = deliveryPortController.text.isNotEmpty 
+                      ? deliveryPortController.text 
+                      : selectedVisit?.portName;
+
                     final request = CreateOrderRequest(
                       shipId: selectedShip!.id,
-                      deliveryPort: deliveryPortController.text.isNotEmpty ? deliveryPortController.text : null,
+                      shipVisitId: selectedVisit?.id,
+                      deliveryPort: deliveryPort,
                       notes: notesController.text.isNotEmpty ? notesController.text : null,
                       currency: selectedCurrency,
                     );

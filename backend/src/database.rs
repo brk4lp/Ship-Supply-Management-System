@@ -95,13 +95,15 @@ async fn create_tables(conn: &DatabaseConnection) -> Result<(), DbErr> {
             id INTEGER PRIMARY KEY AUTOINCREMENT,
             order_number TEXT UNIQUE NOT NULL,
             ship_id INTEGER NOT NULL,
+            ship_visit_id INTEGER,
             status TEXT NOT NULL DEFAULT 'NEW',
             delivery_port TEXT,
             currency TEXT NOT NULL DEFAULT 'USD',
             notes TEXT,
             created_at TEXT NOT NULL DEFAULT (datetime('now')),
             updated_at TEXT NOT NULL DEFAULT (datetime('now')),
-            FOREIGN KEY (ship_id) REFERENCES ships(id)
+            FOREIGN KEY (ship_id) REFERENCES ships(id),
+            FOREIGN KEY (ship_visit_id) REFERENCES ship_visits(id)
         )
         "#.to_string()
     )).await?;
@@ -302,6 +304,39 @@ async fn create_tables(conn: &DatabaseConnection) -> Result<(), DbErr> {
         DatabaseBackend::Sqlite,
         "CREATE INDEX IF NOT EXISTS idx_ship_visits_status ON ship_visits(status)".to_string()
     )).await?;
+
+    // =========================================================================
+    // MIGRATIONS - Add columns to existing tables
+    // =========================================================================
+    
+    // Add ship_visit_id to orders table if it doesn't exist
+    // SQLite doesn't support IF NOT EXISTS for ADD COLUMN, so we check first
+    let columns_result = conn.query_all(Statement::from_string(
+        DatabaseBackend::Sqlite,
+        "PRAGMA table_info(orders)".to_string()
+    )).await?;
+    
+    let has_ship_visit_id = columns_result.iter().any(|row| {
+        use sea_orm::QueryResult;
+        row.try_get::<String>("", "name")
+            .map(|name| name == "ship_visit_id")
+            .unwrap_or(false)
+    });
+    
+    if !has_ship_visit_id {
+        tracing::info!("Adding ship_visit_id column to orders table...");
+        conn.execute(Statement::from_string(
+            DatabaseBackend::Sqlite,
+            "ALTER TABLE orders ADD COLUMN ship_visit_id INTEGER REFERENCES ship_visits(id)".to_string()
+        )).await?;
+        
+        // Create index for the new column
+        conn.execute(Statement::from_string(
+            DatabaseBackend::Sqlite,
+            "CREATE INDEX IF NOT EXISTS idx_orders_ship_visit_id ON orders(ship_visit_id)".to_string()
+        )).await?;
+        tracing::info!("Migration complete: ship_visit_id added to orders");
+    }
 
     tracing::info!("SQLite tables created successfully");
     Ok(())

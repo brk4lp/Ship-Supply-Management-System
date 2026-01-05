@@ -46,11 +46,24 @@ Future<OrderWithItems?> getOrderWithItems({required int id}) =>
 Future<Order> createOrder({required CreateOrderRequest order}) =>
     RustLib.instance.api.crateApiCreateOrder(order: order);
 
+/// Update an existing order
+Future<Order> updateOrder(
+        {required int id, required UpdateOrderRequest order}) =>
+    RustLib.instance.api.crateApiUpdateOrder(id: id, order: order);
+
 /// Update order status (state machine enforced)
 Future<Order> updateOrderStatus(
         {required int id, required OrderStatus newStatus}) =>
     RustLib.instance.api
         .crateApiUpdateOrderStatus(id: id, newStatus: newStatus);
+
+/// Get orders by ship visit ID
+Future<List<Order>> getOrdersByShipVisit({required int shipVisitId}) =>
+    RustLib.instance.api.crateApiGetOrdersByShipVisit(shipVisitId: shipVisitId);
+
+/// Delete an order (cascade deletes order items)
+Future<bool> deleteOrder({required int id}) =>
+    RustLib.instance.api.crateApiDeleteOrder(id: id);
 
 /// Get all items for an order
 Future<List<OrderItem>> getOrderItems({required int orderId}) =>
@@ -280,6 +293,18 @@ Future<CalendarData> getCalendarData(
     RustLib.instance.api
         .crateApiGetCalendarData(startDate: startDate, endDate: endDate);
 
+/// Get order totals (revenue, cost, profit)
+Future<OrderTotals> getOrderTotals({required int orderId}) =>
+    RustLib.instance.api.crateApiGetOrderTotals(orderId: orderId);
+
+/// Get profit summary for dashboard
+Future<ProfitSummary> getProfitSummary() =>
+    RustLib.instance.api.crateApiGetProfitSummary();
+
+/// Get top profitable orders
+Future<List<OrderProfitInfo>> getTopProfitableOrders({required int limit}) =>
+    RustLib.instance.api.crateApiGetTopProfitableOrders(limit: limit);
+
 /// Initialize the database connection with custom URL
 Future<void> initDatabase({required String databaseUrl}) =>
     RustLib.instance.api.crateApiInitDatabase(databaseUrl: databaseUrl);
@@ -291,6 +316,9 @@ Future<String> initLocalDatabase() =>
 /// Check if database is connected
 Future<bool> isDatabaseConnected() =>
     RustLib.instance.api.crateApiIsDatabaseConnected();
+
+/// Load demo/seed data for Egeport presentation
+Future<String> loadSeedData() => RustLib.instance.api.crateApiLoadSeedData();
 
 /// Simple greet function to test FRB integration
 Future<String> greet({required String name}) =>

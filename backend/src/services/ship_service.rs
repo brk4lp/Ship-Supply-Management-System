@@ -144,7 +144,37 @@ pub async fn delete(id: i32) -> Result<bool> {
         .await
         .ok_or_else(|| anyhow::anyhow!("Database not connected"))?;
 
-    // Hard delete - actually remove the record
+    // CASCADE DELETE: First delete related records in child tables
+    
+    // 1. Get all orders for this ship and delete their items (order_items has CASCADE, but let's be explicit)
+    conn.execute(Statement::from_sql_and_values(
+        DatabaseBackend::Sqlite,
+        "DELETE FROM order_items WHERE order_id IN (SELECT id FROM orders WHERE ship_id = ?)",
+        vec![Value::Int(Some(id))]
+    )).await?;
+    
+    // 2. Delete orders for this ship
+    conn.execute(Statement::from_sql_and_values(
+        DatabaseBackend::Sqlite,
+        "DELETE FROM orders WHERE ship_id = ?",
+        vec![Value::Int(Some(id))]
+    )).await?;
+    
+    // 3. Set ship_visit_id to NULL for orders that reference ship_visits of this ship
+    conn.execute(Statement::from_sql_and_values(
+        DatabaseBackend::Sqlite,
+        "UPDATE orders SET ship_visit_id = NULL WHERE ship_visit_id IN (SELECT id FROM ship_visits WHERE ship_id = ?)",
+        vec![Value::Int(Some(id))]
+    )).await?;
+    
+    // 4. Delete ship_visits for this ship
+    conn.execute(Statement::from_sql_and_values(
+        DatabaseBackend::Sqlite,
+        "DELETE FROM ship_visits WHERE ship_id = ?",
+        vec![Value::Int(Some(id))]
+    )).await?;
+
+    // 5. Finally delete the ship itself
     let result = conn.execute(Statement::from_sql_and_values(
         DatabaseBackend::Sqlite,
         "DELETE FROM ships WHERE id = ?",

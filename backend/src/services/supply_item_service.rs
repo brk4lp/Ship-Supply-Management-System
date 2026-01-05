@@ -201,12 +201,29 @@ pub async fn update(id: i32, item: UpdateSupplyItemRequest) -> Result<SupplyItem
         .ok_or_else(|| anyhow::anyhow!("Failed to retrieve updated supply item"))
 }
 
-/// Delete a supply item (hard delete)
+/// Delete a supply item (hard delete with cascade)
 pub async fn delete(id: i32) -> Result<bool> {
     let conn = database::get_connection()
         .await
         .ok_or_else(|| anyhow::anyhow!("Database not connected"))?;
 
+    // CASCADE DELETE: First delete related records in child tables
+    
+    // 1. Delete stock_movements for stocks that reference this supply_item
+    conn.execute(Statement::from_sql_and_values(
+        DatabaseBackend::Sqlite,
+        "DELETE FROM stock_movements WHERE stock_id IN (SELECT id FROM stock WHERE supply_item_id = ?)",
+        vec![Value::Int(Some(id))]
+    )).await?;
+    
+    // 2. Delete stock entries for this supply_item
+    conn.execute(Statement::from_sql_and_values(
+        DatabaseBackend::Sqlite,
+        "DELETE FROM stock WHERE supply_item_id = ?",
+        vec![Value::Int(Some(id))]
+    )).await?;
+
+    // 3. Finally delete the supply item itself
     let result = conn.execute(Statement::from_sql_and_values(
         DatabaseBackend::Sqlite,
         "DELETE FROM supply_items WHERE id = ?",

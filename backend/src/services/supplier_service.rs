@@ -150,12 +150,36 @@ pub async fn update(id: i32, supplier: UpdateSupplierRequest) -> Result<Supplier
         .ok_or_else(|| anyhow::anyhow!("Failed to retrieve updated supplier"))
 }
 
-/// Delete a supplier (hard delete)
+/// Delete a supplier (hard delete with cascade)
 pub async fn delete(id: i32) -> Result<bool> {
     let conn = database::get_connection()
         .await
         .ok_or_else(|| anyhow::anyhow!("Database not connected"))?;
 
+    // CASCADE DELETE: First delete related records in child tables
+    
+    // 1. Delete stock_movements for stocks that reference supply_items of this supplier
+    conn.execute(Statement::from_sql_and_values(
+        DatabaseBackend::Sqlite,
+        "DELETE FROM stock_movements WHERE stock_id IN (SELECT s.id FROM stock s INNER JOIN supply_items si ON s.supply_item_id = si.id WHERE si.supplier_id = ?)",
+        vec![Value::Int(Some(id))]
+    )).await?;
+    
+    // 2. Delete stock entries for supply_items of this supplier
+    conn.execute(Statement::from_sql_and_values(
+        DatabaseBackend::Sqlite,
+        "DELETE FROM stock WHERE supply_item_id IN (SELECT id FROM supply_items WHERE supplier_id = ?)",
+        vec![Value::Int(Some(id))]
+    )).await?;
+    
+    // 3. Delete supply_items for this supplier
+    conn.execute(Statement::from_sql_and_values(
+        DatabaseBackend::Sqlite,
+        "DELETE FROM supply_items WHERE supplier_id = ?",
+        vec![Value::Int(Some(id))]
+    )).await?;
+
+    // 4. Finally delete the supplier itself
     let result = conn.execute(Statement::from_sql_and_values(
         DatabaseBackend::Sqlite,
         "DELETE FROM suppliers WHERE id = ?",

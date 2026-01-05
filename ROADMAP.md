@@ -312,7 +312,8 @@ profit_margin = (order_profit / total_revenue) * 100
 | ShipVisit CRUD API | ✅ | Ziyaret planlama (ETA, ETD, status) |
 | ShipVisit list UI | ✅ | PlutoGrid ile ziyaret listesi |
 | Visit status update | ✅ | Planned → Arrived → Departed durum geçişi |
-| Calendar FFI entegrasyonu | ⬜ | Rust'tan veri çekme |
+| Calendar FFI entegrasyonu | ✅ | Rust'tan gerçek veri çekme |
+| Calendar real data | ✅ | Mock veri kaldırıldı, API entegrasyonu |
 | Resource view by Port | ⬜ | Takvimde limana göre gruplama |
 | Drag & drop rescheduling | ⬜ | Takvimde sürükle-bırak |
 | Visit notifications | ⬜ | Yaklaşan ziyaret bildirimi |
@@ -352,31 +353,50 @@ pub struct ShipVisit {
 }
 ```
 
-### 3.2 Operasyon Takvimi (Operations Calendar) 🆕
+### 3.2 Sipariş-Ziyaret Entegrasyonu (Order-ShipVisit Link) ✅
+**Süre:** 1 hafta | **Öncelik:** 🔴 Kritik | **Tamamlanma:** Ocak 2026
+
+| Görev | Durum | Açıklama |
+|-------|-------|----------|
+| Order entity'ye ship_visit_id ekleme | ✅ | Opsiyonel foreign key |
+| Database şema güncelleme | ✅ | orders tablosuna ship_visit_id kolonu |
+| Order service güncelleme | ✅ | Join sorgularıyla ziyaret bilgisi |
+| UpdateOrderRequest modeli | ✅ | Sipariş güncelleme API |
+| getOrdersByShipVisit API | ✅ | Ziyarete göre siparişleri listeleme |
+| Sipariş formuna ziyaret seçici | ✅ | Dropdown ile ziyaret seçimi |
+| PlutoGrid'de ziyaret kolonu | ✅ | Siparişler listesinde ziyaret gösterimi |
+| Ziyaret-port bilgisi auto-fill | ✅ | Ziyaret seçilince liman otomatik dolar |
+
+**Order-ShipVisit İlişkisi:**
+```
+Order → (optional) ShipVisit → Port
+  ↓
+  shipVisitInfo: "Tuzla Limanı (2026-01-10 - 2026-01-12)"
+```
+
+### 3.3 Operasyon Takvimi (Operations Calendar) 🆕
 **Süre:** 3 hafta | **Öncelik:** 🔴 Kritik
 
 **Açıklama:** Tüm operasyonel verilerin tek bir takvim üzerinde görselleştirilmesi. Syncfusion Calendar kullanılarak gemi ziyaretleri, siparişler, teslimatlar ve depo hareketleri entegre şekilde gösterilecek.
 
 | Görev | Durum | Açıklama |
 |-------|-------|----------|
-| Calendar data service (Rust) | ⬜ | Tüm takvim verilerini birleştiren FFI API |
+| Calendar data service (Rust) | ✅ | Tüm takvim verilerini birleştiren FFI API |
+| Ship visits layer | ✅ | Gemi ziyaretleri (ETA/ETD) blokları |
+| Color coding system | ✅ | Her veri tipi için farklı renk |
+| Timeline view (Windows) | ✅ | Temel timeline görünümü |
+| Schedule view (iOS) | ✅ | Agenda listesi - mobil uyumlu |
+| Event detail popup | ✅ | Tıklayınca detay göster |
 | Multi-layer calendar view | ⬜ | Farklı veri tiplerini katman olarak gösterme |
-| Ship visits layer | ⬜ | Gemi ziyaretleri (ETA/ETD) blokları |
 | Orders layer | ⬜ | Sipariş teslimat tarihleri |
 | Deliveries layer | ⬜ | Depo çıkış & gemi teslimat tarihleri |
-| Color coding system | ⬜ | Her veri tipi için farklı renk |
 | Filter by ship | ⬜ | Belirli gemiye ait olayları filtrele |
 | Filter by port | ⬜ | Belirli limana ait olayları filtrele |
 | Filter by status | ⬜ | Durum bazlı filtreleme |
-| Timeline view (Windows) | ⬜ | Resource view - limana göre gruplama |
-| Schedule view (iOS) | ⬜ | Agenda listesi - mobil uyumlu |
-| Event detail popup | ⬜ | Tıklayınca detay göster |
+| Resource view by Port | ⬜ | Limana göre gruplama |
 | Quick actions | ⬜ | Takvimden hızlı işlem (durum güncelle) |
 | Drag & drop reschedule | ⬜ | Sürükle-bırak ile tarih değiştir |
-| Today indicator | ⬜ | Bugünü vurgulayan çizgi |
-| Week/Month/Day views | ⬜ | Farklı zaman aralığı görünümleri |
-
-**Takvim Veri Tipleri & Renkleri:**
+| Today indicator | ⬜ | Bugünü vurgulayan çizgi
 ```
 🚢 Gemi Ziyareti (Ship Visit)     → Navy Blue (#1E40AF)
    - ETA-ETD bloğu olarak gösterilir

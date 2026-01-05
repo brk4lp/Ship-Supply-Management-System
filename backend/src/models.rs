@@ -130,6 +130,9 @@ pub struct Order {
     pub order_number: String,
     pub ship_id: i32,
     pub ship_name: Option<String>,
+    /// Optional link to a ship visit - when the order will be delivered
+    pub ship_visit_id: Option<i32>,
+    pub ship_visit_info: Option<String>,
     pub status: OrderStatus,
     pub delivery_port: Option<String>,
     pub notes: Option<String>,
@@ -148,9 +151,20 @@ pub struct OrderWithItems {
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CreateOrderRequest {
     pub ship_id: i32,
+    /// Optional ship visit ID - links order to a specific port call
+    pub ship_visit_id: Option<i32>,
     pub delivery_port: Option<String>,
     pub notes: Option<String>,
     pub currency: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UpdateOrderRequest {
+    pub ship_id: Option<i32>,
+    pub ship_visit_id: Option<i32>,
+    pub delivery_port: Option<String>,
+    pub notes: Option<String>,
+    pub currency: Option<String>,
 }
 
 // ============================================================================
@@ -237,6 +251,30 @@ pub struct OrderTotals {
     pub total_revenue: f64,
     pub gross_profit: f64,
     pub margin_percent: Option<f64>,
+    pub currency: String,
+}
+
+/// Profit summary for dashboard
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ProfitSummary {
+    pub total_orders: i32,
+    pub total_revenue: f64,
+    pub total_cost: f64,
+    pub total_profit: f64,
+    pub average_margin: Option<f64>,
+    pub currency: String,
+}
+
+/// Order profit information
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct OrderProfitInfo {
+    pub order_id: i32,
+    pub order_number: String,
+    pub ship_name: String,
+    pub total_revenue: f64,
+    pub total_cost: f64,
+    pub profit: f64,
+    pub margin_percent: f64,
     pub currency: String,
 }
 

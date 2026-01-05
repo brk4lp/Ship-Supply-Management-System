@@ -182,11 +182,28 @@ pub async fn update(id: i32, req: UpdatePortRequest) -> Result<Option<Port>> {
     get_by_id(id).await
 }
 
-/// Delete a port
+/// Delete a port (with cascade delete)
 pub async fn delete(id: i32) -> Result<bool> {
     let conn = database::get_connection().await
         .ok_or_else(|| anyhow::anyhow!("Database not connected"))?;
 
+    // CASCADE DELETE: First delete related records in child tables
+    
+    // 1. Set ship_visit_id to NULL for orders that reference ship_visits of this port
+    conn.execute(Statement::from_sql_and_values(
+        DatabaseBackend::Sqlite,
+        "UPDATE orders SET ship_visit_id = NULL WHERE ship_visit_id IN (SELECT id FROM ship_visits WHERE port_id = ?)",
+        vec![Value::Int(Some(id))]
+    )).await?;
+    
+    // 2. Delete ship_visits for this port
+    conn.execute(Statement::from_sql_and_values(
+        DatabaseBackend::Sqlite,
+        "DELETE FROM ship_visits WHERE port_id = ?",
+        vec![Value::Int(Some(id))]
+    )).await?;
+
+    // 3. Finally delete the port itself
     let result = conn.execute(Statement::from_sql_and_values(
         DatabaseBackend::Sqlite,
         "DELETE FROM ports WHERE id = ?",
