@@ -143,6 +143,84 @@ class CreateShipRequest {
           owner == other.owner;
 }
 
+class CreateStockMovementRequest {
+  final int stockId;
+  final StockMovementType movementType;
+  final double quantity;
+  final String? referenceType;
+  final int? referenceId;
+  final String? referenceInfo;
+  final String? notes;
+
+  const CreateStockMovementRequest({
+    required this.stockId,
+    required this.movementType,
+    required this.quantity,
+    this.referenceType,
+    this.referenceId,
+    this.referenceInfo,
+    this.notes,
+  });
+
+  @override
+  int get hashCode =>
+      stockId.hashCode ^
+      movementType.hashCode ^
+      quantity.hashCode ^
+      referenceType.hashCode ^
+      referenceId.hashCode ^
+      referenceInfo.hashCode ^
+      notes.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CreateStockMovementRequest &&
+          runtimeType == other.runtimeType &&
+          stockId == other.stockId &&
+          movementType == other.movementType &&
+          quantity == other.quantity &&
+          referenceType == other.referenceType &&
+          referenceId == other.referenceId &&
+          referenceInfo == other.referenceInfo &&
+          notes == other.notes;
+}
+
+class CreateStockRequest {
+  final int supplyItemId;
+  final double quantity;
+  final String unit;
+  final String? warehouseLocation;
+  final double minimumQuantity;
+
+  const CreateStockRequest({
+    required this.supplyItemId,
+    required this.quantity,
+    required this.unit,
+    this.warehouseLocation,
+    required this.minimumQuantity,
+  });
+
+  @override
+  int get hashCode =>
+      supplyItemId.hashCode ^
+      quantity.hashCode ^
+      unit.hashCode ^
+      warehouseLocation.hashCode ^
+      minimumQuantity.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CreateStockRequest &&
+          runtimeType == other.runtimeType &&
+          supplyItemId == other.supplyItemId &&
+          quantity == other.quantity &&
+          unit == other.unit &&
+          warehouseLocation == other.warehouseLocation &&
+          minimumQuantity == other.minimumQuantity;
+}
+
 class CreateSupplierRequest {
   final String name;
   final String? contactPerson;
@@ -552,6 +630,188 @@ class Ship {
           updatedAt == other.updatedAt;
 }
 
+/// Current stock level for a product
+class Stock {
+  final int id;
+  final int supplyItemId;
+  final String? supplyItemName;
+  final double quantity;
+  final String unit;
+  final String? warehouseLocation;
+  final double minimumQuantity;
+  final String lastUpdated;
+
+  const Stock({
+    required this.id,
+    required this.supplyItemId,
+    this.supplyItemName,
+    required this.quantity,
+    required this.unit,
+    this.warehouseLocation,
+    required this.minimumQuantity,
+    required this.lastUpdated,
+  });
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      supplyItemId.hashCode ^
+      supplyItemName.hashCode ^
+      quantity.hashCode ^
+      unit.hashCode ^
+      warehouseLocation.hashCode ^
+      minimumQuantity.hashCode ^
+      lastUpdated.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Stock &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          supplyItemId == other.supplyItemId &&
+          supplyItemName == other.supplyItemName &&
+          quantity == other.quantity &&
+          unit == other.unit &&
+          warehouseLocation == other.warehouseLocation &&
+          minimumQuantity == other.minimumQuantity &&
+          lastUpdated == other.lastUpdated;
+}
+
+/// Stock movement record
+class StockMovement {
+  final int id;
+  final int stockId;
+  final String? supplyItemName;
+  final StockMovementType movementType;
+  final double quantity;
+  final String unit;
+  final String? referenceType;
+  final int? referenceId;
+  final String? referenceInfo;
+  final String? notes;
+  final String createdAt;
+
+  const StockMovement({
+    required this.id,
+    required this.stockId,
+    this.supplyItemName,
+    required this.movementType,
+    required this.quantity,
+    required this.unit,
+    this.referenceType,
+    this.referenceId,
+    this.referenceInfo,
+    this.notes,
+    required this.createdAt,
+  });
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      stockId.hashCode ^
+      supplyItemName.hashCode ^
+      movementType.hashCode ^
+      quantity.hashCode ^
+      unit.hashCode ^
+      referenceType.hashCode ^
+      referenceId.hashCode ^
+      referenceInfo.hashCode ^
+      notes.hashCode ^
+      createdAt.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is StockMovement &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          stockId == other.stockId &&
+          supplyItemName == other.supplyItemName &&
+          movementType == other.movementType &&
+          quantity == other.quantity &&
+          unit == other.unit &&
+          referenceType == other.referenceType &&
+          referenceId == other.referenceId &&
+          referenceInfo == other.referenceInfo &&
+          notes == other.notes &&
+          createdAt == other.createdAt;
+}
+
+/// Stock movement type - what kind of inventory change
+enum StockMovementType {
+  /// Goods received from supplier
+  in_,
+
+  /// Goods sent to ship
+  out,
+
+  /// Inventory adjustment (count correction)
+  adjustment,
+
+  /// Return from ship
+  return_,
+  ;
+}
+
+/// Stock summary for dashboard
+class StockSummary {
+  final int totalItems;
+  final int lowStockCount;
+  final int outOfStockCount;
+  final double totalValue;
+  final String currency;
+
+  const StockSummary({
+    required this.totalItems,
+    required this.lowStockCount,
+    required this.outOfStockCount,
+    required this.totalValue,
+    required this.currency,
+  });
+
+  @override
+  int get hashCode =>
+      totalItems.hashCode ^
+      lowStockCount.hashCode ^
+      outOfStockCount.hashCode ^
+      totalValue.hashCode ^
+      currency.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is StockSummary &&
+          runtimeType == other.runtimeType &&
+          totalItems == other.totalItems &&
+          lowStockCount == other.lowStockCount &&
+          outOfStockCount == other.outOfStockCount &&
+          totalValue == other.totalValue &&
+          currency == other.currency;
+}
+
+/// Stock with movement history
+class StockWithMovements {
+  final Stock stock;
+  final List<StockMovement> movements;
+
+  const StockWithMovements({
+    required this.stock,
+    required this.movements,
+  });
+
+  @override
+  int get hashCode => stock.hashCode ^ movements.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is StockWithMovements &&
+          runtimeType == other.runtimeType &&
+          stock == other.stock &&
+          movements == other.movements;
+}
+
 class Supplier {
   final int id;
   final String name;
@@ -778,6 +1038,31 @@ class UpdateShipRequest {
           shipType == other.shipType &&
           grossTonnage == other.grossTonnage &&
           owner == other.owner;
+}
+
+class UpdateStockRequest {
+  final double? quantity;
+  final String? warehouseLocation;
+  final double? minimumQuantity;
+
+  const UpdateStockRequest({
+    this.quantity,
+    this.warehouseLocation,
+    this.minimumQuantity,
+  });
+
+  @override
+  int get hashCode =>
+      quantity.hashCode ^ warehouseLocation.hashCode ^ minimumQuantity.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is UpdateStockRequest &&
+          runtimeType == other.runtimeType &&
+          quantity == other.quantity &&
+          warehouseLocation == other.warehouseLocation &&
+          minimumQuantity == other.minimumQuantity;
 }
 
 class UpdateSupplierRequest {

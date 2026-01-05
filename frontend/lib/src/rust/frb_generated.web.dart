@@ -39,6 +39,10 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected CreateShipRequest dco_decode_box_autoadd_create_ship_request(dynamic raw);
 
+@protected CreateStockMovementRequest dco_decode_box_autoadd_create_stock_movement_request(dynamic raw);
+
+@protected CreateStockRequest dco_decode_box_autoadd_create_stock_request(dynamic raw);
+
 @protected CreateSupplierRequest dco_decode_box_autoadd_create_supplier_request(dynamic raw);
 
 @protected CreateSupplyItemRequest dco_decode_box_autoadd_create_supply_item_request(dynamic raw);
@@ -55,6 +59,10 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected Ship dco_decode_box_autoadd_ship(dynamic raw);
 
+@protected Stock dco_decode_box_autoadd_stock(dynamic raw);
+
+@protected StockWithMovements dco_decode_box_autoadd_stock_with_movements(dynamic raw);
+
 @protected Supplier dco_decode_box_autoadd_supplier(dynamic raw);
 
 @protected SupplyItem dco_decode_box_autoadd_supply_item(dynamic raw);
@@ -62,6 +70,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 @protected UpdateOrderItemRequest dco_decode_box_autoadd_update_order_item_request(dynamic raw);
 
 @protected UpdateShipRequest dco_decode_box_autoadd_update_ship_request(dynamic raw);
+
+@protected UpdateStockRequest dco_decode_box_autoadd_update_stock_request(dynamic raw);
 
 @protected UpdateSupplierRequest dco_decode_box_autoadd_update_supplier_request(dynamic raw);
 
@@ -72,6 +82,10 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 @protected CreateOrderRequest dco_decode_create_order_request(dynamic raw);
 
 @protected CreateShipRequest dco_decode_create_ship_request(dynamic raw);
+
+@protected CreateStockMovementRequest dco_decode_create_stock_movement_request(dynamic raw);
+
+@protected CreateStockRequest dco_decode_create_stock_request(dynamic raw);
 
 @protected CreateSupplierRequest dco_decode_create_supplier_request(dynamic raw);
 
@@ -95,6 +109,10 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected List<Ship> dco_decode_list_ship(dynamic raw);
 
+@protected List<Stock> dco_decode_list_stock(dynamic raw);
+
+@protected List<StockMovement> dco_decode_list_stock_movement(dynamic raw);
+
 @protected List<Supplier> dco_decode_list_supplier(dynamic raw);
 
 @protected List<SupplyItem> dco_decode_list_supply_item(dynamic raw);
@@ -115,6 +133,10 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected Ship? dco_decode_opt_box_autoadd_ship(dynamic raw);
 
+@protected Stock? dco_decode_opt_box_autoadd_stock(dynamic raw);
+
+@protected StockWithMovements? dco_decode_opt_box_autoadd_stock_with_movements(dynamic raw);
+
 @protected Supplier? dco_decode_opt_box_autoadd_supplier(dynamic raw);
 
 @protected SupplyItem? dco_decode_opt_box_autoadd_supply_item(dynamic raw);
@@ -131,6 +153,16 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected Ship dco_decode_ship(dynamic raw);
 
+@protected Stock dco_decode_stock(dynamic raw);
+
+@protected StockMovement dco_decode_stock_movement(dynamic raw);
+
+@protected StockMovementType dco_decode_stock_movement_type(dynamic raw);
+
+@protected StockSummary dco_decode_stock_summary(dynamic raw);
+
+@protected StockWithMovements dco_decode_stock_with_movements(dynamic raw);
+
 @protected Supplier dco_decode_supplier(dynamic raw);
 
 @protected SupplyItem dco_decode_supply_item(dynamic raw);
@@ -142,6 +174,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 @protected UpdateOrderItemRequest dco_decode_update_order_item_request(dynamic raw);
 
 @protected UpdateShipRequest dco_decode_update_ship_request(dynamic raw);
+
+@protected UpdateStockRequest dco_decode_update_stock_request(dynamic raw);
 
 @protected UpdateSupplierRequest dco_decode_update_supplier_request(dynamic raw);
 
@@ -159,6 +193,10 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected CreateShipRequest sse_decode_box_autoadd_create_ship_request(SseDeserializer deserializer);
 
+@protected CreateStockMovementRequest sse_decode_box_autoadd_create_stock_movement_request(SseDeserializer deserializer);
+
+@protected CreateStockRequest sse_decode_box_autoadd_create_stock_request(SseDeserializer deserializer);
+
 @protected CreateSupplierRequest sse_decode_box_autoadd_create_supplier_request(SseDeserializer deserializer);
 
 @protected CreateSupplyItemRequest sse_decode_box_autoadd_create_supply_item_request(SseDeserializer deserializer);
@@ -175,6 +213,10 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected Ship sse_decode_box_autoadd_ship(SseDeserializer deserializer);
 
+@protected Stock sse_decode_box_autoadd_stock(SseDeserializer deserializer);
+
+@protected StockWithMovements sse_decode_box_autoadd_stock_with_movements(SseDeserializer deserializer);
+
 @protected Supplier sse_decode_box_autoadd_supplier(SseDeserializer deserializer);
 
 @protected SupplyItem sse_decode_box_autoadd_supply_item(SseDeserializer deserializer);
@@ -182,6 +224,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 @protected UpdateOrderItemRequest sse_decode_box_autoadd_update_order_item_request(SseDeserializer deserializer);
 
 @protected UpdateShipRequest sse_decode_box_autoadd_update_ship_request(SseDeserializer deserializer);
+
+@protected UpdateStockRequest sse_decode_box_autoadd_update_stock_request(SseDeserializer deserializer);
 
 @protected UpdateSupplierRequest sse_decode_box_autoadd_update_supplier_request(SseDeserializer deserializer);
 
@@ -192,6 +236,10 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 @protected CreateOrderRequest sse_decode_create_order_request(SseDeserializer deserializer);
 
 @protected CreateShipRequest sse_decode_create_ship_request(SseDeserializer deserializer);
+
+@protected CreateStockMovementRequest sse_decode_create_stock_movement_request(SseDeserializer deserializer);
+
+@protected CreateStockRequest sse_decode_create_stock_request(SseDeserializer deserializer);
 
 @protected CreateSupplierRequest sse_decode_create_supplier_request(SseDeserializer deserializer);
 
@@ -215,6 +263,10 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected List<Ship> sse_decode_list_ship(SseDeserializer deserializer);
 
+@protected List<Stock> sse_decode_list_stock(SseDeserializer deserializer);
+
+@protected List<StockMovement> sse_decode_list_stock_movement(SseDeserializer deserializer);
+
 @protected List<Supplier> sse_decode_list_supplier(SseDeserializer deserializer);
 
 @protected List<SupplyItem> sse_decode_list_supply_item(SseDeserializer deserializer);
@@ -235,6 +287,10 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected Ship? sse_decode_opt_box_autoadd_ship(SseDeserializer deserializer);
 
+@protected Stock? sse_decode_opt_box_autoadd_stock(SseDeserializer deserializer);
+
+@protected StockWithMovements? sse_decode_opt_box_autoadd_stock_with_movements(SseDeserializer deserializer);
+
 @protected Supplier? sse_decode_opt_box_autoadd_supplier(SseDeserializer deserializer);
 
 @protected SupplyItem? sse_decode_opt_box_autoadd_supply_item(SseDeserializer deserializer);
@@ -251,6 +307,16 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected Ship sse_decode_ship(SseDeserializer deserializer);
 
+@protected Stock sse_decode_stock(SseDeserializer deserializer);
+
+@protected StockMovement sse_decode_stock_movement(SseDeserializer deserializer);
+
+@protected StockMovementType sse_decode_stock_movement_type(SseDeserializer deserializer);
+
+@protected StockSummary sse_decode_stock_summary(SseDeserializer deserializer);
+
+@protected StockWithMovements sse_decode_stock_with_movements(SseDeserializer deserializer);
+
 @protected Supplier sse_decode_supplier(SseDeserializer deserializer);
 
 @protected SupplyItem sse_decode_supply_item(SseDeserializer deserializer);
@@ -262,6 +328,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 @protected UpdateOrderItemRequest sse_decode_update_order_item_request(SseDeserializer deserializer);
 
 @protected UpdateShipRequest sse_decode_update_ship_request(SseDeserializer deserializer);
+
+@protected UpdateStockRequest sse_decode_update_stock_request(SseDeserializer deserializer);
 
 @protected UpdateSupplierRequest sse_decode_update_supplier_request(SseDeserializer deserializer);
 
@@ -279,6 +347,10 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected void sse_encode_box_autoadd_create_ship_request(CreateShipRequest self, SseSerializer serializer);
 
+@protected void sse_encode_box_autoadd_create_stock_movement_request(CreateStockMovementRequest self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_create_stock_request(CreateStockRequest self, SseSerializer serializer);
+
 @protected void sse_encode_box_autoadd_create_supplier_request(CreateSupplierRequest self, SseSerializer serializer);
 
 @protected void sse_encode_box_autoadd_create_supply_item_request(CreateSupplyItemRequest self, SseSerializer serializer);
@@ -295,6 +367,10 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected void sse_encode_box_autoadd_ship(Ship self, SseSerializer serializer);
 
+@protected void sse_encode_box_autoadd_stock(Stock self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_stock_with_movements(StockWithMovements self, SseSerializer serializer);
+
 @protected void sse_encode_box_autoadd_supplier(Supplier self, SseSerializer serializer);
 
 @protected void sse_encode_box_autoadd_supply_item(SupplyItem self, SseSerializer serializer);
@@ -302,6 +378,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 @protected void sse_encode_box_autoadd_update_order_item_request(UpdateOrderItemRequest self, SseSerializer serializer);
 
 @protected void sse_encode_box_autoadd_update_ship_request(UpdateShipRequest self, SseSerializer serializer);
+
+@protected void sse_encode_box_autoadd_update_stock_request(UpdateStockRequest self, SseSerializer serializer);
 
 @protected void sse_encode_box_autoadd_update_supplier_request(UpdateSupplierRequest self, SseSerializer serializer);
 
@@ -312,6 +390,10 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 @protected void sse_encode_create_order_request(CreateOrderRequest self, SseSerializer serializer);
 
 @protected void sse_encode_create_ship_request(CreateShipRequest self, SseSerializer serializer);
+
+@protected void sse_encode_create_stock_movement_request(CreateStockMovementRequest self, SseSerializer serializer);
+
+@protected void sse_encode_create_stock_request(CreateStockRequest self, SseSerializer serializer);
 
 @protected void sse_encode_create_supplier_request(CreateSupplierRequest self, SseSerializer serializer);
 
@@ -335,6 +417,10 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected void sse_encode_list_ship(List<Ship> self, SseSerializer serializer);
 
+@protected void sse_encode_list_stock(List<Stock> self, SseSerializer serializer);
+
+@protected void sse_encode_list_stock_movement(List<StockMovement> self, SseSerializer serializer);
+
 @protected void sse_encode_list_supplier(List<Supplier> self, SseSerializer serializer);
 
 @protected void sse_encode_list_supply_item(List<SupplyItem> self, SseSerializer serializer);
@@ -355,6 +441,10 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected void sse_encode_opt_box_autoadd_ship(Ship? self, SseSerializer serializer);
 
+@protected void sse_encode_opt_box_autoadd_stock(Stock? self, SseSerializer serializer);
+
+@protected void sse_encode_opt_box_autoadd_stock_with_movements(StockWithMovements? self, SseSerializer serializer);
+
 @protected void sse_encode_opt_box_autoadd_supplier(Supplier? self, SseSerializer serializer);
 
 @protected void sse_encode_opt_box_autoadd_supply_item(SupplyItem? self, SseSerializer serializer);
@@ -371,6 +461,16 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 
 @protected void sse_encode_ship(Ship self, SseSerializer serializer);
 
+@protected void sse_encode_stock(Stock self, SseSerializer serializer);
+
+@protected void sse_encode_stock_movement(StockMovement self, SseSerializer serializer);
+
+@protected void sse_encode_stock_movement_type(StockMovementType self, SseSerializer serializer);
+
+@protected void sse_encode_stock_summary(StockSummary self, SseSerializer serializer);
+
+@protected void sse_encode_stock_with_movements(StockWithMovements self, SseSerializer serializer);
+
 @protected void sse_encode_supplier(Supplier self, SseSerializer serializer);
 
 @protected void sse_encode_supply_item(SupplyItem self, SseSerializer serializer);
@@ -382,6 +482,8 @@ import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated_web.dart';
 @protected void sse_encode_update_order_item_request(UpdateOrderItemRequest self, SseSerializer serializer);
 
 @protected void sse_encode_update_ship_request(UpdateShipRequest self, SseSerializer serializer);
+
+@protected void sse_encode_update_stock_request(UpdateStockRequest self, SseSerializer serializer);
 
 @protected void sse_encode_update_supplier_request(UpdateSupplierRequest self, SseSerializer serializer);
 

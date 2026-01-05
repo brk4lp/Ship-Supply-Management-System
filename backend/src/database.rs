@@ -181,6 +181,59 @@ async fn create_tables(conn: &DatabaseConnection) -> Result<(), DbErr> {
         "CREATE INDEX IF NOT EXISTS idx_supply_items_category ON supply_items(category)".to_string()
     )).await?;
 
+    // Stock table (current inventory levels)
+    conn.execute(Statement::from_string(
+        DatabaseBackend::Sqlite,
+        r#"
+        CREATE TABLE IF NOT EXISTS stock (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            supply_item_id INTEGER NOT NULL UNIQUE,
+            quantity REAL NOT NULL DEFAULT 0,
+            unit TEXT NOT NULL,
+            warehouse_location TEXT,
+            minimum_quantity REAL NOT NULL DEFAULT 0,
+            last_updated TEXT NOT NULL DEFAULT (datetime('now')),
+            FOREIGN KEY (supply_item_id) REFERENCES supply_items(id)
+        )
+        "#.to_string()
+    )).await?;
+
+    // Stock movements table (inventory history)
+    conn.execute(Statement::from_string(
+        DatabaseBackend::Sqlite,
+        r#"
+        CREATE TABLE IF NOT EXISTS stock_movements (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            stock_id INTEGER NOT NULL,
+            movement_type TEXT NOT NULL,
+            quantity REAL NOT NULL,
+            unit TEXT NOT NULL,
+            reference_type TEXT,
+            reference_id INTEGER,
+            reference_info TEXT,
+            notes TEXT,
+            created_at TEXT NOT NULL DEFAULT (datetime('now')),
+            FOREIGN KEY (stock_id) REFERENCES stock(id)
+        )
+        "#.to_string()
+    )).await?;
+
+    // Stock indexes
+    conn.execute(Statement::from_string(
+        DatabaseBackend::Sqlite,
+        "CREATE INDEX IF NOT EXISTS idx_stock_supply_item_id ON stock(supply_item_id)".to_string()
+    )).await?;
+
+    conn.execute(Statement::from_string(
+        DatabaseBackend::Sqlite,
+        "CREATE INDEX IF NOT EXISTS idx_stock_movements_stock_id ON stock_movements(stock_id)".to_string()
+    )).await?;
+
+    conn.execute(Statement::from_string(
+        DatabaseBackend::Sqlite,
+        "CREATE INDEX IF NOT EXISTS idx_stock_movements_type ON stock_movements(movement_type)".to_string()
+    )).await?;
+
     tracing::info!("SQLite tables created successfully");
     Ok(())
 }

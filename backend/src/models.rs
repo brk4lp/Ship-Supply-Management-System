@@ -329,3 +329,104 @@ pub struct UpdateSupplyItemRequest {
     pub minimum_order_quantity: Option<i32>,
     pub is_available: Option<bool>,
 }
+
+// ============================================================================
+// Stock / Warehouse Models
+// ============================================================================
+
+/// Stock movement type - what kind of inventory change
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum StockMovementType {
+    /// Goods received from supplier
+    In,
+    /// Goods sent to ship
+    Out,
+    /// Inventory adjustment (count correction)
+    Adjustment,
+    /// Return from ship
+    Return,
+}
+
+impl StockMovementType {
+    pub fn display_name(&self) -> &'static str {
+        match self {
+            StockMovementType::In => "Giriş",
+            StockMovementType::Out => "Çıkış",
+            StockMovementType::Adjustment => "Sayım Düzeltme",
+            StockMovementType::Return => "İade",
+        }
+    }
+}
+
+/// Current stock level for a product
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Stock {
+    pub id: i32,
+    pub supply_item_id: i32,
+    pub supply_item_name: Option<String>,
+    pub quantity: f64,
+    pub unit: String,
+    pub warehouse_location: Option<String>,
+    pub minimum_quantity: f64,
+    pub last_updated: String,
+}
+
+/// Stock movement record
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StockMovement {
+    pub id: i32,
+    pub stock_id: i32,
+    pub supply_item_name: Option<String>,
+    pub movement_type: StockMovementType,
+    pub quantity: f64,
+    pub unit: String,
+    pub reference_type: Option<String>,  // "order", "supplier", "adjustment"
+    pub reference_id: Option<i32>,        // order_id, supplier_id, etc.
+    pub reference_info: Option<String>,   // "Sipariş #ORD-2026-001" veya "Tedarikçi: ABC Ltd."
+    pub notes: Option<String>,
+    pub created_at: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CreateStockRequest {
+    pub supply_item_id: i32,
+    pub quantity: f64,
+    pub unit: String,
+    pub warehouse_location: Option<String>,
+    pub minimum_quantity: f64,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UpdateStockRequest {
+    pub quantity: Option<f64>,
+    pub warehouse_location: Option<String>,
+    pub minimum_quantity: Option<f64>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CreateStockMovementRequest {
+    pub stock_id: i32,
+    pub movement_type: StockMovementType,
+    pub quantity: f64,
+    pub reference_type: Option<String>,
+    pub reference_id: Option<i32>,
+    pub reference_info: Option<String>,
+    pub notes: Option<String>,
+}
+
+/// Stock with movement history
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StockWithMovements {
+    pub stock: Stock,
+    pub movements: Vec<StockMovement>,
+}
+
+/// Stock summary for dashboard
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct StockSummary {
+    pub total_items: i32,
+    pub low_stock_count: i32,
+    pub out_of_stock_count: i32,
+    pub total_value: f64,
+    pub currency: String,
+}

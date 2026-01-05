@@ -39,6 +39,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   CreateShipRequest dco_decode_box_autoadd_create_ship_request(dynamic raw);
 
   @protected
+  CreateStockMovementRequest
+      dco_decode_box_autoadd_create_stock_movement_request(dynamic raw);
+
+  @protected
+  CreateStockRequest dco_decode_box_autoadd_create_stock_request(dynamic raw);
+
+  @protected
   CreateSupplierRequest dco_decode_box_autoadd_create_supplier_request(
       dynamic raw);
 
@@ -65,6 +72,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Ship dco_decode_box_autoadd_ship(dynamic raw);
 
   @protected
+  Stock dco_decode_box_autoadd_stock(dynamic raw);
+
+  @protected
+  StockWithMovements dco_decode_box_autoadd_stock_with_movements(dynamic raw);
+
+  @protected
   Supplier dco_decode_box_autoadd_supplier(dynamic raw);
 
   @protected
@@ -76,6 +89,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   UpdateShipRequest dco_decode_box_autoadd_update_ship_request(dynamic raw);
+
+  @protected
+  UpdateStockRequest dco_decode_box_autoadd_update_stock_request(dynamic raw);
 
   @protected
   UpdateSupplierRequest dco_decode_box_autoadd_update_supplier_request(
@@ -93,6 +109,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   CreateShipRequest dco_decode_create_ship_request(dynamic raw);
+
+  @protected
+  CreateStockMovementRequest dco_decode_create_stock_movement_request(
+      dynamic raw);
+
+  @protected
+  CreateStockRequest dco_decode_create_stock_request(dynamic raw);
 
   @protected
   CreateSupplierRequest dco_decode_create_supplier_request(dynamic raw);
@@ -128,6 +151,12 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<Ship> dco_decode_list_ship(dynamic raw);
 
   @protected
+  List<Stock> dco_decode_list_stock(dynamic raw);
+
+  @protected
+  List<StockMovement> dco_decode_list_stock_movement(dynamic raw);
+
+  @protected
   List<Supplier> dco_decode_list_supplier(dynamic raw);
 
   @protected
@@ -158,6 +187,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Ship? dco_decode_opt_box_autoadd_ship(dynamic raw);
 
   @protected
+  Stock? dco_decode_opt_box_autoadd_stock(dynamic raw);
+
+  @protected
+  StockWithMovements? dco_decode_opt_box_autoadd_stock_with_movements(
+      dynamic raw);
+
+  @protected
   Supplier? dco_decode_opt_box_autoadd_supplier(dynamic raw);
 
   @protected
@@ -182,6 +218,21 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Ship dco_decode_ship(dynamic raw);
 
   @protected
+  Stock dco_decode_stock(dynamic raw);
+
+  @protected
+  StockMovement dco_decode_stock_movement(dynamic raw);
+
+  @protected
+  StockMovementType dco_decode_stock_movement_type(dynamic raw);
+
+  @protected
+  StockSummary dco_decode_stock_summary(dynamic raw);
+
+  @protected
+  StockWithMovements dco_decode_stock_with_movements(dynamic raw);
+
+  @protected
   Supplier dco_decode_supplier(dynamic raw);
 
   @protected
@@ -198,6 +249,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   UpdateShipRequest dco_decode_update_ship_request(dynamic raw);
+
+  @protected
+  UpdateStockRequest dco_decode_update_stock_request(dynamic raw);
 
   @protected
   UpdateSupplierRequest dco_decode_update_supplier_request(dynamic raw);
@@ -224,6 +278,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   CreateShipRequest sse_decode_box_autoadd_create_ship_request(
+      SseDeserializer deserializer);
+
+  @protected
+  CreateStockMovementRequest
+      sse_decode_box_autoadd_create_stock_movement_request(
+          SseDeserializer deserializer);
+
+  @protected
+  CreateStockRequest sse_decode_box_autoadd_create_stock_request(
       SseDeserializer deserializer);
 
   @protected
@@ -255,6 +318,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Ship sse_decode_box_autoadd_ship(SseDeserializer deserializer);
 
   @protected
+  Stock sse_decode_box_autoadd_stock(SseDeserializer deserializer);
+
+  @protected
+  StockWithMovements sse_decode_box_autoadd_stock_with_movements(
+      SseDeserializer deserializer);
+
+  @protected
   Supplier sse_decode_box_autoadd_supplier(SseDeserializer deserializer);
 
   @protected
@@ -266,6 +336,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   UpdateShipRequest sse_decode_box_autoadd_update_ship_request(
+      SseDeserializer deserializer);
+
+  @protected
+  UpdateStockRequest sse_decode_box_autoadd_update_stock_request(
       SseDeserializer deserializer);
 
   @protected
@@ -286,6 +360,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   CreateShipRequest sse_decode_create_ship_request(
+      SseDeserializer deserializer);
+
+  @protected
+  CreateStockMovementRequest sse_decode_create_stock_movement_request(
+      SseDeserializer deserializer);
+
+  @protected
+  CreateStockRequest sse_decode_create_stock_request(
       SseDeserializer deserializer);
 
   @protected
@@ -324,6 +406,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   List<Ship> sse_decode_list_ship(SseDeserializer deserializer);
 
   @protected
+  List<Stock> sse_decode_list_stock(SseDeserializer deserializer);
+
+  @protected
+  List<StockMovement> sse_decode_list_stock_movement(
+      SseDeserializer deserializer);
+
+  @protected
   List<Supplier> sse_decode_list_supplier(SseDeserializer deserializer);
 
   @protected
@@ -357,6 +446,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Ship? sse_decode_opt_box_autoadd_ship(SseDeserializer deserializer);
 
   @protected
+  Stock? sse_decode_opt_box_autoadd_stock(SseDeserializer deserializer);
+
+  @protected
+  StockWithMovements? sse_decode_opt_box_autoadd_stock_with_movements(
+      SseDeserializer deserializer);
+
+  @protected
   Supplier? sse_decode_opt_box_autoadd_supplier(SseDeserializer deserializer);
 
   @protected
@@ -382,6 +478,23 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   Ship sse_decode_ship(SseDeserializer deserializer);
 
   @protected
+  Stock sse_decode_stock(SseDeserializer deserializer);
+
+  @protected
+  StockMovement sse_decode_stock_movement(SseDeserializer deserializer);
+
+  @protected
+  StockMovementType sse_decode_stock_movement_type(
+      SseDeserializer deserializer);
+
+  @protected
+  StockSummary sse_decode_stock_summary(SseDeserializer deserializer);
+
+  @protected
+  StockWithMovements sse_decode_stock_with_movements(
+      SseDeserializer deserializer);
+
+  @protected
   Supplier sse_decode_supplier(SseDeserializer deserializer);
 
   @protected
@@ -399,6 +512,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   UpdateShipRequest sse_decode_update_ship_request(
+      SseDeserializer deserializer);
+
+  @protected
+  UpdateStockRequest sse_decode_update_stock_request(
       SseDeserializer deserializer);
 
   @protected
@@ -431,6 +548,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       CreateShipRequest self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_create_stock_movement_request(
+      CreateStockMovementRequest self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_create_stock_request(
+      CreateStockRequest self, SseSerializer serializer);
+
+  @protected
   void sse_encode_box_autoadd_create_supplier_request(
       CreateSupplierRequest self, SseSerializer serializer);
 
@@ -460,6 +585,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_box_autoadd_ship(Ship self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_stock(Stock self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_stock_with_movements(
+      StockWithMovements self, SseSerializer serializer);
+
+  @protected
   void sse_encode_box_autoadd_supplier(Supplier self, SseSerializer serializer);
 
   @protected
@@ -473,6 +605,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_box_autoadd_update_ship_request(
       UpdateShipRequest self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_update_stock_request(
+      UpdateStockRequest self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_update_supplier_request(
@@ -493,6 +629,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_create_ship_request(
       CreateShipRequest self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_create_stock_movement_request(
+      CreateStockMovementRequest self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_create_stock_request(
+      CreateStockRequest self, SseSerializer serializer);
 
   @protected
   void sse_encode_create_supplier_request(
@@ -532,6 +676,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_list_ship(List<Ship> self, SseSerializer serializer);
 
   @protected
+  void sse_encode_list_stock(List<Stock> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_stock_movement(
+      List<StockMovement> self, SseSerializer serializer);
+
+  @protected
   void sse_encode_list_supplier(List<Supplier> self, SseSerializer serializer);
 
   @protected
@@ -566,6 +717,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_opt_box_autoadd_ship(Ship? self, SseSerializer serializer);
 
   @protected
+  void sse_encode_opt_box_autoadd_stock(Stock? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_opt_box_autoadd_stock_with_movements(
+      StockWithMovements? self, SseSerializer serializer);
+
+  @protected
   void sse_encode_opt_box_autoadd_supplier(
       Supplier? self, SseSerializer serializer);
 
@@ -593,6 +751,23 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_ship(Ship self, SseSerializer serializer);
 
   @protected
+  void sse_encode_stock(Stock self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_stock_movement(StockMovement self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_stock_movement_type(
+      StockMovementType self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_stock_summary(StockSummary self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_stock_with_movements(
+      StockWithMovements self, SseSerializer serializer);
+
+  @protected
   void sse_encode_supplier(Supplier self, SseSerializer serializer);
 
   @protected
@@ -611,6 +786,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_update_ship_request(
       UpdateShipRequest self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_update_stock_request(
+      UpdateStockRequest self, SseSerializer serializer);
 
   @protected
   void sse_encode_update_supplier_request(

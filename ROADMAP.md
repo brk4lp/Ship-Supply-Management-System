@@ -1,7 +1,7 @@
 # 🚢 Ship Supply Management System (SSMS) - Proje Yol Haritası
 
-> **Son Güncelleme:** 8 Ocak 2026  
-> **Proje Durumu:** 🟢 Aktif Geliştirme (Faz 2 - Çekirdek Modüller Tamamlandı)
+> **Son Güncelleme:** 5 Ocak 2026  
+> **Proje Durumu:** 🟠 Aktif Geliştirme (Faz 2 - Çekirdek İş Mantığı)
 
 ---
 
@@ -93,16 +93,16 @@ dart_output: frontend/lib/src/rust/
 c_output: frontend/rust/
 ```
 
-### 1.2 Veritabanı Altyapısı
-**Süre:** 2 hafta | **Öncelik:** 🔴 Kritik
+### 1.2 Veritabanı Altyapısı ✅
+**Süre:** 2 hafta | **Öncelik:** 🔴 Kritik | **Tamamlanma:** Ocak 2026
 
 | Görev | Durum | Açıklama |
 |-------|-------|----------|
 | PostgreSQL Docker setup | ⬜ | docker-compose.yml güncelleme |
 | SeaORM migration sistemi | ⬜ | `sea-orm-cli` ile migration |
-| Entity relationship'ler | ⬜ | Foreign key tanımlamaları |
+| Entity relationship'ler | ✅ | Foreign key tanımlamaları |
 | Connection pool | ⬜ | `sqlx` pool konfigürasyonu |
-| SQLite offline cache | ⬜ | Yerel veritabanı yapısı |
+| SQLite offline cache | ✅ | Yerel veritabanı yapısı çalışıyor |
 
 **Veritabanı Şeması:**
 ```
@@ -132,7 +132,7 @@ c_output: frontend/rust/
 
 ---
 
-## 🔶 Faz 2: Çekirdek İş Mantığı (Q2 2026)
+## 🟠 Faz 2: Çekirdek İş Mantığı (Q2 2026) - AKTİF
 
 ### 2.1 Gemi Yönetimi (Ships Module) ✅
 **Süre:** 2 hafta | **Öncelik:** 🔴 Kritik | **Tamamlanma:** Ocak 2026
@@ -351,7 +351,88 @@ pub struct ShipVisit {
 }
 ```
 
-### 3.2 Raporlama & Analytics
+### 3.2 Operasyon Takvimi (Operations Calendar) 🆕
+**Süre:** 3 hafta | **Öncelik:** 🔴 Kritik
+
+**Açıklama:** Tüm operasyonel verilerin tek bir takvim üzerinde görselleştirilmesi. Syncfusion Calendar kullanılarak gemi ziyaretleri, siparişler, teslimatlar ve depo hareketleri entegre şekilde gösterilecek.
+
+| Görev | Durum | Açıklama |
+|-------|-------|----------|
+| Calendar data service (Rust) | ⬜ | Tüm takvim verilerini birleştiren FFI API |
+| Multi-layer calendar view | ⬜ | Farklı veri tiplerini katman olarak gösterme |
+| Ship visits layer | ⬜ | Gemi ziyaretleri (ETA/ETD) blokları |
+| Orders layer | ⬜ | Sipariş teslimat tarihleri |
+| Deliveries layer | ⬜ | Depo çıkış & gemi teslimat tarihleri |
+| Color coding system | ⬜ | Her veri tipi için farklı renk |
+| Filter by ship | ⬜ | Belirli gemiye ait olayları filtrele |
+| Filter by port | ⬜ | Belirli limana ait olayları filtrele |
+| Filter by status | ⬜ | Durum bazlı filtreleme |
+| Timeline view (Windows) | ⬜ | Resource view - limana göre gruplama |
+| Schedule view (iOS) | ⬜ | Agenda listesi - mobil uyumlu |
+| Event detail popup | ⬜ | Tıklayınca detay göster |
+| Quick actions | ⬜ | Takvimden hızlı işlem (durum güncelle) |
+| Drag & drop reschedule | ⬜ | Sürükle-bırak ile tarih değiştir |
+| Today indicator | ⬜ | Bugünü vurgulayan çizgi |
+| Week/Month/Day views | ⬜ | Farklı zaman aralığı görünümleri |
+
+**Takvim Veri Tipleri & Renkleri:**
+```
+🚢 Gemi Ziyareti (Ship Visit)     → Navy Blue (#1E40AF)
+   - ETA-ETD bloğu olarak gösterilir
+   - Durum: Planned, Arrived, Departed
+
+📦 Sipariş Teslimatı (Order)       → Indigo (#4F46E5)
+   - Teslimat tarihi işaretçisi
+   - Durum rengine göre opacity
+
+🏭 Depo Teslimatı (Warehouse)      → Amber (#F59E0B)
+   - Depoya mal giriş tarihi
+   - Tedarikçi bilgisi tooltip'te
+
+🚚 Gemi Teslimatı (Ship Delivery)  → Emerald (#10B981)
+   - Gemiye teslimat tarihi
+   - Sipariş numarası ile ilişkili
+```
+
+**Calendar Event Entity:**
+```rust
+pub struct CalendarEvent {
+    pub id: String,             // "visit_123", "order_456"
+    pub event_type: EventType,  // ShipVisit, OrderDelivery, WarehouseDelivery, ShipDelivery
+    pub title: String,          // "M/V AURORA - Tuzla"
+    pub subtitle: Option<String>, // "Sipariş #ORD-2026-001"
+    pub start_date: DateTime,
+    pub end_date: DateTime,
+    pub color: String,          // Hex color
+    pub status: String,
+    pub related_ship_id: Option<i32>,
+    pub related_port_id: Option<i32>,
+    pub related_order_id: Option<i32>,
+    pub metadata: Option<String>, // JSON for extra data
+}
+```
+
+**Takvim Görünüm Modları:**
+```
+┌─────────────────────────────────────────────────────────────────┐
+│  📅 Operasyon Takvimi                    [Gün] [Hafta] [Ay]    │
+├─────────────────────────────────────────────────────────────────┤
+│  Filtreler: [🚢 Gemiler ▼] [🏗️ Limanlar ▼] [📦 Siparişler ▼]  │
+├─────────────────────────────────────────────────────────────────┤
+│                                                                 │
+│  Tuzla      │▓▓▓▓▓▓▓▓▓▓│ M/V AURORA (5-8 Ocak)                │
+│             │          │▓▓▓▓│ M/V NEPTUNE (7-9 Ocak)          │
+│             │                                                   │
+│  Ambarlı    │     │▓▓▓▓▓▓▓▓▓▓▓▓│ M/V POSEIDON (6-10 Ocak)    │
+│             │                                                   │
+│  Haydarpaşa │              │▓▓▓▓▓▓│ M/V TITAN (8-10 Ocak)     │
+│             │                                                   │
+├─────────────────────────────────────────────────────────────────┤
+│  🔵 Gemi Ziyareti  🟣 Sipariş  🟡 Depo Teslimat  🟢 Gemi Teslimat │
+└─────────────────────────────────────────────────────────────────┘
+```
+
+### 3.3 Raporlama & Analytics
 **Süre:** 3 hafta | **Öncelik:** 🟡 Yüksek
 
 | Görev | Durum | Açıklama |
@@ -371,7 +452,7 @@ pub struct ShipVisit {
 - Bekleyen Siparişler
 - Yaklaşan Ziyaretler (7 gün)
 
-### 3.3 Arama & Filtreleme Altyapısı
+### 3.4 Arama & Filtreleme Altyapısı
 **Süre:** 1 hafta | **Öncelik:** 🟡 Yüksek
 
 | Görev | Durum | Açıklama |
@@ -382,7 +463,7 @@ pub struct ShipVisit {
 | Recent searches | ⬜ | Son aramalar |
 | Search suggestions | ⬜ | Otomatik tamamlama |
 
-### 3.4 Bildirim Sistemi
+### 3.5 Bildirim Sistemi
 **Süre:** 2 hafta | **Öncelik:** 🟢 Orta
 
 | Görev | Durum | Açıklama |
@@ -393,7 +474,7 @@ pub struct ShipVisit {
 | Email notifications | ⬜ | Kritik durumlar için email |
 | Notification preferences | ⬜ | Kullanıcı tercihleri |
 
-### 3.5 Dosya Yönetimi
+### 3.6 Dosya Yönetimi
 **Süre:** 2 hafta | **Öncelik:** 🟢 Orta
 
 | Görev | Durum | Açıklama |

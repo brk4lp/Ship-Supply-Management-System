@@ -8,6 +8,7 @@ import '../../features/orders/presentation/pages/order_detail_page.dart';
 import '../../features/ships/presentation/pages/ship_list_page.dart';
 import '../../features/suppliers/presentation/pages/supplier_list_page.dart';
 import '../../features/supply_items/presentation/pages/supply_item_list_page.dart';
+import '../../features/stock/presentation/pages/stock_list_page.dart';
 import '../widgets/main_scaffold.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -58,6 +59,11 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             path: '/supply-items',
             name: 'supply-items',
             builder: (context, state) => const SupplyItemListPage(),
+          ),
+          GoRoute(
+            path: '/stock',
+            name: 'stock',
+            builder: (context, state) => const StockListPage(),
           ),
         ],
       ),

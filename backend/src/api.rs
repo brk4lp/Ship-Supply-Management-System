@@ -266,6 +266,94 @@ pub async fn get_supply_item_count() -> Result<i64, String> {
 }
 
 // ============================================================================
+// Stock / Warehouse Operations
+// ============================================================================
+
+/// Get all stock items
+pub async fn get_all_stock() -> Result<Vec<Stock>, String> {
+    services::stock_service::get_all()
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Get stock items with low quantity (below minimum)
+pub async fn get_low_stock() -> Result<Vec<Stock>, String> {
+    services::stock_service::get_low_stock()
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Get a single stock item by ID
+pub async fn get_stock_by_id(id: i32) -> Result<Option<Stock>, String> {
+    services::stock_service::get_by_id(id)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Get stock by supply item ID
+pub async fn get_stock_by_supply_item(supply_item_id: i32) -> Result<Option<Stock>, String> {
+    services::stock_service::get_by_supply_item(supply_item_id)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Create a new stock entry
+pub async fn create_stock(stock: CreateStockRequest) -> Result<Stock, String> {
+    services::stock_service::create(stock)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Update stock entry
+pub async fn update_stock(id: i32, stock: UpdateStockRequest) -> Result<Stock, String> {
+    services::stock_service::update(id, stock)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Delete stock entry
+pub async fn delete_stock(id: i32) -> Result<bool, String> {
+    services::stock_service::delete(id)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Get stock movements for a stock item
+pub async fn get_stock_movements(stock_id: i32) -> Result<Vec<StockMovement>, String> {
+    services::stock_service::get_movements(stock_id)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Get recent stock movements (all items)
+pub async fn get_recent_stock_movements(limit: i32) -> Result<Vec<StockMovement>, String> {
+    services::stock_service::get_recent_movements(limit)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Create stock movement (updates stock quantity automatically)
+pub async fn create_stock_movement(movement: CreateStockMovementRequest) -> Result<StockMovement, String> {
+    services::stock_service::create_movement(movement)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Get stock with all movements
+pub async fn get_stock_with_movements(id: i32) -> Result<Option<StockWithMovements>, String> {
+    services::stock_service::get_with_movements(id)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Get stock summary for dashboard
+pub async fn get_stock_summary() -> Result<StockSummary, String> {
+    services::stock_service::get_summary()
+        .await
+        .map_err(|e| e.to_string())
+}
+
+// ============================================================================
 // Database Initialization
 // ============================================================================
 

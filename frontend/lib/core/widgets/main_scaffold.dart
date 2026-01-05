@@ -56,6 +56,12 @@ class _MainScaffoldState extends State<MainScaffold> {
       label: 'Ürün Kataloğu',
       path: '/supply-items',
     ),
+    _NavItem(
+      icon: Icons.warehouse_outlined,
+      selectedIcon: Icons.warehouse,
+      label: 'Stok Takibi',
+      path: '/stock',
+    ),
   ];
 
   @override

@@ -154,6 +154,55 @@ Future<List<SupplyItem>> searchSupplyItems({required String query}) =>
 Future<PlatformInt64> getSupplyItemCount() =>
     RustLib.instance.api.crateApiGetSupplyItemCount();
 
+/// Get all stock items
+Future<List<Stock>> getAllStock() => RustLib.instance.api.crateApiGetAllStock();
+
+/// Get stock items with low quantity (below minimum)
+Future<List<Stock>> getLowStock() => RustLib.instance.api.crateApiGetLowStock();
+
+/// Get a single stock item by ID
+Future<Stock?> getStockById({required int id}) =>
+    RustLib.instance.api.crateApiGetStockById(id: id);
+
+/// Get stock by supply item ID
+Future<Stock?> getStockBySupplyItem({required int supplyItemId}) =>
+    RustLib.instance.api
+        .crateApiGetStockBySupplyItem(supplyItemId: supplyItemId);
+
+/// Create a new stock entry
+Future<Stock> createStock({required CreateStockRequest stock}) =>
+    RustLib.instance.api.crateApiCreateStock(stock: stock);
+
+/// Update stock entry
+Future<Stock> updateStock(
+        {required int id, required UpdateStockRequest stock}) =>
+    RustLib.instance.api.crateApiUpdateStock(id: id, stock: stock);
+
+/// Delete stock entry
+Future<bool> deleteStock({required int id}) =>
+    RustLib.instance.api.crateApiDeleteStock(id: id);
+
+/// Get stock movements for a stock item
+Future<List<StockMovement>> getStockMovements({required int stockId}) =>
+    RustLib.instance.api.crateApiGetStockMovements(stockId: stockId);
+
+/// Get recent stock movements (all items)
+Future<List<StockMovement>> getRecentStockMovements({required int limit}) =>
+    RustLib.instance.api.crateApiGetRecentStockMovements(limit: limit);
+
+/// Create stock movement (updates stock quantity automatically)
+Future<StockMovement> createStockMovement(
+        {required CreateStockMovementRequest movement}) =>
+    RustLib.instance.api.crateApiCreateStockMovement(movement: movement);
+
+/// Get stock with all movements
+Future<StockWithMovements?> getStockWithMovements({required int id}) =>
+    RustLib.instance.api.crateApiGetStockWithMovements(id: id);
+
+/// Get stock summary for dashboard
+Future<StockSummary> getStockSummary() =>
+    RustLib.instance.api.crateApiGetStockSummary();
+
 /// Initialize the database connection with custom URL
 Future<void> initDatabase({required String databaseUrl}) =>
     RustLib.instance.api.crateApiInitDatabase(databaseUrl: databaseUrl);

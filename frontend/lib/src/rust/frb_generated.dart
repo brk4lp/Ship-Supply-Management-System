@@ -69,7 +69,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.11.1';
 
   @override
-  int get rustContentHash => -1239987423;
+  int get rustContentHash => 899940218;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -94,6 +94,11 @@ abstract class RustLibApi extends BaseApi {
 
   Future<Ship> crateApiCreateShip({required CreateShipRequest ship});
 
+  Future<Stock> crateApiCreateStock({required CreateStockRequest stock});
+
+  Future<StockMovement> crateApiCreateStockMovement(
+      {required CreateStockMovementRequest movement});
+
   Future<Supplier> crateApiCreateSupplier(
       {required CreateSupplierRequest supplier});
 
@@ -104,6 +109,8 @@ abstract class RustLibApi extends BaseApi {
 
   Future<bool> crateApiDeleteShip({required int id});
 
+  Future<bool> crateApiDeleteStock({required int id});
+
   Future<bool> crateApiDeleteSupplier({required int id});
 
   Future<bool> crateApiDeleteSupplyItem({required int id});
@@ -112,17 +119,34 @@ abstract class RustLibApi extends BaseApi {
 
   Future<List<Ship>> crateApiGetAllShips();
 
+  Future<List<Stock>> crateApiGetAllStock();
+
   Future<List<Supplier>> crateApiGetAllSuppliers();
 
   Future<List<SupplyItem>> crateApiGetAllSupplyItems();
+
+  Future<List<Stock>> crateApiGetLowStock();
 
   Future<List<OrderItem>> crateApiGetOrderItems({required int orderId});
 
   Future<OrderWithItems?> crateApiGetOrderWithItems({required int id});
 
+  Future<List<StockMovement>> crateApiGetRecentStockMovements(
+      {required int limit});
+
   Future<Ship?> crateApiGetShipById({required int id});
 
   Future<PlatformInt64> crateApiGetShipCount();
+
+  Future<Stock?> crateApiGetStockById({required int id});
+
+  Future<Stock?> crateApiGetStockBySupplyItem({required int supplyItemId});
+
+  Future<List<StockMovement>> crateApiGetStockMovements({required int stockId});
+
+  Future<StockSummary> crateApiGetStockSummary();
+
+  Future<StockWithMovements?> crateApiGetStockWithMovements({required int id});
 
   Future<Supplier?> crateApiGetSupplierById({required int id});
 
@@ -165,6 +189,9 @@ abstract class RustLibApi extends BaseApi {
 
   Future<Ship> crateApiUpdateShip(
       {required int id, required UpdateShipRequest ship});
+
+  Future<Stock> crateApiUpdateStock(
+      {required int id, required UpdateStockRequest stock});
 
   Future<Supplier> crateApiUpdateSupplier(
       {required int id, required UpdateSupplierRequest supplier});
@@ -310,6 +337,57 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<Stock> crateApiCreateStock({required CreateStockRequest stock}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_box_autoadd_create_stock_request(stock, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 6, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_stock,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiCreateStockConstMeta,
+      argValues: [stock],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiCreateStockConstMeta => const TaskConstMeta(
+        debugName: "create_stock",
+        argNames: ["stock"],
+      );
+
+  @override
+  Future<StockMovement> crateApiCreateStockMovement(
+      {required CreateStockMovementRequest movement}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_box_autoadd_create_stock_movement_request(
+            movement, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 7, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_stock_movement,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiCreateStockMovementConstMeta,
+      argValues: [movement],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiCreateStockMovementConstMeta =>
+      const TaskConstMeta(
+        debugName: "create_stock_movement",
+        argNames: ["movement"],
+      );
+
+  @override
   Future<Supplier> crateApiCreateSupplier(
       {required CreateSupplierRequest supplier}) {
     return handler.executeNormal(NormalTask(
@@ -317,7 +395,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_box_autoadd_create_supplier_request(supplier, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 6, port: port_);
+            funcId: 8, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_supplier,
@@ -342,7 +420,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_box_autoadd_create_supply_item_request(item, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 7, port: port_);
+            funcId: 9, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_supply_item,
@@ -366,7 +444,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_i_32(id, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 8, port: port_);
+            funcId: 10, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -390,7 +468,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_i_32(id, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 9, port: port_);
+            funcId: 11, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -408,13 +486,37 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<bool> crateApiDeleteStock({required int id}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_i_32(id, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 12, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiDeleteStockConstMeta,
+      argValues: [id],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiDeleteStockConstMeta => const TaskConstMeta(
+        debugName: "delete_stock",
+        argNames: ["id"],
+      );
+
+  @override
   Future<bool> crateApiDeleteSupplier({required int id}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_i_32(id, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 10, port: port_);
+            funcId: 13, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -438,7 +540,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_i_32(id, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 11, port: port_);
+            funcId: 14, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -462,7 +564,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_opt_box_autoadd_order_status(statusFilter, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 12, port: port_);
+            funcId: 15, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_order,
@@ -485,7 +587,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 13, port: port_);
+            funcId: 16, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_ship,
@@ -503,12 +605,35 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<List<Stock>> crateApiGetAllStock() {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 17, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_stock,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiGetAllStockConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiGetAllStockConstMeta => const TaskConstMeta(
+        debugName: "get_all_stock",
+        argNames: [],
+      );
+
+  @override
   Future<List<Supplier>> crateApiGetAllSuppliers() {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 14, port: port_);
+            funcId: 18, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_supplier,
@@ -531,7 +656,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 15, port: port_);
+            funcId: 19, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_supply_item,
@@ -549,13 +674,36 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<List<Stock>> crateApiGetLowStock() {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 20, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_stock,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiGetLowStockConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiGetLowStockConstMeta => const TaskConstMeta(
+        debugName: "get_low_stock",
+        argNames: [],
+      );
+
+  @override
   Future<List<OrderItem>> crateApiGetOrderItems({required int orderId}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_i_32(orderId, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 16, port: port_);
+            funcId: 21, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_order_item,
@@ -579,7 +727,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_i_32(id, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 17, port: port_);
+            funcId: 22, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_box_autoadd_order_with_items,
@@ -597,13 +745,39 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<List<StockMovement>> crateApiGetRecentStockMovements(
+      {required int limit}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_i_32(limit, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 23, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_stock_movement,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiGetRecentStockMovementsConstMeta,
+      argValues: [limit],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiGetRecentStockMovementsConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_recent_stock_movements",
+        argNames: ["limit"],
+      );
+
+  @override
   Future<Ship?> crateApiGetShipById({required int id}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_i_32(id, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 18, port: port_);
+            funcId: 24, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_box_autoadd_ship,
@@ -626,7 +800,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 19, port: port_);
+            funcId: 25, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_i_64,
@@ -644,13 +818,135 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<Stock?> crateApiGetStockById({required int id}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_i_32(id, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 26, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_opt_box_autoadd_stock,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiGetStockByIdConstMeta,
+      argValues: [id],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiGetStockByIdConstMeta => const TaskConstMeta(
+        debugName: "get_stock_by_id",
+        argNames: ["id"],
+      );
+
+  @override
+  Future<Stock?> crateApiGetStockBySupplyItem({required int supplyItemId}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_i_32(supplyItemId, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 27, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_opt_box_autoadd_stock,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiGetStockBySupplyItemConstMeta,
+      argValues: [supplyItemId],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiGetStockBySupplyItemConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_stock_by_supply_item",
+        argNames: ["supplyItemId"],
+      );
+
+  @override
+  Future<List<StockMovement>> crateApiGetStockMovements(
+      {required int stockId}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_i_32(stockId, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 28, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_stock_movement,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiGetStockMovementsConstMeta,
+      argValues: [stockId],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiGetStockMovementsConstMeta => const TaskConstMeta(
+        debugName: "get_stock_movements",
+        argNames: ["stockId"],
+      );
+
+  @override
+  Future<StockSummary> crateApiGetStockSummary() {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 29, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_stock_summary,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiGetStockSummaryConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiGetStockSummaryConstMeta => const TaskConstMeta(
+        debugName: "get_stock_summary",
+        argNames: [],
+      );
+
+  @override
+  Future<StockWithMovements?> crateApiGetStockWithMovements({required int id}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_i_32(id, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 30, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_opt_box_autoadd_stock_with_movements,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiGetStockWithMovementsConstMeta,
+      argValues: [id],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiGetStockWithMovementsConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_stock_with_movements",
+        argNames: ["id"],
+      );
+
+  @override
   Future<Supplier?> crateApiGetSupplierById({required int id}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_i_32(id, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 20, port: port_);
+            funcId: 31, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_box_autoadd_supplier,
@@ -673,7 +969,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 21, port: port_);
+            funcId: 32, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_i_64,
@@ -698,7 +994,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(category, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 22, port: port_);
+            funcId: 33, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_supplier,
@@ -723,7 +1019,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_i_32(id, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 23, port: port_);
+            funcId: 34, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_box_autoadd_supply_item,
@@ -746,7 +1042,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 24, port: port_);
+            funcId: 35, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_i_64,
@@ -771,7 +1067,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(category, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 25, port: port_);
+            funcId: 36, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_supply_item,
@@ -797,7 +1093,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_i_32(supplierId, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 26, port: port_);
+            funcId: 37, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_supply_item,
@@ -821,7 +1117,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 27, port: port_);
+            funcId: 38, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -845,7 +1141,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(name, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 28, port: port_);
+            funcId: 39, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -869,7 +1165,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(databaseUrl, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 29, port: port_);
+            funcId: 40, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -892,7 +1188,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 30, port: port_);
+            funcId: 41, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -915,7 +1211,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 31, port: port_);
+            funcId: 42, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -940,7 +1236,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(query, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 32, port: port_);
+            funcId: 43, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_ship,
@@ -964,7 +1260,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(query, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 33, port: port_);
+            funcId: 44, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_supplier,
@@ -988,7 +1284,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(query, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 34, port: port_);
+            funcId: 45, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_supply_item,
@@ -1014,7 +1310,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_i_32(id, serializer);
         sse_encode_box_autoadd_update_order_item_request(item, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 35, port: port_);
+            funcId: 46, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_order_item,
@@ -1040,7 +1336,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_i_32(id, serializer);
         sse_encode_order_status(newStatus, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 36, port: port_);
+            funcId: 47, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_order,
@@ -1066,7 +1362,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_i_32(id, serializer);
         sse_encode_box_autoadd_update_ship_request(ship, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 37, port: port_);
+            funcId: 48, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_ship,
@@ -1084,6 +1380,32 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<Stock> crateApiUpdateStock(
+      {required int id, required UpdateStockRequest stock}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_i_32(id, serializer);
+        sse_encode_box_autoadd_update_stock_request(stock, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 49, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_stock,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiUpdateStockConstMeta,
+      argValues: [id, stock],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiUpdateStockConstMeta => const TaskConstMeta(
+        debugName: "update_stock",
+        argNames: ["id", "stock"],
+      );
+
+  @override
   Future<Supplier> crateApiUpdateSupplier(
       {required int id, required UpdateSupplierRequest supplier}) {
     return handler.executeNormal(NormalTask(
@@ -1092,7 +1414,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_i_32(id, serializer);
         sse_encode_box_autoadd_update_supplier_request(supplier, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 38, port: port_);
+            funcId: 50, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_supplier,
@@ -1118,7 +1440,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_i_32(id, serializer);
         sse_encode_box_autoadd_update_supply_item_request(item, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 39, port: port_);
+            funcId: 51, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_supply_item,
@@ -1173,6 +1495,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  CreateStockMovementRequest
+      dco_decode_box_autoadd_create_stock_movement_request(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_create_stock_movement_request(raw);
+  }
+
+  @protected
+  CreateStockRequest dco_decode_box_autoadd_create_stock_request(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_create_stock_request(raw);
+  }
+
+  @protected
   CreateSupplierRequest dco_decode_box_autoadd_create_supplier_request(
       dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
@@ -1223,6 +1558,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Stock dco_decode_box_autoadd_stock(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_stock(raw);
+  }
+
+  @protected
+  StockWithMovements dco_decode_box_autoadd_stock_with_movements(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_stock_with_movements(raw);
+  }
+
+  @protected
   Supplier dco_decode_box_autoadd_supplier(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_supplier(raw);
@@ -1245,6 +1592,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   UpdateShipRequest dco_decode_box_autoadd_update_ship_request(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_update_ship_request(raw);
+  }
+
+  @protected
+  UpdateStockRequest dco_decode_box_autoadd_update_stock_request(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_update_stock_request(raw);
   }
 
   @protected
@@ -1311,6 +1664,39 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       shipType: dco_decode_opt_String(arr[3]),
       grossTonnage: dco_decode_opt_box_autoadd_f_64(arr[4]),
       owner: dco_decode_opt_String(arr[5]),
+    );
+  }
+
+  @protected
+  CreateStockMovementRequest dco_decode_create_stock_movement_request(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 7)
+      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
+    return CreateStockMovementRequest(
+      stockId: dco_decode_i_32(arr[0]),
+      movementType: dco_decode_stock_movement_type(arr[1]),
+      quantity: dco_decode_f_64(arr[2]),
+      referenceType: dco_decode_opt_String(arr[3]),
+      referenceId: dco_decode_opt_box_autoadd_i_32(arr[4]),
+      referenceInfo: dco_decode_opt_String(arr[5]),
+      notes: dco_decode_opt_String(arr[6]),
+    );
+  }
+
+  @protected
+  CreateStockRequest dco_decode_create_stock_request(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return CreateStockRequest(
+      supplyItemId: dco_decode_i_32(arr[0]),
+      quantity: dco_decode_f_64(arr[1]),
+      unit: dco_decode_String(arr[2]),
+      warehouseLocation: dco_decode_opt_String(arr[3]),
+      minimumQuantity: dco_decode_f_64(arr[4]),
     );
   }
 
@@ -1413,6 +1799,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<Stock> dco_decode_list_stock(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_stock).toList();
+  }
+
+  @protected
+  List<StockMovement> dco_decode_list_stock_movement(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_stock_movement).toList();
+  }
+
+  @protected
   List<Supplier> dco_decode_list_supplier(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_supplier).toList();
@@ -1470,6 +1868,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   Ship? dco_decode_opt_box_autoadd_ship(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null ? null : dco_decode_box_autoadd_ship(raw);
+  }
+
+  @protected
+  Stock? dco_decode_opt_box_autoadd_stock(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_stock(raw);
+  }
+
+  @protected
+  StockWithMovements? dco_decode_opt_box_autoadd_stock_with_movements(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null
+        ? null
+        : dco_decode_box_autoadd_stock_with_movements(raw);
   }
 
   @protected
@@ -1583,6 +1996,78 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Stock dco_decode_stock(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 8)
+      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
+    return Stock(
+      id: dco_decode_i_32(arr[0]),
+      supplyItemId: dco_decode_i_32(arr[1]),
+      supplyItemName: dco_decode_opt_String(arr[2]),
+      quantity: dco_decode_f_64(arr[3]),
+      unit: dco_decode_String(arr[4]),
+      warehouseLocation: dco_decode_opt_String(arr[5]),
+      minimumQuantity: dco_decode_f_64(arr[6]),
+      lastUpdated: dco_decode_String(arr[7]),
+    );
+  }
+
+  @protected
+  StockMovement dco_decode_stock_movement(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 11)
+      throw Exception('unexpected arr length: expect 11 but see ${arr.length}');
+    return StockMovement(
+      id: dco_decode_i_32(arr[0]),
+      stockId: dco_decode_i_32(arr[1]),
+      supplyItemName: dco_decode_opt_String(arr[2]),
+      movementType: dco_decode_stock_movement_type(arr[3]),
+      quantity: dco_decode_f_64(arr[4]),
+      unit: dco_decode_String(arr[5]),
+      referenceType: dco_decode_opt_String(arr[6]),
+      referenceId: dco_decode_opt_box_autoadd_i_32(arr[7]),
+      referenceInfo: dco_decode_opt_String(arr[8]),
+      notes: dco_decode_opt_String(arr[9]),
+      createdAt: dco_decode_String(arr[10]),
+    );
+  }
+
+  @protected
+  StockMovementType dco_decode_stock_movement_type(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return StockMovementType.values[raw as int];
+  }
+
+  @protected
+  StockSummary dco_decode_stock_summary(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 5)
+      throw Exception('unexpected arr length: expect 5 but see ${arr.length}');
+    return StockSummary(
+      totalItems: dco_decode_i_32(arr[0]),
+      lowStockCount: dco_decode_i_32(arr[1]),
+      outOfStockCount: dco_decode_i_32(arr[2]),
+      totalValue: dco_decode_f_64(arr[3]),
+      currency: dco_decode_String(arr[4]),
+    );
+  }
+
+  @protected
+  StockWithMovements dco_decode_stock_with_movements(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return StockWithMovements(
+      stock: dco_decode_stock(arr[0]),
+      movements: dco_decode_list_stock_movement(arr[1]),
+    );
+  }
+
+  @protected
   Supplier dco_decode_supplier(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -1677,6 +2162,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  UpdateStockRequest dco_decode_update_stock_request(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 3)
+      throw Exception('unexpected arr length: expect 3 but see ${arr.length}');
+    return UpdateStockRequest(
+      quantity: dco_decode_opt_box_autoadd_f_64(arr[0]),
+      warehouseLocation: dco_decode_opt_String(arr[1]),
+      minimumQuantity: dco_decode_opt_box_autoadd_f_64(arr[2]),
+    );
+  }
+
+  @protected
   UpdateSupplierRequest dco_decode_update_supplier_request(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -1754,6 +2252,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  CreateStockMovementRequest
+      sse_decode_box_autoadd_create_stock_movement_request(
+          SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_create_stock_movement_request(deserializer));
+  }
+
+  @protected
+  CreateStockRequest sse_decode_box_autoadd_create_stock_request(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_create_stock_request(deserializer));
+  }
+
+  @protected
   CreateSupplierRequest sse_decode_box_autoadd_create_supplier_request(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -1807,6 +2320,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Stock sse_decode_box_autoadd_stock(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_stock(deserializer));
+  }
+
+  @protected
+  StockWithMovements sse_decode_box_autoadd_stock_with_movements(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_stock_with_movements(deserializer));
+  }
+
+  @protected
   Supplier sse_decode_box_autoadd_supplier(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_supplier(deserializer));
@@ -1830,6 +2356,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_update_ship_request(deserializer));
+  }
+
+  @protected
+  UpdateStockRequest sse_decode_box_autoadd_update_stock_request(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_update_stock_request(deserializer));
   }
 
   @protected
@@ -1911,6 +2444,44 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         shipType: var_shipType,
         grossTonnage: var_grossTonnage,
         owner: var_owner);
+  }
+
+  @protected
+  CreateStockMovementRequest sse_decode_create_stock_movement_request(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_stockId = sse_decode_i_32(deserializer);
+    var var_movementType = sse_decode_stock_movement_type(deserializer);
+    var var_quantity = sse_decode_f_64(deserializer);
+    var var_referenceType = sse_decode_opt_String(deserializer);
+    var var_referenceId = sse_decode_opt_box_autoadd_i_32(deserializer);
+    var var_referenceInfo = sse_decode_opt_String(deserializer);
+    var var_notes = sse_decode_opt_String(deserializer);
+    return CreateStockMovementRequest(
+        stockId: var_stockId,
+        movementType: var_movementType,
+        quantity: var_quantity,
+        referenceType: var_referenceType,
+        referenceId: var_referenceId,
+        referenceInfo: var_referenceInfo,
+        notes: var_notes);
+  }
+
+  @protected
+  CreateStockRequest sse_decode_create_stock_request(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_supplyItemId = sse_decode_i_32(deserializer);
+    var var_quantity = sse_decode_f_64(deserializer);
+    var var_unit = sse_decode_String(deserializer);
+    var var_warehouseLocation = sse_decode_opt_String(deserializer);
+    var var_minimumQuantity = sse_decode_f_64(deserializer);
+    return CreateStockRequest(
+        supplyItemId: var_supplyItemId,
+        quantity: var_quantity,
+        unit: var_unit,
+        warehouseLocation: var_warehouseLocation,
+        minimumQuantity: var_minimumQuantity);
   }
 
   @protected
@@ -2043,6 +2614,31 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<Stock> sse_decode_list_stock(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <Stock>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_stock(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<StockMovement> sse_decode_list_stock_movement(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <StockMovement>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_stock_movement(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
   List<Supplier> sse_decode_list_supplier(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -2152,6 +2748,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
     if (sse_decode_bool(deserializer)) {
       return (sse_decode_box_autoadd_ship(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  Stock? sse_decode_opt_box_autoadd_stock(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_stock(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  StockWithMovements? sse_decode_opt_box_autoadd_stock_with_movements(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_stock_with_movements(deserializer));
     } else {
       return null;
     }
@@ -2300,6 +2919,89 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Stock sse_decode_stock(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_id = sse_decode_i_32(deserializer);
+    var var_supplyItemId = sse_decode_i_32(deserializer);
+    var var_supplyItemName = sse_decode_opt_String(deserializer);
+    var var_quantity = sse_decode_f_64(deserializer);
+    var var_unit = sse_decode_String(deserializer);
+    var var_warehouseLocation = sse_decode_opt_String(deserializer);
+    var var_minimumQuantity = sse_decode_f_64(deserializer);
+    var var_lastUpdated = sse_decode_String(deserializer);
+    return Stock(
+        id: var_id,
+        supplyItemId: var_supplyItemId,
+        supplyItemName: var_supplyItemName,
+        quantity: var_quantity,
+        unit: var_unit,
+        warehouseLocation: var_warehouseLocation,
+        minimumQuantity: var_minimumQuantity,
+        lastUpdated: var_lastUpdated);
+  }
+
+  @protected
+  StockMovement sse_decode_stock_movement(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_id = sse_decode_i_32(deserializer);
+    var var_stockId = sse_decode_i_32(deserializer);
+    var var_supplyItemName = sse_decode_opt_String(deserializer);
+    var var_movementType = sse_decode_stock_movement_type(deserializer);
+    var var_quantity = sse_decode_f_64(deserializer);
+    var var_unit = sse_decode_String(deserializer);
+    var var_referenceType = sse_decode_opt_String(deserializer);
+    var var_referenceId = sse_decode_opt_box_autoadd_i_32(deserializer);
+    var var_referenceInfo = sse_decode_opt_String(deserializer);
+    var var_notes = sse_decode_opt_String(deserializer);
+    var var_createdAt = sse_decode_String(deserializer);
+    return StockMovement(
+        id: var_id,
+        stockId: var_stockId,
+        supplyItemName: var_supplyItemName,
+        movementType: var_movementType,
+        quantity: var_quantity,
+        unit: var_unit,
+        referenceType: var_referenceType,
+        referenceId: var_referenceId,
+        referenceInfo: var_referenceInfo,
+        notes: var_notes,
+        createdAt: var_createdAt);
+  }
+
+  @protected
+  StockMovementType sse_decode_stock_movement_type(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return StockMovementType.values[inner];
+  }
+
+  @protected
+  StockSummary sse_decode_stock_summary(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_totalItems = sse_decode_i_32(deserializer);
+    var var_lowStockCount = sse_decode_i_32(deserializer);
+    var var_outOfStockCount = sse_decode_i_32(deserializer);
+    var var_totalValue = sse_decode_f_64(deserializer);
+    var var_currency = sse_decode_String(deserializer);
+    return StockSummary(
+        totalItems: var_totalItems,
+        lowStockCount: var_lowStockCount,
+        outOfStockCount: var_outOfStockCount,
+        totalValue: var_totalValue,
+        currency: var_currency);
+  }
+
+  @protected
+  StockWithMovements sse_decode_stock_with_movements(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_stock = sse_decode_stock(deserializer);
+    var var_movements = sse_decode_list_stock_movement(deserializer);
+    return StockWithMovements(stock: var_stock, movements: var_movements);
+  }
+
+  @protected
   Supplier sse_decode_supplier(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_id = sse_decode_i_32(deserializer);
@@ -2423,6 +3125,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  UpdateStockRequest sse_decode_update_stock_request(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_quantity = sse_decode_opt_box_autoadd_f_64(deserializer);
+    var var_warehouseLocation = sse_decode_opt_String(deserializer);
+    var var_minimumQuantity = sse_decode_opt_box_autoadd_f_64(deserializer);
+    return UpdateStockRequest(
+        quantity: var_quantity,
+        warehouseLocation: var_warehouseLocation,
+        minimumQuantity: var_minimumQuantity);
+  }
+
+  @protected
   UpdateSupplierRequest sse_decode_update_supplier_request(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -2511,6 +3226,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_create_stock_movement_request(
+      CreateStockMovementRequest self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_create_stock_movement_request(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_create_stock_request(
+      CreateStockRequest self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_create_stock_request(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_create_supplier_request(
       CreateSupplierRequest self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -2564,6 +3293,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_stock(Stock self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_stock(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_stock_with_movements(
+      StockWithMovements self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_stock_with_movements(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_supplier(
       Supplier self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -2589,6 +3331,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       UpdateShipRequest self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_update_ship_request(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_update_stock_request(
+      UpdateStockRequest self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_update_stock_request(self, serializer);
   }
 
   @protected
@@ -2644,6 +3393,30 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_String(self.shipType, serializer);
     sse_encode_opt_box_autoadd_f_64(self.grossTonnage, serializer);
     sse_encode_opt_String(self.owner, serializer);
+  }
+
+  @protected
+  void sse_encode_create_stock_movement_request(
+      CreateStockMovementRequest self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.stockId, serializer);
+    sse_encode_stock_movement_type(self.movementType, serializer);
+    sse_encode_f_64(self.quantity, serializer);
+    sse_encode_opt_String(self.referenceType, serializer);
+    sse_encode_opt_box_autoadd_i_32(self.referenceId, serializer);
+    sse_encode_opt_String(self.referenceInfo, serializer);
+    sse_encode_opt_String(self.notes, serializer);
+  }
+
+  @protected
+  void sse_encode_create_stock_request(
+      CreateStockRequest self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.supplyItemId, serializer);
+    sse_encode_f_64(self.quantity, serializer);
+    sse_encode_String(self.unit, serializer);
+    sse_encode_opt_String(self.warehouseLocation, serializer);
+    sse_encode_f_64(self.minimumQuantity, serializer);
   }
 
   @protected
@@ -2740,6 +3513,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
       sse_encode_ship(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_stock(List<Stock> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_stock(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_stock_movement(
+      List<StockMovement> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_stock_movement(item, serializer);
     }
   }
 
@@ -2846,6 +3638,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_opt_box_autoadd_stock(Stock? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_stock(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_stock_with_movements(
+      StockWithMovements? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_stock_with_movements(self, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_opt_box_autoadd_supplier(
       Supplier? self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -2942,6 +3755,60 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_stock(Stock self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.id, serializer);
+    sse_encode_i_32(self.supplyItemId, serializer);
+    sse_encode_opt_String(self.supplyItemName, serializer);
+    sse_encode_f_64(self.quantity, serializer);
+    sse_encode_String(self.unit, serializer);
+    sse_encode_opt_String(self.warehouseLocation, serializer);
+    sse_encode_f_64(self.minimumQuantity, serializer);
+    sse_encode_String(self.lastUpdated, serializer);
+  }
+
+  @protected
+  void sse_encode_stock_movement(StockMovement self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.id, serializer);
+    sse_encode_i_32(self.stockId, serializer);
+    sse_encode_opt_String(self.supplyItemName, serializer);
+    sse_encode_stock_movement_type(self.movementType, serializer);
+    sse_encode_f_64(self.quantity, serializer);
+    sse_encode_String(self.unit, serializer);
+    sse_encode_opt_String(self.referenceType, serializer);
+    sse_encode_opt_box_autoadd_i_32(self.referenceId, serializer);
+    sse_encode_opt_String(self.referenceInfo, serializer);
+    sse_encode_opt_String(self.notes, serializer);
+    sse_encode_String(self.createdAt, serializer);
+  }
+
+  @protected
+  void sse_encode_stock_movement_type(
+      StockMovementType self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
+  }
+
+  @protected
+  void sse_encode_stock_summary(StockSummary self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.totalItems, serializer);
+    sse_encode_i_32(self.lowStockCount, serializer);
+    sse_encode_i_32(self.outOfStockCount, serializer);
+    sse_encode_f_64(self.totalValue, serializer);
+    sse_encode_String(self.currency, serializer);
+  }
+
+  @protected
+  void sse_encode_stock_with_movements(
+      StockWithMovements self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_stock(self.stock, serializer);
+    sse_encode_list_stock_movement(self.movements, serializer);
+  }
+
+  @protected
   void sse_encode_supplier(Supplier self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.id, serializer);
@@ -3014,6 +3881,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_String(self.shipType, serializer);
     sse_encode_opt_box_autoadd_f_64(self.grossTonnage, serializer);
     sse_encode_opt_String(self.owner, serializer);
+  }
+
+  @protected
+  void sse_encode_update_stock_request(
+      UpdateStockRequest self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_opt_box_autoadd_f_64(self.quantity, serializer);
+    sse_encode_opt_String(self.warehouseLocation, serializer);
+    sse_encode_opt_box_autoadd_f_64(self.minimumQuantity, serializer);
   }
 
   @protected
