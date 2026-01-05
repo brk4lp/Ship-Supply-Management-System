@@ -203,6 +203,83 @@ Future<StockWithMovements?> getStockWithMovements({required int id}) =>
 Future<StockSummary> getStockSummary() =>
     RustLib.instance.api.crateApiGetStockSummary();
 
+/// Get all ports
+Future<List<Port>> getAllPorts() => RustLib.instance.api.crateApiGetAllPorts();
+
+/// Get active ports only
+Future<List<Port>> getActivePorts() =>
+    RustLib.instance.api.crateApiGetActivePorts();
+
+/// Get a single port by ID
+Future<Port?> getPortById({required int id}) =>
+    RustLib.instance.api.crateApiGetPortById(id: id);
+
+/// Create a new port
+Future<Port> createPort({required CreatePortRequest port}) =>
+    RustLib.instance.api.crateApiCreatePort(port: port);
+
+/// Update an existing port
+Future<Port?> updatePort({required int id, required UpdatePortRequest port}) =>
+    RustLib.instance.api.crateApiUpdatePort(id: id, port: port);
+
+/// Delete a port
+Future<bool> deletePort({required int id}) =>
+    RustLib.instance.api.crateApiDeletePort(id: id);
+
+/// Get ports by country
+Future<List<Port>> getPortsByCountry({required String country}) =>
+    RustLib.instance.api.crateApiGetPortsByCountry(country: country);
+
+/// Get all ship visits
+Future<List<ShipVisit>> getAllShipVisits() =>
+    RustLib.instance.api.crateApiGetAllShipVisits();
+
+/// Get upcoming ship visits (ETA >= today)
+Future<List<ShipVisit>> getUpcomingShipVisits() =>
+    RustLib.instance.api.crateApiGetUpcomingShipVisits();
+
+/// Get ship visits by port
+Future<List<ShipVisit>> getShipVisitsByPort({required int portId}) =>
+    RustLib.instance.api.crateApiGetShipVisitsByPort(portId: portId);
+
+/// Get ship visits by ship
+Future<List<ShipVisit>> getShipVisitsByShip({required int shipId}) =>
+    RustLib.instance.api.crateApiGetShipVisitsByShip(shipId: shipId);
+
+/// Get a single ship visit by ID
+Future<ShipVisit?> getShipVisitById({required int id}) =>
+    RustLib.instance.api.crateApiGetShipVisitById(id: id);
+
+/// Create a new ship visit
+Future<ShipVisit> createShipVisit({required CreateShipVisitRequest visit}) =>
+    RustLib.instance.api.crateApiCreateShipVisit(visit: visit);
+
+/// Update an existing ship visit
+Future<ShipVisit?> updateShipVisit(
+        {required int id, required UpdateShipVisitRequest visit}) =>
+    RustLib.instance.api.crateApiUpdateShipVisit(id: id, visit: visit);
+
+/// Update ship visit status
+Future<ShipVisit?> updateShipVisitStatus(
+        {required int id, required VisitStatus status}) =>
+    RustLib.instance.api.crateApiUpdateShipVisitStatus(id: id, status: status);
+
+/// Delete a ship visit
+Future<bool> deleteShipVisit({required int id}) =>
+    RustLib.instance.api.crateApiDeleteShipVisit(id: id);
+
+/// Get ship visits within a date range
+Future<List<ShipVisit>> getShipVisitsByDateRange(
+        {required String startDate, required String endDate}) =>
+    RustLib.instance.api.crateApiGetShipVisitsByDateRange(
+        startDate: startDate, endDate: endDate);
+
+/// Get calendar data for a date range (all events + ports)
+Future<CalendarData> getCalendarData(
+        {required String startDate, required String endDate}) =>
+    RustLib.instance.api
+        .crateApiGetCalendarData(startDate: startDate, endDate: endDate);
+
 /// Initialize the database connection with custom URL
 Future<void> initDatabase({required String databaseUrl}) =>
     RustLib.instance.api.crateApiInitDatabase(databaseUrl: databaseUrl);

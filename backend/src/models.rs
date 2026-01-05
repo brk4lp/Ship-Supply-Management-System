@@ -430,3 +430,174 @@ pub struct StockSummary {
     pub total_value: f64,
     pub currency: String,
 }
+
+// ============================================================================
+// Port Models
+// ============================================================================
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct Port {
+    pub id: i32,
+    pub name: String,
+    pub country: String,
+    pub city: Option<String>,
+    pub timezone: String,
+    pub latitude: Option<f64>,
+    pub longitude: Option<f64>,
+    pub notes: Option<String>,
+    pub is_active: bool,
+    pub created_at: String,
+    pub updated_at: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CreatePortRequest {
+    pub name: String,
+    pub country: String,
+    pub city: Option<String>,
+    pub timezone: String,
+    pub latitude: Option<f64>,
+    pub longitude: Option<f64>,
+    pub notes: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UpdatePortRequest {
+    pub name: Option<String>,
+    pub country: Option<String>,
+    pub city: Option<String>,
+    pub timezone: Option<String>,
+    pub latitude: Option<f64>,
+    pub longitude: Option<f64>,
+    pub notes: Option<String>,
+    pub is_active: Option<bool>,
+}
+
+// ============================================================================
+// Ship Visit Models
+// ============================================================================
+
+/// Ship visit status
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum VisitStatus {
+    Planned,
+    Arrived,
+    Departed,
+    Cancelled,
+}
+
+impl VisitStatus {
+    pub fn display_name(&self) -> &'static str {
+        match self {
+            VisitStatus::Planned => "Planlandı",
+            VisitStatus::Arrived => "Limanda",
+            VisitStatus::Departed => "Ayrıldı",
+            VisitStatus::Cancelled => "İptal",
+        }
+    }
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ShipVisit {
+    pub id: i32,
+    pub ship_id: i32,
+    pub ship_name: Option<String>,
+    pub port_id: i32,
+    pub port_name: Option<String>,
+    pub eta: String,              // Estimated Time of Arrival (ISO 8601)
+    pub etd: String,              // Estimated Time of Departure (ISO 8601)
+    pub ata: Option<String>,      // Actual Time of Arrival
+    pub atd: Option<String>,      // Actual Time of Departure
+    pub status: VisitStatus,
+    pub agent_info: Option<String>,  // Ship agent contact
+    pub notes: Option<String>,
+    pub created_at: String,
+    pub updated_at: String,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CreateShipVisitRequest {
+    pub ship_id: i32,
+    pub port_id: i32,
+    pub eta: String,
+    pub etd: String,
+    pub agent_info: Option<String>,
+    pub notes: Option<String>,
+}
+
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct UpdateShipVisitRequest {
+    pub port_id: Option<i32>,
+    pub eta: Option<String>,
+    pub etd: Option<String>,
+    pub ata: Option<String>,
+    pub atd: Option<String>,
+    pub status: Option<VisitStatus>,
+    pub agent_info: Option<String>,
+    pub notes: Option<String>,
+}
+
+/// Ship visit with related orders
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct ShipVisitWithOrders {
+    pub visit: ShipVisit,
+    pub orders: Vec<Order>,
+}
+
+// ============================================================================
+// Calendar Models
+// ============================================================================
+
+/// Calendar event type
+#[derive(Debug, Clone, Copy, PartialEq, Eq, Serialize, Deserialize)]
+pub enum CalendarEventType {
+    ShipVisit,
+    OrderDelivery,
+    WarehouseDelivery,
+    ShipDelivery,
+}
+
+impl CalendarEventType {
+    pub fn display_name(&self) -> &'static str {
+        match self {
+            CalendarEventType::ShipVisit => "Gemi Ziyareti",
+            CalendarEventType::OrderDelivery => "Sipariş Teslimatı",
+            CalendarEventType::WarehouseDelivery => "Depoya Teslimat",
+            CalendarEventType::ShipDelivery => "Gemiye Teslimat",
+        }
+    }
+    
+    pub fn color(&self) -> &'static str {
+        match self {
+            CalendarEventType::ShipVisit => "#1E40AF",        // Navy Blue
+            CalendarEventType::OrderDelivery => "#4F46E5",    // Indigo
+            CalendarEventType::WarehouseDelivery => "#F59E0B", // Amber
+            CalendarEventType::ShipDelivery => "#10B981",      // Emerald
+        }
+    }
+}
+
+/// Calendar event for unified calendar view
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CalendarEvent {
+    pub id: String,                       // "visit_123", "order_456"
+    pub event_type: CalendarEventType,
+    pub title: String,                    // "M/V AURORA - Tuzla"
+    pub subtitle: Option<String>,         // "Sipariş #ORD-2026-001"
+    pub start_date: String,               // ISO 8601
+    pub end_date: String,                 // ISO 8601
+    pub color: String,                    // Hex color
+    pub status: String,
+    pub related_ship_id: Option<i32>,
+    pub related_port_id: Option<i32>,
+    pub related_order_id: Option<i32>,
+    pub metadata: Option<String>,         // JSON for extra data
+}
+
+/// Calendar data response with all events
+#[derive(Debug, Clone, Serialize, Deserialize)]
+pub struct CalendarData {
+    pub events: Vec<CalendarEvent>,
+    pub ports: Vec<Port>,                 // For resource view grouping
+}
+

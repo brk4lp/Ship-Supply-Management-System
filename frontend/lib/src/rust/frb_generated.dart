@@ -69,7 +69,7 @@ class RustLib extends BaseEntrypoint<RustLibApi, RustLibApiImpl, RustLibWire> {
   String get codegenVersion => '2.11.1';
 
   @override
-  int get rustContentHash => 899940218;
+  int get rustContentHash => -1861400095;
 
   static const kDefaultExternalLibraryLoaderConfig =
       ExternalLibraryLoaderConfig(
@@ -92,7 +92,12 @@ abstract class RustLibApi extends BaseApi {
 
   Future<Order> crateApiCreateOrder({required CreateOrderRequest order});
 
+  Future<Port> crateApiCreatePort({required CreatePortRequest port});
+
   Future<Ship> crateApiCreateShip({required CreateShipRequest ship});
+
+  Future<ShipVisit> crateApiCreateShipVisit(
+      {required CreateShipVisitRequest visit});
 
   Future<Stock> crateApiCreateStock({required CreateStockRequest stock});
 
@@ -107,7 +112,11 @@ abstract class RustLibApi extends BaseApi {
 
   Future<bool> crateApiDeleteOrderItem({required int id});
 
+  Future<bool> crateApiDeletePort({required int id});
+
   Future<bool> crateApiDeleteShip({required int id});
+
+  Future<bool> crateApiDeleteShipVisit({required int id});
 
   Future<bool> crateApiDeleteStock({required int id});
 
@@ -115,7 +124,13 @@ abstract class RustLibApi extends BaseApi {
 
   Future<bool> crateApiDeleteSupplyItem({required int id});
 
+  Future<List<Port>> crateApiGetActivePorts();
+
   Future<List<Order>> crateApiGetAllOrders({OrderStatus? statusFilter});
+
+  Future<List<Port>> crateApiGetAllPorts();
+
+  Future<List<ShipVisit>> crateApiGetAllShipVisits();
 
   Future<List<Ship>> crateApiGetAllShips();
 
@@ -125,11 +140,18 @@ abstract class RustLibApi extends BaseApi {
 
   Future<List<SupplyItem>> crateApiGetAllSupplyItems();
 
+  Future<CalendarData> crateApiGetCalendarData(
+      {required String startDate, required String endDate});
+
   Future<List<Stock>> crateApiGetLowStock();
 
   Future<List<OrderItem>> crateApiGetOrderItems({required int orderId});
 
   Future<OrderWithItems?> crateApiGetOrderWithItems({required int id});
+
+  Future<Port?> crateApiGetPortById({required int id});
+
+  Future<List<Port>> crateApiGetPortsByCountry({required String country});
 
   Future<List<StockMovement>> crateApiGetRecentStockMovements(
       {required int limit});
@@ -137,6 +159,15 @@ abstract class RustLibApi extends BaseApi {
   Future<Ship?> crateApiGetShipById({required int id});
 
   Future<PlatformInt64> crateApiGetShipCount();
+
+  Future<ShipVisit?> crateApiGetShipVisitById({required int id});
+
+  Future<List<ShipVisit>> crateApiGetShipVisitsByDateRange(
+      {required String startDate, required String endDate});
+
+  Future<List<ShipVisit>> crateApiGetShipVisitsByPort({required int portId});
+
+  Future<List<ShipVisit>> crateApiGetShipVisitsByShip({required int shipId});
 
   Future<Stock?> crateApiGetStockById({required int id});
 
@@ -165,6 +196,8 @@ abstract class RustLibApi extends BaseApi {
   Future<List<SupplyItem>> crateApiGetSupplyItemsBySupplier(
       {required int supplierId});
 
+  Future<List<ShipVisit>> crateApiGetUpcomingShipVisits();
+
   Future<String> crateApiGetVersion();
 
   Future<String> crateApiGreet({required String name});
@@ -187,8 +220,17 @@ abstract class RustLibApi extends BaseApi {
   Future<Order> crateApiUpdateOrderStatus(
       {required int id, required OrderStatus newStatus});
 
+  Future<Port?> crateApiUpdatePort(
+      {required int id, required UpdatePortRequest port});
+
   Future<Ship> crateApiUpdateShip(
       {required int id, required UpdateShipRequest ship});
+
+  Future<ShipVisit?> crateApiUpdateShipVisit(
+      {required int id, required UpdateShipVisitRequest visit});
+
+  Future<ShipVisit?> crateApiUpdateShipVisitStatus(
+      {required int id, required VisitStatus status});
 
   Future<Stock> crateApiUpdateStock(
       {required int id, required UpdateStockRequest stock});
@@ -313,13 +355,37 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<Port> crateApiCreatePort({required CreatePortRequest port}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_box_autoadd_create_port_request(port, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 5, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_port,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiCreatePortConstMeta,
+      argValues: [port],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiCreatePortConstMeta => const TaskConstMeta(
+        debugName: "create_port",
+        argNames: ["port"],
+      );
+
+  @override
   Future<Ship> crateApiCreateShip({required CreateShipRequest ship}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_box_autoadd_create_ship_request(ship, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 5, port: port_);
+            funcId: 6, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_ship,
@@ -337,13 +403,38 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<ShipVisit> crateApiCreateShipVisit(
+      {required CreateShipVisitRequest visit}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_box_autoadd_create_ship_visit_request(visit, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 7, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_ship_visit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiCreateShipVisitConstMeta,
+      argValues: [visit],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiCreateShipVisitConstMeta => const TaskConstMeta(
+        debugName: "create_ship_visit",
+        argNames: ["visit"],
+      );
+
+  @override
   Future<Stock> crateApiCreateStock({required CreateStockRequest stock}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_box_autoadd_create_stock_request(stock, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 6, port: port_);
+            funcId: 8, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_stock,
@@ -369,7 +460,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_box_autoadd_create_stock_movement_request(
             movement, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 7, port: port_);
+            funcId: 9, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_stock_movement,
@@ -395,7 +486,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_box_autoadd_create_supplier_request(supplier, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 8, port: port_);
+            funcId: 10, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_supplier,
@@ -420,7 +511,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_box_autoadd_create_supply_item_request(item, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 9, port: port_);
+            funcId: 11, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_supply_item,
@@ -444,7 +535,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_i_32(id, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 10, port: port_);
+            funcId: 12, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -462,13 +553,37 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<bool> crateApiDeletePort({required int id}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_i_32(id, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 13, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiDeletePortConstMeta,
+      argValues: [id],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiDeletePortConstMeta => const TaskConstMeta(
+        debugName: "delete_port",
+        argNames: ["id"],
+      );
+
+  @override
   Future<bool> crateApiDeleteShip({required int id}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_i_32(id, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 11, port: port_);
+            funcId: 14, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -486,13 +601,37 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<bool> crateApiDeleteShipVisit({required int id}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_i_32(id, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 15, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_bool,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiDeleteShipVisitConstMeta,
+      argValues: [id],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiDeleteShipVisitConstMeta => const TaskConstMeta(
+        debugName: "delete_ship_visit",
+        argNames: ["id"],
+      );
+
+  @override
   Future<bool> crateApiDeleteStock({required int id}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_i_32(id, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 12, port: port_);
+            funcId: 16, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -516,7 +655,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_i_32(id, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 13, port: port_);
+            funcId: 17, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -540,7 +679,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_i_32(id, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 14, port: port_);
+            funcId: 18, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -558,13 +697,36 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<List<Port>> crateApiGetActivePorts() {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 19, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_port,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiGetActivePortsConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiGetActivePortsConstMeta => const TaskConstMeta(
+        debugName: "get_active_ports",
+        argNames: [],
+      );
+
+  @override
   Future<List<Order>> crateApiGetAllOrders({OrderStatus? statusFilter}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_opt_box_autoadd_order_status(statusFilter, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 15, port: port_);
+            funcId: 20, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_order,
@@ -582,12 +744,58 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<List<Port>> crateApiGetAllPorts() {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 21, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_port,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiGetAllPortsConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiGetAllPortsConstMeta => const TaskConstMeta(
+        debugName: "get_all_ports",
+        argNames: [],
+      );
+
+  @override
+  Future<List<ShipVisit>> crateApiGetAllShipVisits() {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 22, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_ship_visit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiGetAllShipVisitsConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiGetAllShipVisitsConstMeta => const TaskConstMeta(
+        debugName: "get_all_ship_visits",
+        argNames: [],
+      );
+
+  @override
   Future<List<Ship>> crateApiGetAllShips() {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 16, port: port_);
+            funcId: 23, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_ship,
@@ -610,7 +818,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 17, port: port_);
+            funcId: 24, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_stock,
@@ -633,7 +841,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 18, port: port_);
+            funcId: 25, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_supplier,
@@ -656,7 +864,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 19, port: port_);
+            funcId: 26, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_supply_item,
@@ -674,12 +882,38 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<CalendarData> crateApiGetCalendarData(
+      {required String startDate, required String endDate}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(startDate, serializer);
+        sse_encode_String(endDate, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 27, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_calendar_data,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiGetCalendarDataConstMeta,
+      argValues: [startDate, endDate],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiGetCalendarDataConstMeta => const TaskConstMeta(
+        debugName: "get_calendar_data",
+        argNames: ["startDate", "endDate"],
+      );
+
+  @override
   Future<List<Stock>> crateApiGetLowStock() {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 20, port: port_);
+            funcId: 28, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_stock,
@@ -703,7 +937,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_i_32(orderId, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 21, port: port_);
+            funcId: 29, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_order_item,
@@ -727,7 +961,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_i_32(id, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 22, port: port_);
+            funcId: 30, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_box_autoadd_order_with_items,
@@ -745,6 +979,54 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<Port?> crateApiGetPortById({required int id}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_i_32(id, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 31, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_opt_box_autoadd_port,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiGetPortByIdConstMeta,
+      argValues: [id],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiGetPortByIdConstMeta => const TaskConstMeta(
+        debugName: "get_port_by_id",
+        argNames: ["id"],
+      );
+
+  @override
+  Future<List<Port>> crateApiGetPortsByCountry({required String country}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(country, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 32, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_port,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiGetPortsByCountryConstMeta,
+      argValues: [country],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiGetPortsByCountryConstMeta => const TaskConstMeta(
+        debugName: "get_ports_by_country",
+        argNames: ["country"],
+      );
+
+  @override
   Future<List<StockMovement>> crateApiGetRecentStockMovements(
       {required int limit}) {
     return handler.executeNormal(NormalTask(
@@ -752,7 +1034,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_i_32(limit, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 23, port: port_);
+            funcId: 33, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_stock_movement,
@@ -777,7 +1059,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_i_32(id, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 24, port: port_);
+            funcId: 34, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_box_autoadd_ship,
@@ -800,7 +1082,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 25, port: port_);
+            funcId: 35, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_i_64,
@@ -818,13 +1100,114 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<ShipVisit?> crateApiGetShipVisitById({required int id}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_i_32(id, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 36, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_opt_box_autoadd_ship_visit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiGetShipVisitByIdConstMeta,
+      argValues: [id],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiGetShipVisitByIdConstMeta => const TaskConstMeta(
+        debugName: "get_ship_visit_by_id",
+        argNames: ["id"],
+      );
+
+  @override
+  Future<List<ShipVisit>> crateApiGetShipVisitsByDateRange(
+      {required String startDate, required String endDate}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_String(startDate, serializer);
+        sse_encode_String(endDate, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 37, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_ship_visit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiGetShipVisitsByDateRangeConstMeta,
+      argValues: [startDate, endDate],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiGetShipVisitsByDateRangeConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_ship_visits_by_date_range",
+        argNames: ["startDate", "endDate"],
+      );
+
+  @override
+  Future<List<ShipVisit>> crateApiGetShipVisitsByPort({required int portId}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_i_32(portId, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 38, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_ship_visit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiGetShipVisitsByPortConstMeta,
+      argValues: [portId],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiGetShipVisitsByPortConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_ship_visits_by_port",
+        argNames: ["portId"],
+      );
+
+  @override
+  Future<List<ShipVisit>> crateApiGetShipVisitsByShip({required int shipId}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_i_32(shipId, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 39, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_ship_visit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiGetShipVisitsByShipConstMeta,
+      argValues: [shipId],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiGetShipVisitsByShipConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_ship_visits_by_ship",
+        argNames: ["shipId"],
+      );
+
+  @override
   Future<Stock?> crateApiGetStockById({required int id}) {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_i_32(id, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 26, port: port_);
+            funcId: 40, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_box_autoadd_stock,
@@ -848,7 +1231,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_i_32(supplyItemId, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 27, port: port_);
+            funcId: 41, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_box_autoadd_stock,
@@ -874,7 +1257,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_i_32(stockId, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 28, port: port_);
+            funcId: 42, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_stock_movement,
@@ -897,7 +1280,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 29, port: port_);
+            funcId: 43, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_stock_summary,
@@ -921,7 +1304,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_i_32(id, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 30, port: port_);
+            funcId: 44, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_box_autoadd_stock_with_movements,
@@ -946,7 +1329,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_i_32(id, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 31, port: port_);
+            funcId: 45, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_box_autoadd_supplier,
@@ -969,7 +1352,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 32, port: port_);
+            funcId: 46, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_i_64,
@@ -994,7 +1377,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(category, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 33, port: port_);
+            funcId: 47, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_supplier,
@@ -1019,7 +1402,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_i_32(id, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 34, port: port_);
+            funcId: 48, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_opt_box_autoadd_supply_item,
@@ -1042,7 +1425,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 35, port: port_);
+            funcId: 49, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_i_64,
@@ -1067,7 +1450,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(category, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 36, port: port_);
+            funcId: 50, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_supply_item,
@@ -1093,7 +1476,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_i_32(supplierId, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 37, port: port_);
+            funcId: 51, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_supply_item,
@@ -1112,12 +1495,36 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<List<ShipVisit>> crateApiGetUpcomingShipVisits() {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 52, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_list_ship_visit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiGetUpcomingShipVisitsConstMeta,
+      argValues: [],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiGetUpcomingShipVisitsConstMeta =>
+      const TaskConstMeta(
+        debugName: "get_upcoming_ship_visits",
+        argNames: [],
+      );
+
+  @override
   Future<String> crateApiGetVersion() {
     return handler.executeNormal(NormalTask(
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 38, port: port_);
+            funcId: 53, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -1141,7 +1548,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(name, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 39, port: port_);
+            funcId: 54, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -1165,7 +1572,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(databaseUrl, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 40, port: port_);
+            funcId: 55, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_unit,
@@ -1188,7 +1595,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 41, port: port_);
+            funcId: 56, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_String,
@@ -1211,7 +1618,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       callFfi: (port_) {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 42, port: port_);
+            funcId: 57, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_bool,
@@ -1236,7 +1643,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(query, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 43, port: port_);
+            funcId: 58, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_ship,
@@ -1260,7 +1667,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(query, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 44, port: port_);
+            funcId: 59, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_supplier,
@@ -1284,7 +1691,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         final serializer = SseSerializer(generalizedFrbRustBinding);
         sse_encode_String(query, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 45, port: port_);
+            funcId: 60, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_list_supply_item,
@@ -1310,7 +1717,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_i_32(id, serializer);
         sse_encode_box_autoadd_update_order_item_request(item, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 46, port: port_);
+            funcId: 61, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_order_item,
@@ -1336,7 +1743,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_i_32(id, serializer);
         sse_encode_order_status(newStatus, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 47, port: port_);
+            funcId: 62, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_order,
@@ -1354,6 +1761,32 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<Port?> crateApiUpdatePort(
+      {required int id, required UpdatePortRequest port}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_i_32(id, serializer);
+        sse_encode_box_autoadd_update_port_request(port, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 63, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_opt_box_autoadd_port,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiUpdatePortConstMeta,
+      argValues: [id, port],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiUpdatePortConstMeta => const TaskConstMeta(
+        debugName: "update_port",
+        argNames: ["id", "port"],
+      );
+
+  @override
   Future<Ship> crateApiUpdateShip(
       {required int id, required UpdateShipRequest ship}) {
     return handler.executeNormal(NormalTask(
@@ -1362,7 +1795,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_i_32(id, serializer);
         sse_encode_box_autoadd_update_ship_request(ship, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 48, port: port_);
+            funcId: 64, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_ship,
@@ -1380,6 +1813,59 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       );
 
   @override
+  Future<ShipVisit?> crateApiUpdateShipVisit(
+      {required int id, required UpdateShipVisitRequest visit}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_i_32(id, serializer);
+        sse_encode_box_autoadd_update_ship_visit_request(visit, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 65, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_opt_box_autoadd_ship_visit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiUpdateShipVisitConstMeta,
+      argValues: [id, visit],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiUpdateShipVisitConstMeta => const TaskConstMeta(
+        debugName: "update_ship_visit",
+        argNames: ["id", "visit"],
+      );
+
+  @override
+  Future<ShipVisit?> crateApiUpdateShipVisitStatus(
+      {required int id, required VisitStatus status}) {
+    return handler.executeNormal(NormalTask(
+      callFfi: (port_) {
+        final serializer = SseSerializer(generalizedFrbRustBinding);
+        sse_encode_i_32(id, serializer);
+        sse_encode_visit_status(status, serializer);
+        pdeCallFfi(generalizedFrbRustBinding, serializer,
+            funcId: 66, port: port_);
+      },
+      codec: SseCodec(
+        decodeSuccessData: sse_decode_opt_box_autoadd_ship_visit,
+        decodeErrorData: sse_decode_String,
+      ),
+      constMeta: kCrateApiUpdateShipVisitStatusConstMeta,
+      argValues: [id, status],
+      apiImpl: this,
+    ));
+  }
+
+  TaskConstMeta get kCrateApiUpdateShipVisitStatusConstMeta =>
+      const TaskConstMeta(
+        debugName: "update_ship_visit_status",
+        argNames: ["id", "status"],
+      );
+
+  @override
   Future<Stock> crateApiUpdateStock(
       {required int id, required UpdateStockRequest stock}) {
     return handler.executeNormal(NormalTask(
@@ -1388,7 +1874,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_i_32(id, serializer);
         sse_encode_box_autoadd_update_stock_request(stock, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 49, port: port_);
+            funcId: 67, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_stock,
@@ -1414,7 +1900,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_i_32(id, serializer);
         sse_encode_box_autoadd_update_supplier_request(supplier, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 50, port: port_);
+            funcId: 68, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_supplier,
@@ -1440,7 +1926,7 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         sse_encode_i_32(id, serializer);
         sse_encode_box_autoadd_update_supply_item_request(item, serializer);
         pdeCallFfi(generalizedFrbRustBinding, serializer,
-            funcId: 51, port: port_);
+            funcId: 69, port: port_);
       },
       codec: SseCodec(
         decodeSuccessData: sse_decode_supply_item,
@@ -1489,9 +1975,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  CreatePortRequest dco_decode_box_autoadd_create_port_request(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_create_port_request(raw);
+  }
+
+  @protected
   CreateShipRequest dco_decode_box_autoadd_create_ship_request(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_create_ship_request(raw);
+  }
+
+  @protected
+  CreateShipVisitRequest dco_decode_box_autoadd_create_ship_visit_request(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_create_ship_visit_request(raw);
   }
 
   @protected
@@ -1552,9 +2051,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Port dco_decode_box_autoadd_port(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_port(raw);
+  }
+
+  @protected
   Ship dco_decode_box_autoadd_ship(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_ship(raw);
+  }
+
+  @protected
+  ShipVisit dco_decode_box_autoadd_ship_visit(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_ship_visit(raw);
   }
 
   @protected
@@ -1589,9 +2100,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  UpdatePortRequest dco_decode_box_autoadd_update_port_request(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_update_port_request(raw);
+  }
+
+  @protected
   UpdateShipRequest dco_decode_box_autoadd_update_ship_request(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_update_ship_request(raw);
+  }
+
+  @protected
+  UpdateShipVisitRequest dco_decode_box_autoadd_update_ship_visit_request(
+      dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_update_ship_visit_request(raw);
   }
 
   @protected
@@ -1612,6 +2136,52 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return dco_decode_update_supply_item_request(raw);
+  }
+
+  @protected
+  VisitStatus dco_decode_box_autoadd_visit_status(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return dco_decode_visit_status(raw);
+  }
+
+  @protected
+  CalendarData dco_decode_calendar_data(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 2)
+      throw Exception('unexpected arr length: expect 2 but see ${arr.length}');
+    return CalendarData(
+      events: dco_decode_list_calendar_event(arr[0]),
+      ports: dco_decode_list_port(arr[1]),
+    );
+  }
+
+  @protected
+  CalendarEvent dco_decode_calendar_event(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 12)
+      throw Exception('unexpected arr length: expect 12 but see ${arr.length}');
+    return CalendarEvent(
+      id: dco_decode_String(arr[0]),
+      eventType: dco_decode_calendar_event_type(arr[1]),
+      title: dco_decode_String(arr[2]),
+      subtitle: dco_decode_opt_String(arr[3]),
+      startDate: dco_decode_String(arr[4]),
+      endDate: dco_decode_String(arr[5]),
+      color: dco_decode_String(arr[6]),
+      status: dco_decode_String(arr[7]),
+      relatedShipId: dco_decode_opt_box_autoadd_i_32(arr[8]),
+      relatedPortId: dco_decode_opt_box_autoadd_i_32(arr[9]),
+      relatedOrderId: dco_decode_opt_box_autoadd_i_32(arr[10]),
+      metadata: dco_decode_opt_String(arr[11]),
+    );
+  }
+
+  @protected
+  CalendarEventType dco_decode_calendar_event_type(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return CalendarEventType.values[raw as int];
   }
 
   @protected
@@ -1652,6 +2222,23 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  CreatePortRequest dco_decode_create_port_request(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 7)
+      throw Exception('unexpected arr length: expect 7 but see ${arr.length}');
+    return CreatePortRequest(
+      name: dco_decode_String(arr[0]),
+      country: dco_decode_String(arr[1]),
+      city: dco_decode_opt_String(arr[2]),
+      timezone: dco_decode_String(arr[3]),
+      latitude: dco_decode_opt_box_autoadd_f_64(arr[4]),
+      longitude: dco_decode_opt_box_autoadd_f_64(arr[5]),
+      notes: dco_decode_opt_String(arr[6]),
+    );
+  }
+
+  @protected
   CreateShipRequest dco_decode_create_ship_request(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -1664,6 +2251,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       shipType: dco_decode_opt_String(arr[3]),
       grossTonnage: dco_decode_opt_box_autoadd_f_64(arr[4]),
       owner: dco_decode_opt_String(arr[5]),
+    );
+  }
+
+  @protected
+  CreateShipVisitRequest dco_decode_create_ship_visit_request(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 6)
+      throw Exception('unexpected arr length: expect 6 but see ${arr.length}');
+    return CreateShipVisitRequest(
+      shipId: dco_decode_i_32(arr[0]),
+      portId: dco_decode_i_32(arr[1]),
+      eta: dco_decode_String(arr[2]),
+      etd: dco_decode_String(arr[3]),
+      agentInfo: dco_decode_opt_String(arr[4]),
+      notes: dco_decode_opt_String(arr[5]),
     );
   }
 
@@ -1775,6 +2378,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<CalendarEvent> dco_decode_list_calendar_event(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_calendar_event).toList();
+  }
+
+  @protected
   List<Order> dco_decode_list_order(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_order).toList();
@@ -1787,6 +2396,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<Port> dco_decode_list_port(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_port).toList();
+  }
+
+  @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw as Uint8List;
@@ -1796,6 +2411,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   List<Ship> dco_decode_list_ship(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return (raw as List<dynamic>).map(dco_decode_ship).toList();
+  }
+
+  @protected
+  List<ShipVisit> dco_decode_list_ship_visit(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return (raw as List<dynamic>).map(dco_decode_ship_visit).toList();
   }
 
   @protected
@@ -1865,9 +2486,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Port? dco_decode_opt_box_autoadd_port(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_port(raw);
+  }
+
+  @protected
   Ship? dco_decode_opt_box_autoadd_ship(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null ? null : dco_decode_box_autoadd_ship(raw);
+  }
+
+  @protected
+  ShipVisit? dco_decode_opt_box_autoadd_ship_visit(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_ship_visit(raw);
   }
 
   @protected
@@ -1895,6 +2528,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   SupplyItem? dco_decode_opt_box_autoadd_supply_item(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     return raw == null ? null : dco_decode_box_autoadd_supply_item(raw);
+  }
+
+  @protected
+  VisitStatus? dco_decode_opt_box_autoadd_visit_status(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return raw == null ? null : dco_decode_box_autoadd_visit_status(raw);
   }
 
   @protected
@@ -1977,6 +2616,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Port dco_decode_port(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 11)
+      throw Exception('unexpected arr length: expect 11 but see ${arr.length}');
+    return Port(
+      id: dco_decode_i_32(arr[0]),
+      name: dco_decode_String(arr[1]),
+      country: dco_decode_String(arr[2]),
+      city: dco_decode_opt_String(arr[3]),
+      timezone: dco_decode_String(arr[4]),
+      latitude: dco_decode_opt_box_autoadd_f_64(arr[5]),
+      longitude: dco_decode_opt_box_autoadd_f_64(arr[6]),
+      notes: dco_decode_opt_String(arr[7]),
+      isActive: dco_decode_bool(arr[8]),
+      createdAt: dco_decode_String(arr[9]),
+      updatedAt: dco_decode_String(arr[10]),
+    );
+  }
+
+  @protected
   Ship dco_decode_ship(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -1992,6 +2652,30 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       owner: dco_decode_opt_String(arr[6]),
       createdAt: dco_decode_String(arr[7]),
       updatedAt: dco_decode_String(arr[8]),
+    );
+  }
+
+  @protected
+  ShipVisit dco_decode_ship_visit(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 14)
+      throw Exception('unexpected arr length: expect 14 but see ${arr.length}');
+    return ShipVisit(
+      id: dco_decode_i_32(arr[0]),
+      shipId: dco_decode_i_32(arr[1]),
+      shipName: dco_decode_opt_String(arr[2]),
+      portId: dco_decode_i_32(arr[3]),
+      portName: dco_decode_opt_String(arr[4]),
+      eta: dco_decode_String(arr[5]),
+      etd: dco_decode_String(arr[6]),
+      ata: dco_decode_opt_String(arr[7]),
+      atd: dco_decode_opt_String(arr[8]),
+      status: dco_decode_visit_status(arr[9]),
+      agentInfo: dco_decode_opt_String(arr[10]),
+      notes: dco_decode_opt_String(arr[11]),
+      createdAt: dco_decode_String(arr[12]),
+      updatedAt: dco_decode_String(arr[13]),
     );
   }
 
@@ -2146,6 +2830,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  UpdatePortRequest dco_decode_update_port_request(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 8)
+      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
+    return UpdatePortRequest(
+      name: dco_decode_opt_String(arr[0]),
+      country: dco_decode_opt_String(arr[1]),
+      city: dco_decode_opt_String(arr[2]),
+      timezone: dco_decode_opt_String(arr[3]),
+      latitude: dco_decode_opt_box_autoadd_f_64(arr[4]),
+      longitude: dco_decode_opt_box_autoadd_f_64(arr[5]),
+      notes: dco_decode_opt_String(arr[6]),
+      isActive: dco_decode_opt_box_autoadd_bool(arr[7]),
+    );
+  }
+
+  @protected
   UpdateShipRequest dco_decode_update_ship_request(dynamic raw) {
     // Codec=Dco (DartCObject based), see doc to use other codecs
     final arr = raw as List<dynamic>;
@@ -2158,6 +2860,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       shipType: dco_decode_opt_String(arr[3]),
       grossTonnage: dco_decode_opt_box_autoadd_f_64(arr[4]),
       owner: dco_decode_opt_String(arr[5]),
+    );
+  }
+
+  @protected
+  UpdateShipVisitRequest dco_decode_update_ship_visit_request(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    final arr = raw as List<dynamic>;
+    if (arr.length != 8)
+      throw Exception('unexpected arr length: expect 8 but see ${arr.length}');
+    return UpdateShipVisitRequest(
+      portId: dco_decode_opt_box_autoadd_i_32(arr[0]),
+      eta: dco_decode_opt_String(arr[1]),
+      etd: dco_decode_opt_String(arr[2]),
+      ata: dco_decode_opt_String(arr[3]),
+      atd: dco_decode_opt_String(arr[4]),
+      status: dco_decode_opt_box_autoadd_visit_status(arr[5]),
+      agentInfo: dco_decode_opt_String(arr[6]),
+      notes: dco_decode_opt_String(arr[7]),
     );
   }
 
@@ -2212,6 +2932,12 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  VisitStatus dco_decode_visit_status(dynamic raw) {
+    // Codec=Dco (DartCObject based), see doc to use other codecs
+    return VisitStatus.values[raw as int];
+  }
+
+  @protected
   String sse_decode_String(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var inner = sse_decode_list_prim_u_8_strict(deserializer);
@@ -2245,10 +2971,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  CreatePortRequest sse_decode_box_autoadd_create_port_request(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_create_port_request(deserializer));
+  }
+
+  @protected
   CreateShipRequest sse_decode_box_autoadd_create_ship_request(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_create_ship_request(deserializer));
+  }
+
+  @protected
+  CreateShipVisitRequest sse_decode_box_autoadd_create_ship_visit_request(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_create_ship_visit_request(deserializer));
   }
 
   @protected
@@ -2314,9 +3054,21 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Port sse_decode_box_autoadd_port(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_port(deserializer));
+  }
+
+  @protected
   Ship sse_decode_box_autoadd_ship(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_ship(deserializer));
+  }
+
+  @protected
+  ShipVisit sse_decode_box_autoadd_ship_visit(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_ship_visit(deserializer));
   }
 
   @protected
@@ -2352,10 +3104,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  UpdatePortRequest sse_decode_box_autoadd_update_port_request(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_update_port_request(deserializer));
+  }
+
+  @protected
   UpdateShipRequest sse_decode_box_autoadd_update_ship_request(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_update_ship_request(deserializer));
+  }
+
+  @protected
+  UpdateShipVisitRequest sse_decode_box_autoadd_update_ship_visit_request(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_update_ship_visit_request(deserializer));
   }
 
   @protected
@@ -2377,6 +3143,59 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     return (sse_decode_update_supply_item_request(deserializer));
+  }
+
+  @protected
+  VisitStatus sse_decode_box_autoadd_visit_status(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    return (sse_decode_visit_status(deserializer));
+  }
+
+  @protected
+  CalendarData sse_decode_calendar_data(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_events = sse_decode_list_calendar_event(deserializer);
+    var var_ports = sse_decode_list_port(deserializer);
+    return CalendarData(events: var_events, ports: var_ports);
+  }
+
+  @protected
+  CalendarEvent sse_decode_calendar_event(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_id = sse_decode_String(deserializer);
+    var var_eventType = sse_decode_calendar_event_type(deserializer);
+    var var_title = sse_decode_String(deserializer);
+    var var_subtitle = sse_decode_opt_String(deserializer);
+    var var_startDate = sse_decode_String(deserializer);
+    var var_endDate = sse_decode_String(deserializer);
+    var var_color = sse_decode_String(deserializer);
+    var var_status = sse_decode_String(deserializer);
+    var var_relatedShipId = sse_decode_opt_box_autoadd_i_32(deserializer);
+    var var_relatedPortId = sse_decode_opt_box_autoadd_i_32(deserializer);
+    var var_relatedOrderId = sse_decode_opt_box_autoadd_i_32(deserializer);
+    var var_metadata = sse_decode_opt_String(deserializer);
+    return CalendarEvent(
+        id: var_id,
+        eventType: var_eventType,
+        title: var_title,
+        subtitle: var_subtitle,
+        startDate: var_startDate,
+        endDate: var_endDate,
+        color: var_color,
+        status: var_status,
+        relatedShipId: var_relatedShipId,
+        relatedPortId: var_relatedPortId,
+        relatedOrderId: var_relatedOrderId,
+        metadata: var_metadata);
+  }
+
+  @protected
+  CalendarEventType sse_decode_calendar_event_type(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return CalendarEventType.values[inner];
   }
 
   @protected
@@ -2428,6 +3247,27 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  CreatePortRequest sse_decode_create_port_request(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_name = sse_decode_String(deserializer);
+    var var_country = sse_decode_String(deserializer);
+    var var_city = sse_decode_opt_String(deserializer);
+    var var_timezone = sse_decode_String(deserializer);
+    var var_latitude = sse_decode_opt_box_autoadd_f_64(deserializer);
+    var var_longitude = sse_decode_opt_box_autoadd_f_64(deserializer);
+    var var_notes = sse_decode_opt_String(deserializer);
+    return CreatePortRequest(
+        name: var_name,
+        country: var_country,
+        city: var_city,
+        timezone: var_timezone,
+        latitude: var_latitude,
+        longitude: var_longitude,
+        notes: var_notes);
+  }
+
+  @protected
   CreateShipRequest sse_decode_create_ship_request(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -2444,6 +3284,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         shipType: var_shipType,
         grossTonnage: var_grossTonnage,
         owner: var_owner);
+  }
+
+  @protected
+  CreateShipVisitRequest sse_decode_create_ship_visit_request(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_shipId = sse_decode_i_32(deserializer);
+    var var_portId = sse_decode_i_32(deserializer);
+    var var_eta = sse_decode_String(deserializer);
+    var var_etd = sse_decode_String(deserializer);
+    var var_agentInfo = sse_decode_opt_String(deserializer);
+    var var_notes = sse_decode_opt_String(deserializer);
+    return CreateShipVisitRequest(
+        shipId: var_shipId,
+        portId: var_portId,
+        eta: var_eta,
+        etd: var_etd,
+        agentInfo: var_agentInfo,
+        notes: var_notes);
   }
 
   @protected
@@ -2571,6 +3430,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<CalendarEvent> sse_decode_list_calendar_event(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <CalendarEvent>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_calendar_event(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
   List<Order> sse_decode_list_order(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
@@ -2595,6 +3467,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  List<Port> sse_decode_list_port(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <Port>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_port(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var len_ = sse_decode_i_32(deserializer);
@@ -2609,6 +3493,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     var ans_ = <Ship>[];
     for (var idx_ = 0; idx_ < len_; ++idx_) {
       ans_.add(sse_decode_ship(deserializer));
+    }
+    return ans_;
+  }
+
+  @protected
+  List<ShipVisit> sse_decode_list_ship_visit(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    var len_ = sse_decode_i_32(deserializer);
+    var ans_ = <ShipVisit>[];
+    for (var idx_ = 0; idx_ < len_; ++idx_) {
+      ans_.add(sse_decode_ship_visit(deserializer));
     }
     return ans_;
   }
@@ -2743,11 +3639,34 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Port? sse_decode_opt_box_autoadd_port(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_port(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
   Ship? sse_decode_opt_box_autoadd_ship(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     if (sse_decode_bool(deserializer)) {
       return (sse_decode_box_autoadd_ship(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  ShipVisit? sse_decode_opt_box_autoadd_ship_visit(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_ship_visit(deserializer));
     } else {
       return null;
     }
@@ -2794,6 +3713,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
 
     if (sse_decode_bool(deserializer)) {
       return (sse_decode_box_autoadd_supply_item(deserializer));
+    } else {
+      return null;
+    }
+  }
+
+  @protected
+  VisitStatus? sse_decode_opt_box_autoadd_visit_status(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    if (sse_decode_bool(deserializer)) {
+      return (sse_decode_box_autoadd_visit_status(deserializer));
     } else {
       return null;
     }
@@ -2895,6 +3826,34 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  Port sse_decode_port(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_id = sse_decode_i_32(deserializer);
+    var var_name = sse_decode_String(deserializer);
+    var var_country = sse_decode_String(deserializer);
+    var var_city = sse_decode_opt_String(deserializer);
+    var var_timezone = sse_decode_String(deserializer);
+    var var_latitude = sse_decode_opt_box_autoadd_f_64(deserializer);
+    var var_longitude = sse_decode_opt_box_autoadd_f_64(deserializer);
+    var var_notes = sse_decode_opt_String(deserializer);
+    var var_isActive = sse_decode_bool(deserializer);
+    var var_createdAt = sse_decode_String(deserializer);
+    var var_updatedAt = sse_decode_String(deserializer);
+    return Port(
+        id: var_id,
+        name: var_name,
+        country: var_country,
+        city: var_city,
+        timezone: var_timezone,
+        latitude: var_latitude,
+        longitude: var_longitude,
+        notes: var_notes,
+        isActive: var_isActive,
+        createdAt: var_createdAt,
+        updatedAt: var_updatedAt);
+  }
+
+  @protected
   Ship sse_decode_ship(SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     var var_id = sse_decode_i_32(deserializer);
@@ -2914,6 +3873,40 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         shipType: var_shipType,
         grossTonnage: var_grossTonnage,
         owner: var_owner,
+        createdAt: var_createdAt,
+        updatedAt: var_updatedAt);
+  }
+
+  @protected
+  ShipVisit sse_decode_ship_visit(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_id = sse_decode_i_32(deserializer);
+    var var_shipId = sse_decode_i_32(deserializer);
+    var var_shipName = sse_decode_opt_String(deserializer);
+    var var_portId = sse_decode_i_32(deserializer);
+    var var_portName = sse_decode_opt_String(deserializer);
+    var var_eta = sse_decode_String(deserializer);
+    var var_etd = sse_decode_String(deserializer);
+    var var_ata = sse_decode_opt_String(deserializer);
+    var var_atd = sse_decode_opt_String(deserializer);
+    var var_status = sse_decode_visit_status(deserializer);
+    var var_agentInfo = sse_decode_opt_String(deserializer);
+    var var_notes = sse_decode_opt_String(deserializer);
+    var var_createdAt = sse_decode_String(deserializer);
+    var var_updatedAt = sse_decode_String(deserializer);
+    return ShipVisit(
+        id: var_id,
+        shipId: var_shipId,
+        shipName: var_shipName,
+        portId: var_portId,
+        portName: var_portName,
+        eta: var_eta,
+        etd: var_etd,
+        ata: var_ata,
+        atd: var_atd,
+        status: var_status,
+        agentInfo: var_agentInfo,
+        notes: var_notes,
         createdAt: var_createdAt,
         updatedAt: var_updatedAt);
   }
@@ -3106,6 +4099,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  UpdatePortRequest sse_decode_update_port_request(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_name = sse_decode_opt_String(deserializer);
+    var var_country = sse_decode_opt_String(deserializer);
+    var var_city = sse_decode_opt_String(deserializer);
+    var var_timezone = sse_decode_opt_String(deserializer);
+    var var_latitude = sse_decode_opt_box_autoadd_f_64(deserializer);
+    var var_longitude = sse_decode_opt_box_autoadd_f_64(deserializer);
+    var var_notes = sse_decode_opt_String(deserializer);
+    var var_isActive = sse_decode_opt_box_autoadd_bool(deserializer);
+    return UpdatePortRequest(
+        name: var_name,
+        country: var_country,
+        city: var_city,
+        timezone: var_timezone,
+        latitude: var_latitude,
+        longitude: var_longitude,
+        notes: var_notes,
+        isActive: var_isActive);
+  }
+
+  @protected
   UpdateShipRequest sse_decode_update_ship_request(
       SseDeserializer deserializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -3122,6 +4138,29 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
         shipType: var_shipType,
         grossTonnage: var_grossTonnage,
         owner: var_owner);
+  }
+
+  @protected
+  UpdateShipVisitRequest sse_decode_update_ship_visit_request(
+      SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var var_portId = sse_decode_opt_box_autoadd_i_32(deserializer);
+    var var_eta = sse_decode_opt_String(deserializer);
+    var var_etd = sse_decode_opt_String(deserializer);
+    var var_ata = sse_decode_opt_String(deserializer);
+    var var_atd = sse_decode_opt_String(deserializer);
+    var var_status = sse_decode_opt_box_autoadd_visit_status(deserializer);
+    var var_agentInfo = sse_decode_opt_String(deserializer);
+    var var_notes = sse_decode_opt_String(deserializer);
+    return UpdateShipVisitRequest(
+        portId: var_portId,
+        eta: var_eta,
+        etd: var_etd,
+        ata: var_ata,
+        atd: var_atd,
+        status: var_status,
+        agentInfo: var_agentInfo,
+        notes: var_notes);
   }
 
   @protected
@@ -3187,6 +4226,13 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  VisitStatus sse_decode_visit_status(SseDeserializer deserializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    var inner = sse_decode_i_32(deserializer);
+    return VisitStatus.values[inner];
+  }
+
+  @protected
   void sse_encode_String(String self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_list_prim_u_8_strict(utf8.encoder.convert(self), serializer);
@@ -3219,10 +4265,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_create_port_request(
+      CreatePortRequest self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_create_port_request(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_create_ship_request(
       CreateShipRequest self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_create_ship_request(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_create_ship_visit_request(
+      CreateShipVisitRequest self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_create_ship_visit_request(self, serializer);
   }
 
   @protected
@@ -3287,9 +4347,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_port(Port self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_port(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_ship(Ship self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_ship(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_ship_visit(
+      ShipVisit self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_ship_visit(self, serializer);
   }
 
   @protected
@@ -3327,10 +4400,24 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_box_autoadd_update_port_request(
+      UpdatePortRequest self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_update_port_request(self, serializer);
+  }
+
+  @protected
   void sse_encode_box_autoadd_update_ship_request(
       UpdateShipRequest self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_update_ship_request(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_update_ship_visit_request(
+      UpdateShipVisitRequest self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_update_ship_visit_request(self, serializer);
   }
 
   @protected
@@ -3352,6 +4439,44 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
       UpdateSupplyItemRequest self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_update_supply_item_request(self, serializer);
+  }
+
+  @protected
+  void sse_encode_box_autoadd_visit_status(
+      VisitStatus self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_visit_status(self, serializer);
+  }
+
+  @protected
+  void sse_encode_calendar_data(CalendarData self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_list_calendar_event(self.events, serializer);
+    sse_encode_list_port(self.ports, serializer);
+  }
+
+  @protected
+  void sse_encode_calendar_event(CalendarEvent self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.id, serializer);
+    sse_encode_calendar_event_type(self.eventType, serializer);
+    sse_encode_String(self.title, serializer);
+    sse_encode_opt_String(self.subtitle, serializer);
+    sse_encode_String(self.startDate, serializer);
+    sse_encode_String(self.endDate, serializer);
+    sse_encode_String(self.color, serializer);
+    sse_encode_String(self.status, serializer);
+    sse_encode_opt_box_autoadd_i_32(self.relatedShipId, serializer);
+    sse_encode_opt_box_autoadd_i_32(self.relatedPortId, serializer);
+    sse_encode_opt_box_autoadd_i_32(self.relatedOrderId, serializer);
+    sse_encode_opt_String(self.metadata, serializer);
+  }
+
+  @protected
+  void sse_encode_calendar_event_type(
+      CalendarEventType self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
   }
 
   @protected
@@ -3384,6 +4509,19 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_create_port_request(
+      CreatePortRequest self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_String(self.name, serializer);
+    sse_encode_String(self.country, serializer);
+    sse_encode_opt_String(self.city, serializer);
+    sse_encode_String(self.timezone, serializer);
+    sse_encode_opt_box_autoadd_f_64(self.latitude, serializer);
+    sse_encode_opt_box_autoadd_f_64(self.longitude, serializer);
+    sse_encode_opt_String(self.notes, serializer);
+  }
+
+  @protected
   void sse_encode_create_ship_request(
       CreateShipRequest self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -3393,6 +4531,18 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_String(self.shipType, serializer);
     sse_encode_opt_box_autoadd_f_64(self.grossTonnage, serializer);
     sse_encode_opt_String(self.owner, serializer);
+  }
+
+  @protected
+  void sse_encode_create_ship_visit_request(
+      CreateShipVisitRequest self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.shipId, serializer);
+    sse_encode_i_32(self.portId, serializer);
+    sse_encode_String(self.eta, serializer);
+    sse_encode_String(self.etd, serializer);
+    sse_encode_opt_String(self.agentInfo, serializer);
+    sse_encode_opt_String(self.notes, serializer);
   }
 
   @protected
@@ -3481,6 +4631,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_list_calendar_event(
+      List<CalendarEvent> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_calendar_event(item, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_list_order(List<Order> self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.length, serializer);
@@ -3500,6 +4660,15 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_list_port(List<Port> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_port(item, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_list_prim_u_8_strict(
       Uint8List self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -3513,6 +4682,16 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_i_32(self.length, serializer);
     for (final item in self) {
       sse_encode_ship(item, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_list_ship_visit(
+      List<ShipVisit> self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.length, serializer);
+    for (final item in self) {
+      sse_encode_ship_visit(item, serializer);
     }
   }
 
@@ -3628,12 +4807,33 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_opt_box_autoadd_port(Port? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_port(self, serializer);
+    }
+  }
+
+  @protected
   void sse_encode_opt_box_autoadd_ship(Ship? self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
 
     sse_encode_bool(self != null, serializer);
     if (self != null) {
       sse_encode_box_autoadd_ship(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_ship_visit(
+      ShipVisit? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_ship_visit(self, serializer);
     }
   }
 
@@ -3677,6 +4877,17 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_bool(self != null, serializer);
     if (self != null) {
       sse_encode_box_autoadd_supply_item(self, serializer);
+    }
+  }
+
+  @protected
+  void sse_encode_opt_box_autoadd_visit_status(
+      VisitStatus? self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+
+    sse_encode_bool(self != null, serializer);
+    if (self != null) {
+      sse_encode_box_autoadd_visit_status(self, serializer);
     }
   }
 
@@ -3741,6 +4952,22 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_port(Port self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.id, serializer);
+    sse_encode_String(self.name, serializer);
+    sse_encode_String(self.country, serializer);
+    sse_encode_opt_String(self.city, serializer);
+    sse_encode_String(self.timezone, serializer);
+    sse_encode_opt_box_autoadd_f_64(self.latitude, serializer);
+    sse_encode_opt_box_autoadd_f_64(self.longitude, serializer);
+    sse_encode_opt_String(self.notes, serializer);
+    sse_encode_bool(self.isActive, serializer);
+    sse_encode_String(self.createdAt, serializer);
+    sse_encode_String(self.updatedAt, serializer);
+  }
+
+  @protected
   void sse_encode_ship(Ship self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
     sse_encode_i_32(self.id, serializer);
@@ -3750,6 +4977,25 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_String(self.shipType, serializer);
     sse_encode_opt_box_autoadd_f_64(self.grossTonnage, serializer);
     sse_encode_opt_String(self.owner, serializer);
+    sse_encode_String(self.createdAt, serializer);
+    sse_encode_String(self.updatedAt, serializer);
+  }
+
+  @protected
+  void sse_encode_ship_visit(ShipVisit self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.id, serializer);
+    sse_encode_i_32(self.shipId, serializer);
+    sse_encode_opt_String(self.shipName, serializer);
+    sse_encode_i_32(self.portId, serializer);
+    sse_encode_opt_String(self.portName, serializer);
+    sse_encode_String(self.eta, serializer);
+    sse_encode_String(self.etd, serializer);
+    sse_encode_opt_String(self.ata, serializer);
+    sse_encode_opt_String(self.atd, serializer);
+    sse_encode_visit_status(self.status, serializer);
+    sse_encode_opt_String(self.agentInfo, serializer);
+    sse_encode_opt_String(self.notes, serializer);
     sse_encode_String(self.createdAt, serializer);
     sse_encode_String(self.updatedAt, serializer);
   }
@@ -3872,6 +5118,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
   }
 
   @protected
+  void sse_encode_update_port_request(
+      UpdatePortRequest self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_opt_String(self.name, serializer);
+    sse_encode_opt_String(self.country, serializer);
+    sse_encode_opt_String(self.city, serializer);
+    sse_encode_opt_String(self.timezone, serializer);
+    sse_encode_opt_box_autoadd_f_64(self.latitude, serializer);
+    sse_encode_opt_box_autoadd_f_64(self.longitude, serializer);
+    sse_encode_opt_String(self.notes, serializer);
+    sse_encode_opt_box_autoadd_bool(self.isActive, serializer);
+  }
+
+  @protected
   void sse_encode_update_ship_request(
       UpdateShipRequest self, SseSerializer serializer) {
     // Codec=Sse (Serialization based), see doc to use other codecs
@@ -3881,6 +5141,20 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_String(self.shipType, serializer);
     sse_encode_opt_box_autoadd_f_64(self.grossTonnage, serializer);
     sse_encode_opt_String(self.owner, serializer);
+  }
+
+  @protected
+  void sse_encode_update_ship_visit_request(
+      UpdateShipVisitRequest self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_opt_box_autoadd_i_32(self.portId, serializer);
+    sse_encode_opt_String(self.eta, serializer);
+    sse_encode_opt_String(self.etd, serializer);
+    sse_encode_opt_String(self.ata, serializer);
+    sse_encode_opt_String(self.atd, serializer);
+    sse_encode_opt_box_autoadd_visit_status(self.status, serializer);
+    sse_encode_opt_String(self.agentInfo, serializer);
+    sse_encode_opt_String(self.notes, serializer);
   }
 
   @protected
@@ -3919,5 +5193,11 @@ class RustLibApiImpl extends RustLibApiImplPlatform implements RustLibApi {
     sse_encode_opt_String(self.currency, serializer);
     sse_encode_opt_box_autoadd_i_32(self.minimumOrderQuantity, serializer);
     sse_encode_opt_box_autoadd_bool(self.isAvailable, serializer);
+  }
+
+  @protected
+  void sse_encode_visit_status(VisitStatus self, SseSerializer serializer) {
+    // Codec=Sse (Serialization based), see doc to use other codecs
+    sse_encode_i_32(self.index, serializer);
   }
 }

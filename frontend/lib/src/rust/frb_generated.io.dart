@@ -36,7 +36,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   CreateOrderRequest dco_decode_box_autoadd_create_order_request(dynamic raw);
 
   @protected
+  CreatePortRequest dco_decode_box_autoadd_create_port_request(dynamic raw);
+
+  @protected
   CreateShipRequest dco_decode_box_autoadd_create_ship_request(dynamic raw);
+
+  @protected
+  CreateShipVisitRequest dco_decode_box_autoadd_create_ship_visit_request(
+      dynamic raw);
 
   @protected
   CreateStockMovementRequest
@@ -69,7 +76,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   OrderWithItems dco_decode_box_autoadd_order_with_items(dynamic raw);
 
   @protected
+  Port dco_decode_box_autoadd_port(dynamic raw);
+
+  @protected
   Ship dco_decode_box_autoadd_ship(dynamic raw);
+
+  @protected
+  ShipVisit dco_decode_box_autoadd_ship_visit(dynamic raw);
 
   @protected
   Stock dco_decode_box_autoadd_stock(dynamic raw);
@@ -88,7 +101,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       dynamic raw);
 
   @protected
+  UpdatePortRequest dco_decode_box_autoadd_update_port_request(dynamic raw);
+
+  @protected
   UpdateShipRequest dco_decode_box_autoadd_update_ship_request(dynamic raw);
+
+  @protected
+  UpdateShipVisitRequest dco_decode_box_autoadd_update_ship_visit_request(
+      dynamic raw);
 
   @protected
   UpdateStockRequest dco_decode_box_autoadd_update_stock_request(dynamic raw);
@@ -102,13 +122,31 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       dynamic raw);
 
   @protected
+  VisitStatus dco_decode_box_autoadd_visit_status(dynamic raw);
+
+  @protected
+  CalendarData dco_decode_calendar_data(dynamic raw);
+
+  @protected
+  CalendarEvent dco_decode_calendar_event(dynamic raw);
+
+  @protected
+  CalendarEventType dco_decode_calendar_event_type(dynamic raw);
+
+  @protected
   CreateOrderItemRequest dco_decode_create_order_item_request(dynamic raw);
 
   @protected
   CreateOrderRequest dco_decode_create_order_request(dynamic raw);
 
   @protected
+  CreatePortRequest dco_decode_create_port_request(dynamic raw);
+
+  @protected
   CreateShipRequest dco_decode_create_ship_request(dynamic raw);
+
+  @protected
+  CreateShipVisitRequest dco_decode_create_ship_visit_request(dynamic raw);
 
   @protected
   CreateStockMovementRequest dco_decode_create_stock_movement_request(
@@ -139,16 +177,25 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ItemProfit dco_decode_item_profit(dynamic raw);
 
   @protected
+  List<CalendarEvent> dco_decode_list_calendar_event(dynamic raw);
+
+  @protected
   List<Order> dco_decode_list_order(dynamic raw);
 
   @protected
   List<OrderItem> dco_decode_list_order_item(dynamic raw);
 
   @protected
+  List<Port> dco_decode_list_port(dynamic raw);
+
+  @protected
   Uint8List dco_decode_list_prim_u_8_strict(dynamic raw);
 
   @protected
   List<Ship> dco_decode_list_ship(dynamic raw);
+
+  @protected
+  List<ShipVisit> dco_decode_list_ship_visit(dynamic raw);
 
   @protected
   List<Stock> dco_decode_list_stock(dynamic raw);
@@ -184,7 +231,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   OrderWithItems? dco_decode_opt_box_autoadd_order_with_items(dynamic raw);
 
   @protected
+  Port? dco_decode_opt_box_autoadd_port(dynamic raw);
+
+  @protected
   Ship? dco_decode_opt_box_autoadd_ship(dynamic raw);
+
+  @protected
+  ShipVisit? dco_decode_opt_box_autoadd_ship_visit(dynamic raw);
 
   @protected
   Stock? dco_decode_opt_box_autoadd_stock(dynamic raw);
@@ -198,6 +251,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   SupplyItem? dco_decode_opt_box_autoadd_supply_item(dynamic raw);
+
+  @protected
+  VisitStatus? dco_decode_opt_box_autoadd_visit_status(dynamic raw);
 
   @protected
   Order dco_decode_order(dynamic raw);
@@ -215,7 +271,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   OrderWithItems dco_decode_order_with_items(dynamic raw);
 
   @protected
+  Port dco_decode_port(dynamic raw);
+
+  @protected
   Ship dco_decode_ship(dynamic raw);
+
+  @protected
+  ShipVisit dco_decode_ship_visit(dynamic raw);
 
   @protected
   Stock dco_decode_stock(dynamic raw);
@@ -248,7 +310,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   UpdateOrderItemRequest dco_decode_update_order_item_request(dynamic raw);
 
   @protected
+  UpdatePortRequest dco_decode_update_port_request(dynamic raw);
+
+  @protected
   UpdateShipRequest dco_decode_update_ship_request(dynamic raw);
+
+  @protected
+  UpdateShipVisitRequest dco_decode_update_ship_visit_request(dynamic raw);
 
   @protected
   UpdateStockRequest dco_decode_update_stock_request(dynamic raw);
@@ -258,6 +326,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   UpdateSupplyItemRequest dco_decode_update_supply_item_request(dynamic raw);
+
+  @protected
+  VisitStatus dco_decode_visit_status(dynamic raw);
 
   @protected
   String sse_decode_String(SseDeserializer deserializer);
@@ -277,7 +348,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  CreatePortRequest sse_decode_box_autoadd_create_port_request(
+      SseDeserializer deserializer);
+
+  @protected
   CreateShipRequest sse_decode_box_autoadd_create_ship_request(
+      SseDeserializer deserializer);
+
+  @protected
+  CreateShipVisitRequest sse_decode_box_autoadd_create_ship_visit_request(
       SseDeserializer deserializer);
 
   @protected
@@ -315,7 +394,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  Port sse_decode_box_autoadd_port(SseDeserializer deserializer);
+
+  @protected
   Ship sse_decode_box_autoadd_ship(SseDeserializer deserializer);
+
+  @protected
+  ShipVisit sse_decode_box_autoadd_ship_visit(SseDeserializer deserializer);
 
   @protected
   Stock sse_decode_box_autoadd_stock(SseDeserializer deserializer);
@@ -335,7 +420,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  UpdatePortRequest sse_decode_box_autoadd_update_port_request(
+      SseDeserializer deserializer);
+
+  @protected
   UpdateShipRequest sse_decode_box_autoadd_update_ship_request(
+      SseDeserializer deserializer);
+
+  @protected
+  UpdateShipVisitRequest sse_decode_box_autoadd_update_ship_visit_request(
       SseDeserializer deserializer);
 
   @protected
@@ -351,6 +444,19 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  VisitStatus sse_decode_box_autoadd_visit_status(SseDeserializer deserializer);
+
+  @protected
+  CalendarData sse_decode_calendar_data(SseDeserializer deserializer);
+
+  @protected
+  CalendarEvent sse_decode_calendar_event(SseDeserializer deserializer);
+
+  @protected
+  CalendarEventType sse_decode_calendar_event_type(
+      SseDeserializer deserializer);
+
+  @protected
   CreateOrderItemRequest sse_decode_create_order_item_request(
       SseDeserializer deserializer);
 
@@ -359,7 +465,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  CreatePortRequest sse_decode_create_port_request(
+      SseDeserializer deserializer);
+
+  @protected
   CreateShipRequest sse_decode_create_ship_request(
+      SseDeserializer deserializer);
+
+  @protected
+  CreateShipVisitRequest sse_decode_create_ship_visit_request(
       SseDeserializer deserializer);
 
   @protected
@@ -394,16 +508,26 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   ItemProfit sse_decode_item_profit(SseDeserializer deserializer);
 
   @protected
+  List<CalendarEvent> sse_decode_list_calendar_event(
+      SseDeserializer deserializer);
+
+  @protected
   List<Order> sse_decode_list_order(SseDeserializer deserializer);
 
   @protected
   List<OrderItem> sse_decode_list_order_item(SseDeserializer deserializer);
 
   @protected
+  List<Port> sse_decode_list_port(SseDeserializer deserializer);
+
+  @protected
   Uint8List sse_decode_list_prim_u_8_strict(SseDeserializer deserializer);
 
   @protected
   List<Ship> sse_decode_list_ship(SseDeserializer deserializer);
+
+  @protected
+  List<ShipVisit> sse_decode_list_ship_visit(SseDeserializer deserializer);
 
   @protected
   List<Stock> sse_decode_list_stock(SseDeserializer deserializer);
@@ -443,7 +567,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  Port? sse_decode_opt_box_autoadd_port(SseDeserializer deserializer);
+
+  @protected
   Ship? sse_decode_opt_box_autoadd_ship(SseDeserializer deserializer);
+
+  @protected
+  ShipVisit? sse_decode_opt_box_autoadd_ship_visit(
+      SseDeserializer deserializer);
 
   @protected
   Stock? sse_decode_opt_box_autoadd_stock(SseDeserializer deserializer);
@@ -457,6 +588,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
 
   @protected
   SupplyItem? sse_decode_opt_box_autoadd_supply_item(
+      SseDeserializer deserializer);
+
+  @protected
+  VisitStatus? sse_decode_opt_box_autoadd_visit_status(
       SseDeserializer deserializer);
 
   @protected
@@ -475,7 +610,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   OrderWithItems sse_decode_order_with_items(SseDeserializer deserializer);
 
   @protected
+  Port sse_decode_port(SseDeserializer deserializer);
+
+  @protected
   Ship sse_decode_ship(SseDeserializer deserializer);
+
+  @protected
+  ShipVisit sse_decode_ship_visit(SseDeserializer deserializer);
 
   @protected
   Stock sse_decode_stock(SseDeserializer deserializer);
@@ -511,7 +652,15 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       SseDeserializer deserializer);
 
   @protected
+  UpdatePortRequest sse_decode_update_port_request(
+      SseDeserializer deserializer);
+
+  @protected
   UpdateShipRequest sse_decode_update_ship_request(
+      SseDeserializer deserializer);
+
+  @protected
+  UpdateShipVisitRequest sse_decode_update_ship_visit_request(
       SseDeserializer deserializer);
 
   @protected
@@ -525,6 +674,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   UpdateSupplyItemRequest sse_decode_update_supply_item_request(
       SseDeserializer deserializer);
+
+  @protected
+  VisitStatus sse_decode_visit_status(SseDeserializer deserializer);
 
   @protected
   void sse_encode_String(String self, SseSerializer serializer);
@@ -544,8 +696,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       CreateOrderRequest self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_create_port_request(
+      CreatePortRequest self, SseSerializer serializer);
+
+  @protected
   void sse_encode_box_autoadd_create_ship_request(
       CreateShipRequest self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_create_ship_visit_request(
+      CreateShipVisitRequest self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_create_stock_movement_request(
@@ -582,7 +742,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       OrderWithItems self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_port(Port self, SseSerializer serializer);
+
+  @protected
   void sse_encode_box_autoadd_ship(Ship self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_ship_visit(
+      ShipVisit self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_stock(Stock self, SseSerializer serializer);
@@ -603,8 +770,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       UpdateOrderItemRequest self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_update_port_request(
+      UpdatePortRequest self, SseSerializer serializer);
+
+  @protected
   void sse_encode_box_autoadd_update_ship_request(
       UpdateShipRequest self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_box_autoadd_update_ship_visit_request(
+      UpdateShipVisitRequest self, SseSerializer serializer);
 
   @protected
   void sse_encode_box_autoadd_update_stock_request(
@@ -619,6 +794,20 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       UpdateSupplyItemRequest self, SseSerializer serializer);
 
   @protected
+  void sse_encode_box_autoadd_visit_status(
+      VisitStatus self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_calendar_data(CalendarData self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_calendar_event(CalendarEvent self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_calendar_event_type(
+      CalendarEventType self, SseSerializer serializer);
+
+  @protected
   void sse_encode_create_order_item_request(
       CreateOrderItemRequest self, SseSerializer serializer);
 
@@ -627,8 +816,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       CreateOrderRequest self, SseSerializer serializer);
 
   @protected
+  void sse_encode_create_port_request(
+      CreatePortRequest self, SseSerializer serializer);
+
+  @protected
   void sse_encode_create_ship_request(
       CreateShipRequest self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_create_ship_visit_request(
+      CreateShipVisitRequest self, SseSerializer serializer);
 
   @protected
   void sse_encode_create_stock_movement_request(
@@ -662,6 +859,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   void sse_encode_item_profit(ItemProfit self, SseSerializer serializer);
 
   @protected
+  void sse_encode_list_calendar_event(
+      List<CalendarEvent> self, SseSerializer serializer);
+
+  @protected
   void sse_encode_list_order(List<Order> self, SseSerializer serializer);
 
   @protected
@@ -669,11 +870,18 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       List<OrderItem> self, SseSerializer serializer);
 
   @protected
+  void sse_encode_list_port(List<Port> self, SseSerializer serializer);
+
+  @protected
   void sse_encode_list_prim_u_8_strict(
       Uint8List self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_ship(List<Ship> self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_list_ship_visit(
+      List<ShipVisit> self, SseSerializer serializer);
 
   @protected
   void sse_encode_list_stock(List<Stock> self, SseSerializer serializer);
@@ -714,7 +922,14 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       OrderWithItems? self, SseSerializer serializer);
 
   @protected
+  void sse_encode_opt_box_autoadd_port(Port? self, SseSerializer serializer);
+
+  @protected
   void sse_encode_opt_box_autoadd_ship(Ship? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_opt_box_autoadd_ship_visit(
+      ShipVisit? self, SseSerializer serializer);
 
   @protected
   void sse_encode_opt_box_autoadd_stock(Stock? self, SseSerializer serializer);
@@ -730,6 +945,10 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_opt_box_autoadd_supply_item(
       SupplyItem? self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_opt_box_autoadd_visit_status(
+      VisitStatus? self, SseSerializer serializer);
 
   @protected
   void sse_encode_order(Order self, SseSerializer serializer);
@@ -748,7 +967,13 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       OrderWithItems self, SseSerializer serializer);
 
   @protected
+  void sse_encode_port(Port self, SseSerializer serializer);
+
+  @protected
   void sse_encode_ship(Ship self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_ship_visit(ShipVisit self, SseSerializer serializer);
 
   @protected
   void sse_encode_stock(Stock self, SseSerializer serializer);
@@ -784,8 +1009,16 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
       UpdateOrderItemRequest self, SseSerializer serializer);
 
   @protected
+  void sse_encode_update_port_request(
+      UpdatePortRequest self, SseSerializer serializer);
+
+  @protected
   void sse_encode_update_ship_request(
       UpdateShipRequest self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_update_ship_visit_request(
+      UpdateShipVisitRequest self, SseSerializer serializer);
 
   @protected
   void sse_encode_update_stock_request(
@@ -798,6 +1031,9 @@ abstract class RustLibApiImplPlatform extends BaseApiImpl<RustLibWire> {
   @protected
   void sse_encode_update_supply_item_request(
       UpdateSupplyItemRequest self, SseSerializer serializer);
+
+  @protected
+  void sse_encode_visit_status(VisitStatus self, SseSerializer serializer);
 }
 
 // Section: wire_class

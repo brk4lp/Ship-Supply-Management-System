@@ -6,6 +6,101 @@
 import 'frb_generated.dart';
 import 'package:flutter_rust_bridge/flutter_rust_bridge_for_generated.dart';
 
+/// Calendar data response with all events
+class CalendarData {
+  final List<CalendarEvent> events;
+  final List<Port> ports;
+
+  const CalendarData({
+    required this.events,
+    required this.ports,
+  });
+
+  @override
+  int get hashCode => events.hashCode ^ ports.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CalendarData &&
+          runtimeType == other.runtimeType &&
+          events == other.events &&
+          ports == other.ports;
+}
+
+/// Calendar event for unified calendar view
+class CalendarEvent {
+  final String id;
+  final CalendarEventType eventType;
+  final String title;
+  final String? subtitle;
+  final String startDate;
+  final String endDate;
+  final String color;
+  final String status;
+  final int? relatedShipId;
+  final int? relatedPortId;
+  final int? relatedOrderId;
+  final String? metadata;
+
+  const CalendarEvent({
+    required this.id,
+    required this.eventType,
+    required this.title,
+    this.subtitle,
+    required this.startDate,
+    required this.endDate,
+    required this.color,
+    required this.status,
+    this.relatedShipId,
+    this.relatedPortId,
+    this.relatedOrderId,
+    this.metadata,
+  });
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      eventType.hashCode ^
+      title.hashCode ^
+      subtitle.hashCode ^
+      startDate.hashCode ^
+      endDate.hashCode ^
+      color.hashCode ^
+      status.hashCode ^
+      relatedShipId.hashCode ^
+      relatedPortId.hashCode ^
+      relatedOrderId.hashCode ^
+      metadata.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CalendarEvent &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          eventType == other.eventType &&
+          title == other.title &&
+          subtitle == other.subtitle &&
+          startDate == other.startDate &&
+          endDate == other.endDate &&
+          color == other.color &&
+          status == other.status &&
+          relatedShipId == other.relatedShipId &&
+          relatedPortId == other.relatedPortId &&
+          relatedOrderId == other.relatedOrderId &&
+          metadata == other.metadata;
+}
+
+/// Calendar event type
+enum CalendarEventType {
+  shipVisit,
+  orderDelivery,
+  warehouseDelivery,
+  shipDelivery,
+  ;
+}
+
 class CreateOrderItemRequest {
   final int orderId;
   final String productName;
@@ -104,6 +199,49 @@ class CreateOrderRequest {
           currency == other.currency;
 }
 
+class CreatePortRequest {
+  final String name;
+  final String country;
+  final String? city;
+  final String timezone;
+  final double? latitude;
+  final double? longitude;
+  final String? notes;
+
+  const CreatePortRequest({
+    required this.name,
+    required this.country,
+    this.city,
+    required this.timezone,
+    this.latitude,
+    this.longitude,
+    this.notes,
+  });
+
+  @override
+  int get hashCode =>
+      name.hashCode ^
+      country.hashCode ^
+      city.hashCode ^
+      timezone.hashCode ^
+      latitude.hashCode ^
+      longitude.hashCode ^
+      notes.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CreatePortRequest &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          country == other.country &&
+          city == other.city &&
+          timezone == other.timezone &&
+          latitude == other.latitude &&
+          longitude == other.longitude &&
+          notes == other.notes;
+}
+
 class CreateShipRequest {
   final String name;
   final String imoNumber;
@@ -141,6 +279,45 @@ class CreateShipRequest {
           shipType == other.shipType &&
           grossTonnage == other.grossTonnage &&
           owner == other.owner;
+}
+
+class CreateShipVisitRequest {
+  final int shipId;
+  final int portId;
+  final String eta;
+  final String etd;
+  final String? agentInfo;
+  final String? notes;
+
+  const CreateShipVisitRequest({
+    required this.shipId,
+    required this.portId,
+    required this.eta,
+    required this.etd,
+    this.agentInfo,
+    this.notes,
+  });
+
+  @override
+  int get hashCode =>
+      shipId.hashCode ^
+      portId.hashCode ^
+      eta.hashCode ^
+      etd.hashCode ^
+      agentInfo.hashCode ^
+      notes.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is CreateShipVisitRequest &&
+          runtimeType == other.runtimeType &&
+          shipId == other.shipId &&
+          portId == other.portId &&
+          eta == other.eta &&
+          etd == other.etd &&
+          agentInfo == other.agentInfo &&
+          notes == other.notes;
 }
 
 class CreateStockMovementRequest {
@@ -579,6 +756,65 @@ class OrderWithItems {
           totals == other.totals;
 }
 
+class Port {
+  final int id;
+  final String name;
+  final String country;
+  final String? city;
+  final String timezone;
+  final double? latitude;
+  final double? longitude;
+  final String? notes;
+  final bool isActive;
+  final String createdAt;
+  final String updatedAt;
+
+  const Port({
+    required this.id,
+    required this.name,
+    required this.country,
+    this.city,
+    required this.timezone,
+    this.latitude,
+    this.longitude,
+    this.notes,
+    required this.isActive,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      name.hashCode ^
+      country.hashCode ^
+      city.hashCode ^
+      timezone.hashCode ^
+      latitude.hashCode ^
+      longitude.hashCode ^
+      notes.hashCode ^
+      isActive.hashCode ^
+      createdAt.hashCode ^
+      updatedAt.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is Port &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          name == other.name &&
+          country == other.country &&
+          city == other.city &&
+          timezone == other.timezone &&
+          latitude == other.latitude &&
+          longitude == other.longitude &&
+          notes == other.notes &&
+          isActive == other.isActive &&
+          createdAt == other.createdAt &&
+          updatedAt == other.updatedAt;
+}
+
 class Ship {
   final int id;
   final String name;
@@ -626,6 +862,77 @@ class Ship {
           shipType == other.shipType &&
           grossTonnage == other.grossTonnage &&
           owner == other.owner &&
+          createdAt == other.createdAt &&
+          updatedAt == other.updatedAt;
+}
+
+class ShipVisit {
+  final int id;
+  final int shipId;
+  final String? shipName;
+  final int portId;
+  final String? portName;
+  final String eta;
+  final String etd;
+  final String? ata;
+  final String? atd;
+  final VisitStatus status;
+  final String? agentInfo;
+  final String? notes;
+  final String createdAt;
+  final String updatedAt;
+
+  const ShipVisit({
+    required this.id,
+    required this.shipId,
+    this.shipName,
+    required this.portId,
+    this.portName,
+    required this.eta,
+    required this.etd,
+    this.ata,
+    this.atd,
+    required this.status,
+    this.agentInfo,
+    this.notes,
+    required this.createdAt,
+    required this.updatedAt,
+  });
+
+  @override
+  int get hashCode =>
+      id.hashCode ^
+      shipId.hashCode ^
+      shipName.hashCode ^
+      portId.hashCode ^
+      portName.hashCode ^
+      eta.hashCode ^
+      etd.hashCode ^
+      ata.hashCode ^
+      atd.hashCode ^
+      status.hashCode ^
+      agentInfo.hashCode ^
+      notes.hashCode ^
+      createdAt.hashCode ^
+      updatedAt.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is ShipVisit &&
+          runtimeType == other.runtimeType &&
+          id == other.id &&
+          shipId == other.shipId &&
+          shipName == other.shipName &&
+          portId == other.portId &&
+          portName == other.portName &&
+          eta == other.eta &&
+          etd == other.etd &&
+          ata == other.ata &&
+          atd == other.atd &&
+          status == other.status &&
+          agentInfo == other.agentInfo &&
+          notes == other.notes &&
           createdAt == other.createdAt &&
           updatedAt == other.updatedAt;
 }
@@ -1001,6 +1308,53 @@ class UpdateOrderItemRequest {
           notes == other.notes;
 }
 
+class UpdatePortRequest {
+  final String? name;
+  final String? country;
+  final String? city;
+  final String? timezone;
+  final double? latitude;
+  final double? longitude;
+  final String? notes;
+  final bool? isActive;
+
+  const UpdatePortRequest({
+    this.name,
+    this.country,
+    this.city,
+    this.timezone,
+    this.latitude,
+    this.longitude,
+    this.notes,
+    this.isActive,
+  });
+
+  @override
+  int get hashCode =>
+      name.hashCode ^
+      country.hashCode ^
+      city.hashCode ^
+      timezone.hashCode ^
+      latitude.hashCode ^
+      longitude.hashCode ^
+      notes.hashCode ^
+      isActive.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is UpdatePortRequest &&
+          runtimeType == other.runtimeType &&
+          name == other.name &&
+          country == other.country &&
+          city == other.city &&
+          timezone == other.timezone &&
+          latitude == other.latitude &&
+          longitude == other.longitude &&
+          notes == other.notes &&
+          isActive == other.isActive;
+}
+
 class UpdateShipRequest {
   final String? name;
   final String? imoNumber;
@@ -1038,6 +1392,53 @@ class UpdateShipRequest {
           shipType == other.shipType &&
           grossTonnage == other.grossTonnage &&
           owner == other.owner;
+}
+
+class UpdateShipVisitRequest {
+  final int? portId;
+  final String? eta;
+  final String? etd;
+  final String? ata;
+  final String? atd;
+  final VisitStatus? status;
+  final String? agentInfo;
+  final String? notes;
+
+  const UpdateShipVisitRequest({
+    this.portId,
+    this.eta,
+    this.etd,
+    this.ata,
+    this.atd,
+    this.status,
+    this.agentInfo,
+    this.notes,
+  });
+
+  @override
+  int get hashCode =>
+      portId.hashCode ^
+      eta.hashCode ^
+      etd.hashCode ^
+      ata.hashCode ^
+      atd.hashCode ^
+      status.hashCode ^
+      agentInfo.hashCode ^
+      notes.hashCode;
+
+  @override
+  bool operator ==(Object other) =>
+      identical(this, other) ||
+      other is UpdateShipVisitRequest &&
+          runtimeType == other.runtimeType &&
+          portId == other.portId &&
+          eta == other.eta &&
+          etd == other.etd &&
+          ata == other.ata &&
+          atd == other.atd &&
+          status == other.status &&
+          agentInfo == other.agentInfo &&
+          notes == other.notes;
 }
 
 class UpdateStockRequest {
@@ -1161,4 +1562,13 @@ class UpdateSupplyItemRequest {
           currency == other.currency &&
           minimumOrderQuantity == other.minimumOrderQuantity &&
           isAvailable == other.isAvailable;
+}
+
+/// Ship visit status
+enum VisitStatus {
+  planned,
+  arrived,
+  departed,
+  cancelled,
+  ;
 }

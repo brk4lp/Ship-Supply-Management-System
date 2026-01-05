@@ -68,7 +68,6 @@ SSMS, gemi kumanyacılığı (ship chandler) operasyonlarını dijitalleştiren,
 - [ ] PostgreSQL uzak veritabanı bağlantısı
 - [ ] Kimlik doğrulama sistemi
 - [ ] Liman (Port) modülü
-- [ ] Kategorize edilmiş sidebar menü
 
 ---
 
@@ -220,15 +219,15 @@ pub struct Ship {
 | Barcode/SKU support | ⬜ | Ürün kodu sistemi |
 | Image upload | ⬜ | Ürün görselleri |
 
-### 2.5 Depo Yönetimi & Stok Takibi (Warehouse Module) 🆕
-**Süre:** 3 hafta | **Öncelik:** 🟡 Yüksek
+### 2.5 Depo Yönetimi & Stok Takibi (Warehouse Module) ✅
+**Süre:** 3 hafta | **Öncelik:** 🟡 Yüksek | **Tamamlanma:** Ocak 2026
 
 | Görev | Durum | Açıklama |
 |-------|-------|----------|
-| Stok giriş/çıkış API | ⬜ | Depo hareketleri |
-| Stok durumu görünümü | ⬜ | Mevcut stok seviyeleri |
-| Minimum stok uyarısı | ⬜ | Kritik seviye bildirimi |
-| Stok hareketi logu | ⬜ | Giriş/çıkış geçmişi |
+| Stok giriş/çıkış API | ✅ | Depo hareketleri (In/Out/Adjustment/Return) |
+| Stok durumu görünümü | ✅ | PlutoGrid ile mevcut stok seviyeleri |
+| Minimum stok uyarısı | ✅ | Kritik seviye bildirimi (low stock filter) |
+| Stok hareketi logu | ✅ | Giriş/çıkış geçmişi (movement history popup) |
 | Depo lokasyonları | ⬜ | Çoklu depo desteği |
 | Stok sayımı | ⬜ | Envanter sayım ekranı |
 
@@ -245,16 +244,17 @@ pub struct Ship {
                        └─────────────┘
 ```
 
-### 2.6 Kategorize Edilmiş Navigasyon (Sidebar Reorganization) 🆕
-**Süre:** 1 hafta | **Öncelik:** 🟢 Orta
+### 2.6 Kategorize Edilmiş Navigasyon (Sidebar Reorganization) ✅
+**Süre:** 1 hafta | **Öncelik:** 🟢 Orta | **Tamamlanma:** Ocak 2026
 
 | Görev | Durum | Açıklama |
 |-------|-------|----------|
-| Sidebar kategori yapısı | ⬜ | Genişleyebilir kategoriler |
-| Depo Yönetimi grubu | ⬜ | Ürünler, Tedarikçiler, Stok Takibi |
-| Denizcilik grubu | ⬜ | Gemiler, Limanlar, Ziyaretler |
-| Operasyon grubu | ⬜ | Siparişler, Takvim, Teslimatlar |
-| Collapse/Expand animasyonu | ⬜ | Smooth geçişler |
+| Sidebar kategori yapısı | ✅ | Genişleyebilir kategoriler (ExpansionTile) |
+| Depo Yönetimi grubu | ✅ | Ürünler, Tedarikçiler, Stok Takibi |
+| Denizcilik grubu | ✅ | Gemiler (gelecekte: Limanlar, Ziyaretler) |
+| Operasyon grubu | ✅ | Siparişler, Takvim (gelecekte: Teslimatlar) |
+| Collapse/Expand animasyonu | ✅ | AnimatedCrossFade + AnimatedRotation |
+| Mobil "Daha Fazla" menü | ✅ | Bottom sheet ile ek sayfalar |
 
 **Sidebar Yapısı:**
 ```
@@ -299,18 +299,19 @@ profit_margin = (order_profit / total_revenue) * 100
 
 ---
 
-## 🟢 Faz 3: Gelişmiş Özellikler (Q3 2026)
+## 🟢 Faz 3: Gelişmiş Özellikler (Q3 2026) - AKTİF
 
-### 3.1 Liman & Ziyaret Yönetimi (Ports & Ship Visits Module)
-**Süre:** 3 hafta | **Öncelik:** 🔴 Kritik
+### 3.1 Liman & Ziyaret Yönetimi (Ports & Ship Visits Module) ✅
+**Süre:** 3 hafta | **Öncelik:** 🔴 Kritik | **Tamamlanma:** Ocak 2026
 
 | Görev | Durum | Açıklama |
 |-------|-------|----------|
-| Port CRUD API | ⬜ | Liman yönetimi (name, country, city, timezone, coordinates) |
-| Port list UI | ⬜ | PlutoGrid ile liman listesi |
-| Port detail sayfası | ⬜ | Liman bilgileri ve istatistikleri |
-| ShipVisit CRUD API | ⬜ | Ziyaret planlama (ETA, ETD, status) |
-| ShipVisit list UI | ⬜ | Ziyaret listesi ve filtreleme |
+| Port CRUD API | ✅ | Liman yönetimi (name, country, city, timezone, coordinates) |
+| Port list UI | ✅ | PlutoGrid ile liman listesi |
+| Port detail sayfası | ✅ | Dialog ile düzenleme |
+| ShipVisit CRUD API | ✅ | Ziyaret planlama (ETA, ETD, status) |
+| ShipVisit list UI | ✅ | PlutoGrid ile ziyaret listesi |
+| Visit status update | ✅ | Planned → Arrived → Departed durum geçişi |
 | Calendar FFI entegrasyonu | ⬜ | Rust'tan veri çekme |
 | Resource view by Port | ⬜ | Takvimde limana göre gruplama |
 | Drag & drop rescheduling | ⬜ | Takvimde sürükle-bırak |

@@ -84,9 +84,18 @@ class _MainScaffoldState extends State<MainScaffold> {
           label: 'Gemiler',
           path: '/ships',
         ),
-        // Gelecekte eklenecek:
-        // _NavItem(icon: Icons.location_on_outlined, selectedIcon: Icons.location_on, label: 'Limanlar', path: '/ports'),
-        // _NavItem(icon: Icons.schedule_outlined, selectedIcon: Icons.schedule, label: 'Ziyaretler', path: '/visits'),
+        _NavItem(
+          icon: Icons.location_on_outlined,
+          selectedIcon: Icons.location_on,
+          label: 'Limanlar',
+          path: '/ports',
+        ),
+        _NavItem(
+          icon: Icons.schedule_outlined,
+          selectedIcon: Icons.schedule,
+          label: 'Ziyaretler',
+          path: '/ship-visits',
+        ),
       ],
     ),
     // 📝 Operasyon

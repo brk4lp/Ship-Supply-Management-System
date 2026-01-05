@@ -234,6 +234,75 @@ async fn create_tables(conn: &DatabaseConnection) -> Result<(), DbErr> {
         "CREATE INDEX IF NOT EXISTS idx_stock_movements_type ON stock_movements(movement_type)".to_string()
     )).await?;
 
+    // Ports table
+    conn.execute(Statement::from_string(
+        DatabaseBackend::Sqlite,
+        r#"
+        CREATE TABLE IF NOT EXISTS ports (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            name TEXT NOT NULL,
+            country TEXT NOT NULL,
+            city TEXT,
+            timezone TEXT NOT NULL DEFAULT 'UTC',
+            latitude REAL,
+            longitude REAL,
+            notes TEXT,
+            is_active INTEGER NOT NULL DEFAULT 1,
+            created_at TEXT NOT NULL DEFAULT (datetime('now')),
+            updated_at TEXT NOT NULL DEFAULT (datetime('now'))
+        )
+        "#.to_string()
+    )).await?;
+
+    // Ship visits table
+    conn.execute(Statement::from_string(
+        DatabaseBackend::Sqlite,
+        r#"
+        CREATE TABLE IF NOT EXISTS ship_visits (
+            id INTEGER PRIMARY KEY AUTOINCREMENT,
+            ship_id INTEGER NOT NULL,
+            port_id INTEGER NOT NULL,
+            eta TEXT NOT NULL,
+            etd TEXT NOT NULL,
+            ata TEXT,
+            atd TEXT,
+            status TEXT NOT NULL DEFAULT 'PLANNED',
+            agent_info TEXT,
+            notes TEXT,
+            created_at TEXT NOT NULL DEFAULT (datetime('now')),
+            updated_at TEXT NOT NULL DEFAULT (datetime('now')),
+            FOREIGN KEY (ship_id) REFERENCES ships(id),
+            FOREIGN KEY (port_id) REFERENCES ports(id)
+        )
+        "#.to_string()
+    )).await?;
+
+    // Port and Ship Visit indexes
+    conn.execute(Statement::from_string(
+        DatabaseBackend::Sqlite,
+        "CREATE INDEX IF NOT EXISTS idx_ports_country ON ports(country)".to_string()
+    )).await?;
+
+    conn.execute(Statement::from_string(
+        DatabaseBackend::Sqlite,
+        "CREATE INDEX IF NOT EXISTS idx_ship_visits_ship_id ON ship_visits(ship_id)".to_string()
+    )).await?;
+
+    conn.execute(Statement::from_string(
+        DatabaseBackend::Sqlite,
+        "CREATE INDEX IF NOT EXISTS idx_ship_visits_port_id ON ship_visits(port_id)".to_string()
+    )).await?;
+
+    conn.execute(Statement::from_string(
+        DatabaseBackend::Sqlite,
+        "CREATE INDEX IF NOT EXISTS idx_ship_visits_eta ON ship_visits(eta)".to_string()
+    )).await?;
+
+    conn.execute(Statement::from_string(
+        DatabaseBackend::Sqlite,
+        "CREATE INDEX IF NOT EXISTS idx_ship_visits_status ON ship_visits(status)".to_string()
+    )).await?;
+
     tracing::info!("SQLite tables created successfully");
     Ok(())
 }

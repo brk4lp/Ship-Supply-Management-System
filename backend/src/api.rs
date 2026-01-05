@@ -354,6 +354,144 @@ pub async fn get_stock_summary() -> Result<StockSummary, String> {
 }
 
 // ============================================================================
+// Port Operations
+// ============================================================================
+
+/// Get all ports
+pub async fn get_all_ports() -> Result<Vec<Port>, String> {
+    services::port_service::get_all()
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Get active ports only
+pub async fn get_active_ports() -> Result<Vec<Port>, String> {
+    services::port_service::get_active()
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Get a single port by ID
+pub async fn get_port_by_id(id: i32) -> Result<Option<Port>, String> {
+    services::port_service::get_by_id(id)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Create a new port
+pub async fn create_port(port: CreatePortRequest) -> Result<Port, String> {
+    services::port_service::create(port)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Update an existing port
+pub async fn update_port(id: i32, port: UpdatePortRequest) -> Result<Option<Port>, String> {
+    services::port_service::update(id, port)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Delete a port
+pub async fn delete_port(id: i32) -> Result<bool, String> {
+    services::port_service::delete(id)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Get ports by country
+pub async fn get_ports_by_country(country: String) -> Result<Vec<Port>, String> {
+    services::port_service::get_by_country(&country)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+// ============================================================================
+// Ship Visit Operations
+// ============================================================================
+
+/// Get all ship visits
+pub async fn get_all_ship_visits() -> Result<Vec<ShipVisit>, String> {
+    services::ship_visit_service::get_all()
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Get upcoming ship visits (ETA >= today)
+pub async fn get_upcoming_ship_visits() -> Result<Vec<ShipVisit>, String> {
+    services::ship_visit_service::get_upcoming()
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Get ship visits by port
+pub async fn get_ship_visits_by_port(port_id: i32) -> Result<Vec<ShipVisit>, String> {
+    services::ship_visit_service::get_by_port(port_id)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Get ship visits by ship
+pub async fn get_ship_visits_by_ship(ship_id: i32) -> Result<Vec<ShipVisit>, String> {
+    services::ship_visit_service::get_by_ship(ship_id)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Get a single ship visit by ID
+pub async fn get_ship_visit_by_id(id: i32) -> Result<Option<ShipVisit>, String> {
+    services::ship_visit_service::get_by_id(id)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Create a new ship visit
+pub async fn create_ship_visit(visit: CreateShipVisitRequest) -> Result<ShipVisit, String> {
+    services::ship_visit_service::create(visit)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Update an existing ship visit
+pub async fn update_ship_visit(id: i32, visit: UpdateShipVisitRequest) -> Result<Option<ShipVisit>, String> {
+    services::ship_visit_service::update(id, visit)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Update ship visit status
+pub async fn update_ship_visit_status(id: i32, status: VisitStatus) -> Result<Option<ShipVisit>, String> {
+    services::ship_visit_service::update_status(id, status)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Delete a ship visit
+pub async fn delete_ship_visit(id: i32) -> Result<bool, String> {
+    services::ship_visit_service::delete(id)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+/// Get ship visits within a date range
+pub async fn get_ship_visits_by_date_range(start_date: String, end_date: String) -> Result<Vec<ShipVisit>, String> {
+    services::ship_visit_service::get_by_date_range(&start_date, &end_date)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+// ============================================================================
+// Calendar Operations
+// ============================================================================
+
+/// Get calendar data for a date range (all events + ports)
+pub async fn get_calendar_data(start_date: String, end_date: String) -> Result<CalendarData, String> {
+    services::ship_visit_service::get_calendar_data(&start_date, &end_date)
+        .await
+        .map_err(|e| e.to_string())
+}
+
+// ============================================================================
 // Database Initialization
 // ============================================================================
 

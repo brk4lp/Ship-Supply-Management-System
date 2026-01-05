@@ -14,6 +14,12 @@ class AppTheme {
   static const Color brandColor = Color(0xFF0F172A);       // Deep Navy
   static const Color accent = Color(0xFF6366F1);           // Muted Indigo
 
+  // Status Colors (Muted/Pastel tones)
+  static const Color success = Color(0xFF10B981);          // Emerald 500
+  static const Color error = Color(0xFFDC2626);            // Red 600
+  static const Color warning = Color(0xFFF59E0B);          // Amber 500
+  static const Color info = Color(0xFF3B82F6);             // Blue 500
+
   // Border Radius
   static const double radiusSmall = 8.0;   // Inputs, buttons
   static const double radiusMedium = 12.0; // Cards, containers

@@ -9,6 +9,8 @@ import '../../features/ships/presentation/pages/ship_list_page.dart';
 import '../../features/suppliers/presentation/pages/supplier_list_page.dart';
 import '../../features/supply_items/presentation/pages/supply_item_list_page.dart';
 import '../../features/stock/presentation/pages/stock_list_page.dart';
+import '../../features/ports/presentation/pages/port_list_page.dart';
+import '../../features/ship_visits/presentation/pages/ship_visit_list_page.dart';
 import '../widgets/main_scaffold.dart';
 
 final appRouterProvider = Provider<GoRouter>((ref) {
@@ -64,6 +66,16 @@ final appRouterProvider = Provider<GoRouter>((ref) {
             path: '/stock',
             name: 'stock',
             builder: (context, state) => const StockListPage(),
+          ),
+          GoRoute(
+            path: '/ports',
+            name: 'ports',
+            builder: (context, state) => const PortListPage(),
+          ),
+          GoRoute(
+            path: '/ship-visits',
+            name: 'ship-visits',
+            builder: (context, state) => const ShipVisitListPage(),
           ),
         ],
       ),

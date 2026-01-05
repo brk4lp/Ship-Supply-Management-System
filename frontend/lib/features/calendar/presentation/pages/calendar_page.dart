@@ -4,7 +4,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:syncfusion_flutter_calendar/calendar.dart';
 import '../../../../core/theme/app_theme.dart';
 import '../../../../core/widgets/linear_components.dart';
-import '../../domain/models/ship_visit.dart';
+import '../../../../src/rust/api.dart' as rust_api;
+import '../../../../src/rust/models.dart' as rust_models;
 
 class CalendarPage extends StatefulWidget {
   const CalendarPage({super.key});
@@ -17,73 +18,127 @@ class _CalendarPageState extends State<CalendarPage> {
   CalendarView _currentView = CalendarView.timelineMonth;
   final CalendarController _calendarController = CalendarController();
 
-  // Sample data - will be replaced with Rust FFI calls
-  // ignore: unused_field - Will be used for resource view grouping
-  final List<Port> _ports = const [
-    Port(id: '1', name: 'Aliağa Limanı', country: 'Türkiye', code: 'TRALI'),
-    Port(id: '2', name: 'İstanbul Demir Yeri', country: 'Türkiye', code: 'TRIST'),
-    Port(id: '3', name: 'İzmir Limanı', country: 'Türkiye', code: 'TRIZM'),
-    Port(id: '4', name: 'Mersin Limanı', country: 'Türkiye', code: 'TRMER'),
-  ];
+  // Real data from Rust API
+  List<rust_models.ShipVisit> _visits = [];
+  List<rust_models.Port> _ports = [];
+  bool _isLoading = true;
+  String? _errorMessage;
 
-  List<ShipVisit> get _sampleVisits {
+  @override
+  void initState() {
+    super.initState();
+    _loadCalendarData();
+  }
+
+  Future<void> _loadCalendarData() async {
+    setState(() {
+      _isLoading = true;
+      _errorMessage = null;
+    });
+
+    try {
+      // Load all visits and ports for calendar
+      final visits = await rust_api.getAllShipVisits();
+      final ports = await rust_api.getActivePorts();
+
+      if (mounted) {
+        setState(() {
+          _visits = visits;
+          _ports = ports;
+          _isLoading = false;
+        });
+      }
+    } catch (e) {
+      if (mounted) {
+        setState(() {
+          _errorMessage = 'Veriler yüklenirken hata oluştu: $e';
+          _isLoading = false;
+        });
+      }
+    }
+  }
+
+  // Convert Rust ShipVisit to calendar-compatible format
+  List<_CalendarVisit> get _calendarVisits {
+    return _visits.map((v) {
+      return _CalendarVisit(
+        id: v.id.toString(),
+        shipName: v.shipName ?? 'Bilinmeyen Gemi',
+        portName: v.portName ?? 'Bilinmeyen Liman',
+        portId: v.portId.toString(),
+        arrivalDate: DateTime.parse(v.eta),
+        departureDate: DateTime.parse(v.etd),
+        status: _mapVisitStatus(v.status),
+        notes: v.notes,
+      );
+    }).toList();
+  }
+
+  // Get upcoming visits (ETA >= today)
+  List<_CalendarVisit> get _upcomingVisits {
     final now = DateTime.now();
-    return [
-      ShipVisit(
-        id: '1',
-        shipName: 'MV Atlantic Star',
-        imoNumber: '9123456',
-        portName: 'Aliağa Limanı',
-        portId: '1',
-        arrivalDate: now.subtract(const Duration(days: 2)),
-        departureDate: now.add(const Duration(days: 3)),
-        status: VisitStatus.confirmed,
-      ),
-      ShipVisit(
-        id: '2',
-        shipName: 'SS Pacific Voyager',
-        imoNumber: '9234567',
-        portName: 'İstanbul Demir Yeri',
-        portId: '2',
-        arrivalDate: now.add(const Duration(days: 5)),
-        departureDate: now.add(const Duration(days: 8)),
-        status: VisitStatus.tentative,
-      ),
-      ShipVisit(
-        id: '3',
-        shipName: 'MV Mediterranean Dream',
-        imoNumber: '9345678',
-        portName: 'İzmir Limanı',
-        portId: '3',
-        arrivalDate: now.add(const Duration(days: 1)),
-        departureDate: now.add(const Duration(days: 4)),
-        status: VisitStatus.confirmed,
-      ),
-      ShipVisit(
-        id: '4',
-        shipName: 'SS Black Sea Explorer',
-        imoNumber: '9456789',
-        portName: 'Mersin Limanı',
-        portId: '4',
-        arrivalDate: now.subtract(const Duration(days: 5)),
-        departureDate: now.subtract(const Duration(days: 1)),
-        status: VisitStatus.delayed,
-      ),
-      ShipVisit(
-        id: '5',
-        shipName: 'MV Aegean Spirit',
-        imoNumber: '9567890',
-        portName: 'Aliağa Limanı',
-        portId: '1',
-        arrivalDate: now.add(const Duration(days: 10)),
-        departureDate: now.add(const Duration(days: 14)),
-        status: VisitStatus.tentative,
-      ),
-    ];
+    return _calendarVisits.where((v) => v.arrivalDate.isAfter(now)).toList()
+      ..sort((a, b) => a.arrivalDate.compareTo(b.arrivalDate));
+  }
+
+  // Map Rust VisitStatus to local enum
+  _VisitStatus _mapVisitStatus(rust_models.VisitStatus status) {
+    switch (status) {
+      case rust_models.VisitStatus.planned:
+        return _VisitStatus.planned;
+      case rust_models.VisitStatus.arrived:
+        return _VisitStatus.arrived;
+      case rust_models.VisitStatus.departed:
+        return _VisitStatus.departed;
+      case rust_models.VisitStatus.cancelled:
+        return _VisitStatus.cancelled;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
+    if (_isLoading) {
+      return Scaffold(
+        backgroundColor: AppTheme.background,
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              const CircularProgressIndicator(color: AppTheme.accent),
+              const SizedBox(height: 16),
+              Text('Takvim verileri yükleniyor...', style: AppTheme.bodyMedium),
+            ],
+          ),
+        ),
+      );
+    }
+
+    if (_errorMessage != null) {
+      return Scaffold(
+        backgroundColor: AppTheme.background,
+        body: Center(
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              Icon(Icons.error_outline, size: 48, color: AppTheme.error),
+              const SizedBox(height: 16),
+              Text(_errorMessage!, style: AppTheme.bodyMedium),
+              const SizedBox(height: 24),
+              ElevatedButton.icon(
+                onPressed: _loadCalendarData,
+                icon: const Icon(Icons.refresh),
+                label: const Text('Tekrar Dene'),
+                style: ElevatedButton.styleFrom(
+                  backgroundColor: AppTheme.accent,
+                  foregroundColor: Colors.white,
+                ),
+              ),
+            ],
+          ),
+        ),
+      );
+    }
+
     if (Platform.isWindows || Platform.isMacOS) {
       return _buildDesktopView(context);
     } else {
@@ -149,10 +204,7 @@ class _CalendarPageState extends State<CalendarPage> {
           ),
           IconButton(
             icon: const Icon(Icons.refresh, color: AppTheme.secondaryText),
-            onPressed: () {
-              // TODO: Refresh from Rust FFI
-              setState(() {});
-            },
+            onPressed: _loadCalendarData,
             tooltip: 'Yenile',
           ),
           const SizedBox(width: 8),
@@ -183,7 +235,7 @@ class _CalendarPageState extends State<CalendarPage> {
                       children: [
                         Text('Durum Açıklaması', style: AppTheme.headingSmall),
                         const SizedBox(height: 16),
-                        ...VisitStatus.values.map((status) => Padding(
+                        ..._VisitStatus.values.map((status) => Padding(
                           padding: const EdgeInsets.only(bottom: 8),
                           child: Row(
                             children: [
@@ -213,18 +265,43 @@ class _CalendarPageState extends State<CalendarPage> {
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.start,
                         children: [
-                          Text('Yaklaşan Ziyaretler', style: AppTheme.headingSmall),
+                          Row(
+                            mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                            children: [
+                              Text('Yaklaşan Ziyaretler', style: AppTheme.headingSmall),
+                              Text(
+                                '${_upcomingVisits.length}',
+                                style: GoogleFonts.inter(
+                                  fontSize: 14,
+                                  fontWeight: FontWeight.w600,
+                                  color: AppTheme.accent,
+                                ),
+                              ),
+                            ],
+                          ),
                           const SizedBox(height: 16),
                           Expanded(
-                            child: ListView.builder(
-                              itemCount: _sampleVisits.where((v) => v.isUpcoming).length,
-                              itemBuilder: (context, index) {
-                                final upcoming = _sampleVisits.where((v) => v.isUpcoming).toList();
-                                if (index >= upcoming.length) return const SizedBox();
-                                final visit = upcoming[index];
-                                return _UpcomingVisitCard(visit: visit);
-                              },
-                            ),
+                            child: _upcomingVisits.isEmpty
+                              ? Center(
+                                  child: Column(
+                                    mainAxisAlignment: MainAxisAlignment.center,
+                                    children: [
+                                      Icon(Icons.event_busy, size: 32, color: AppTheme.secondaryText),
+                                      const SizedBox(height: 8),
+                                      Text(
+                                        'Yaklaşan ziyaret yok',
+                                        style: AppTheme.bodySmall,
+                                      ),
+                                    ],
+                                  ),
+                                )
+                              : ListView.builder(
+                                  itemCount: _upcomingVisits.length,
+                                  itemBuilder: (context, index) {
+                                    final visit = _upcomingVisits[index];
+                                    return _UpcomingVisitCard(visit: visit);
+                                  },
+                                ),
                           ),
                         ],
                       ),
@@ -266,7 +343,7 @@ class _CalendarPageState extends State<CalendarPage> {
       body: SfCalendar(
         controller: _calendarController,
         view: CalendarView.schedule,
-        dataSource: _ShipVisitDataSource(_sampleVisits),
+        dataSource: _ShipVisitDataSource(_calendarVisits),
         scheduleViewSettings: ScheduleViewSettings(
           appointmentItemHeight: 70,
           monthHeaderSettings: MonthHeaderSettings(
@@ -306,12 +383,12 @@ class _CalendarPageState extends State<CalendarPage> {
           ),
         ),
         appointmentBuilder: (context, details) {
-          final visit = details.appointments.first as ShipVisit;
+          final visit = details.appointments.first as _CalendarVisit;
           return _MobileAppointmentCard(visit: visit);
         },
         onTap: (details) {
           if (details.appointments != null && details.appointments!.isNotEmpty) {
-            final visit = details.appointments!.first as ShipVisit;
+            final visit = details.appointments!.first as _CalendarVisit;
             _showVisitDetails(context, visit);
           }
         },
@@ -324,7 +401,7 @@ class _CalendarPageState extends State<CalendarPage> {
       return SfCalendar(
         controller: _calendarController,
         view: CalendarView.month,
-        dataSource: _ShipVisitDataSource(_sampleVisits),
+        dataSource: _ShipVisitDataSource(_calendarVisits),
         monthViewSettings: MonthViewSettings(
           appointmentDisplayMode: MonthAppointmentDisplayMode.appointment,
           showAgenda: true,
@@ -354,7 +431,7 @@ class _CalendarPageState extends State<CalendarPage> {
         ),
         onTap: (details) {
           if (details.appointments != null && details.appointments!.isNotEmpty) {
-            final visit = details.appointments!.first as ShipVisit;
+            final visit = details.appointments!.first as _CalendarVisit;
             _showVisitDetails(context, visit);
           }
         },
@@ -365,7 +442,7 @@ class _CalendarPageState extends State<CalendarPage> {
     return SfCalendar(
       controller: _calendarController,
       view: _currentView,
-      dataSource: _ShipVisitDataSource(_sampleVisits),
+      dataSource: _ShipVisitDataSource(_calendarVisits),
       resourceViewSettings: ResourceViewSettings(
         size: 120,
         displayNameTextStyle: GoogleFonts.inter(
@@ -387,12 +464,12 @@ class _CalendarPageState extends State<CalendarPage> {
       headerStyle: _calendarHeaderStyle,
       todayHighlightColor: AppTheme.accent,
       appointmentBuilder: (context, details) {
-        final visit = details.appointments.first as ShipVisit;
+        final visit = details.appointments.first as _CalendarVisit;
         return _DesktopAppointmentCard(visit: visit);
       },
       onTap: (details) {
         if (details.appointments != null && details.appointments!.isNotEmpty) {
-          final visit = details.appointments!.first as ShipVisit;
+          final visit = details.appointments!.first as _CalendarVisit;
           _showVisitDetails(context, visit);
         }
       },
@@ -416,7 +493,7 @@ class _CalendarPageState extends State<CalendarPage> {
     });
   }
 
-  void _showVisitDetails(BuildContext context, ShipVisit visit) {
+  void _showVisitDetails(BuildContext context, _CalendarVisit visit) {
     showDialog(
       context: context,
       builder: (context) => Dialog(
@@ -432,15 +509,13 @@ class _CalendarPageState extends State<CalendarPage> {
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text(visit.shipName, style: AppTheme.headingMedium),
+                  Expanded(child: Text(visit.shipName, style: AppTheme.headingMedium)),
                   StatusBadge(
                     status: visit.status.displayName,
                     color: visit.status.color,
                   ),
                 ],
               ),
-              const SizedBox(height: 8),
-              Text('IMO: ${visit.imoNumber}', style: AppTheme.bodySmall),
               const Divider(height: 32),
               _DetailRow(icon: Icons.location_on_outlined, label: 'Liman', value: visit.portName),
               const SizedBox(height: 12),
@@ -461,6 +536,14 @@ class _CalendarPageState extends State<CalendarPage> {
                 label: 'Süre',
                 value: '${visit.durationDays} gün',
               ),
+              if (visit.notes != null && visit.notes!.isNotEmpty) ...[
+                const SizedBox(height: 12),
+                _DetailRow(
+                  icon: Icons.notes_outlined,
+                  label: 'Not',
+                  value: visit.notes!,
+                ),
+              ],
               const SizedBox(height: 24),
               Row(
                 mainAxisAlignment: MainAxisAlignment.end,
@@ -497,26 +580,96 @@ class _CalendarPageState extends State<CalendarPage> {
   }
 }
 
-/// Calendar data source for ShipVisit
+// ============================================================================
+// LOCAL MODELS FOR CALENDAR DISPLAY
+// ============================================================================
+
+/// Visit status enum for calendar display
+enum _VisitStatus {
+  planned,
+  arrived,
+  departed,
+  cancelled,
+}
+
+extension _VisitStatusExtension on _VisitStatus {
+  String get displayName {
+    switch (this) {
+      case _VisitStatus.planned:
+        return 'Planlandı';
+      case _VisitStatus.arrived:
+        return 'Vardı';
+      case _VisitStatus.departed:
+        return 'Ayrıldı';
+      case _VisitStatus.cancelled:
+        return 'İptal';
+    }
+  }
+
+  Color get color {
+    switch (this) {
+      case _VisitStatus.planned:
+        return AppTheme.info; // Blue
+      case _VisitStatus.arrived:
+        return AppTheme.success; // Green
+      case _VisitStatus.departed:
+        return const Color(0xFF64748B); // Slate 500
+      case _VisitStatus.cancelled:
+        return AppTheme.error; // Red
+    }
+  }
+}
+
+/// Local calendar visit model
+class _CalendarVisit {
+  final String id;
+  final String shipName;
+  final String portName;
+  final String portId;
+  final DateTime arrivalDate;
+  final DateTime departureDate;
+  final _VisitStatus status;
+  final String? notes;
+
+  const _CalendarVisit({
+    required this.id,
+    required this.shipName,
+    required this.portName,
+    required this.portId,
+    required this.arrivalDate,
+    required this.departureDate,
+    required this.status,
+    this.notes,
+  });
+
+  int get durationDays => departureDate.difference(arrivalDate).inDays + 1;
+  bool get isUpcoming => arrivalDate.isAfter(DateTime.now());
+}
+
+// ============================================================================
+// CALENDAR DATA SOURCE & WIDGETS
+// ============================================================================
+
+/// Calendar data source for _CalendarVisit
 class _ShipVisitDataSource extends CalendarDataSource {
-  _ShipVisitDataSource(List<ShipVisit> visits) {
+  _ShipVisitDataSource(List<_CalendarVisit> visits) {
     appointments = visits;
   }
 
   @override
-  DateTime getStartTime(int index) => (appointments![index] as ShipVisit).arrivalDate;
+  DateTime getStartTime(int index) => (appointments![index] as _CalendarVisit).arrivalDate;
 
   @override
-  DateTime getEndTime(int index) => (appointments![index] as ShipVisit).departureDate;
+  DateTime getEndTime(int index) => (appointments![index] as _CalendarVisit).departureDate;
 
   @override
-  String getSubject(int index) => (appointments![index] as ShipVisit).shipName;
+  String getSubject(int index) => (appointments![index] as _CalendarVisit).shipName;
 
   @override
-  Color getColor(int index) => (appointments![index] as ShipVisit).status.color;
+  Color getColor(int index) => (appointments![index] as _CalendarVisit).status.color;
 
   @override
-  String? getNotes(int index) => (appointments![index] as ShipVisit).notes;
+  String? getNotes(int index) => (appointments![index] as _CalendarVisit).notes;
 }
 
 /// View toggle button for desktop
@@ -570,7 +723,7 @@ class _ViewToggleButton extends StatelessWidget {
 
 /// Desktop appointment card
 class _DesktopAppointmentCard extends StatelessWidget {
-  final ShipVisit visit;
+  final _CalendarVisit visit;
 
   const _DesktopAppointmentCard({required this.visit});
 
@@ -612,7 +765,7 @@ class _DesktopAppointmentCard extends StatelessWidget {
 
 /// Mobile appointment card
 class _MobileAppointmentCard extends StatelessWidget {
-  final ShipVisit visit;
+  final _CalendarVisit visit;
 
   const _MobileAppointmentCard({required this.visit});
 
@@ -684,7 +837,7 @@ class _MobileAppointmentCard extends StatelessWidget {
 
 /// Upcoming visit card for sidebar
 class _UpcomingVisitCard extends StatelessWidget {
-  final ShipVisit visit;
+  final _CalendarVisit visit;
 
   const _UpcomingVisitCard({required this.visit});
 
